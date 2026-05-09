@@ -1,0 +1,74 @@
+/* ============================================================
+   BARANGAY SYSTEM - THEME CSS
+   Blue & White Government-Grade Design
+   ============================================================ */
+
+:root {
+  /* Primary Blue Palette */
+  --primary-900: #0c2461;
+  --primary-800: #1a3a8f;
+  --primary-700: #1e4db7;
+  --primary-600: #2563eb;
+  --primary-500: #3b82f6;
+  --primary-400: #60a5fa;
+  --primary-300: #93c5fd;
+  --primary-200: #bfdbfe;
+  --primary-100: #dbeafe;
+  --primary-50:  #eff6ff;
+
+  /* Accent */
+  --accent-teal: #0891b2;
+  --accent-sky:  #0284c7;
+
+  /* Neutrals */
+  --gray-900: #111827;
+  --gray-800: #1f2937;
+  --gray-700: #374151;
+  --gray-600: #4b5563;
+  --gray-500: #6b7280;
+  --gray-400: #9ca3af;
+  --gray-300: #d1d5db;
+  --gray-200: #e5e7eb;
+  --gray-100: #f3f4f6;
+  --gray-50:  #f9fafb;
+  --white:    #ffffff;
+
+  /* Status Colors */
+  --status-pending:   #f59e0b;
+  --status-approved:  #10b981;
+  --status-scheduled: #3b82f6;
+  --status-resolved:  #6366f1;
+  --status-rejected:  #ef4444;
+  --status-completed: #059669;
+  --status-cancelled: #9ca3af;
+
+  /* Semantic */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger:  #ef4444;
+  --info:    #3b82f6;
+
+  /* Typography */
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+
+  /* Spacing */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+  --radius-xl:  24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:  0 4px 12px rgba(0,0,0,.10);
+  --shadow-lg:  0 10px 30px rgba(0,0,0,.12);
+  --shadow-blue: 0 4px 20px rgba(37,99,235,.25);
+
+  /* Sidebar width */
+  --sidebar-w: 260px;
+  --navbar-h:  64px;
+
+  /* Transitions */
+  --transition: all .2s ease;
+}

@@ -1,0 +1,199 @@
+/* ============================================================
+   BARANGAY SYSTEM - GLOBAL STYLES
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 15px; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--gray-50);
+  color: var(--gray-800);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--gray-900);
+  line-height: 1.25;
+}
+
+a { color: var(--primary-600); text-decoration: none; }
+a:hover { color: var(--primary-700); }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 22px; border: none; border-radius: var(--radius-md);
+  font-family: var(--font-heading); font-weight: 600; font-size: .875rem;
+  cursor: pointer; transition: var(--transition); white-space: nowrap;
+}
+.btn-primary {
+  background: var(--primary-600); color: var(--white);
+  box-shadow: var(--shadow-blue);
+}
+.btn-primary:hover { background: var(--primary-700); transform: translateY(-1px); }
+.btn-secondary {
+  background: var(--white); color: var(--primary-600);
+  border: 1.5px solid var(--primary-300);
+}
+.btn-secondary:hover { background: var(--primary-50); }
+.btn-danger { background: var(--danger); color: var(--white); }
+.btn-danger:hover { background: #dc2626; }
+.btn-success { background: var(--success); color: var(--white); }
+.btn-success:hover { background: #059669; }
+.btn-sm { padding: 6px 14px; font-size: .8rem; }
+.btn-lg { padding: 13px 30px; font-size: 1rem; }
+.btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+/* ── Cards ── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+}
+.card-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title {
+  font-family: var(--font-heading); font-weight: 700;
+  font-size: 1rem; color: var(--gray-900);
+}
+.card-body { padding: 24px; }
+
+/* ── Forms ── */
+.form-group { margin-bottom: 18px; }
+.form-label {
+  display: block; margin-bottom: 6px;
+  font-family: var(--font-heading); font-weight: 600;
+  font-size: .84rem; color: var(--gray-700);
+}
+.form-control {
+  width: 100%; padding: 10px 14px;
+  border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body); font-size: .9rem;
+  color: var(--gray-900);
+  background: var(--white);
+  transition: var(--transition);
+  outline: none;
+}
+.form-control:focus {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+}
+.form-control::placeholder { color: var(--gray-400); }
+select.form-control { cursor: pointer; }
+textarea.form-control { resize: vertical; min-height: 100px; }
+.form-error { font-size: .8rem; color: var(--danger); margin-top: 4px; }
+
+/* ── Tables ── */
+.table-wrapper {
+  width: 100%; overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--gray-200);
+}
+table { width: 100%; border-collapse: collapse; }
+thead { background: var(--primary-50); }
+thead th {
+  padding: 12px 16px; text-align: left;
+  font-family: var(--font-heading); font-weight: 700;
+  font-size: .8rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--primary-800);
+}
+tbody tr {
+  border-top: 1px solid var(--gray-100);
+  transition: background .15s;
+}
+tbody tr:hover { background: var(--primary-50); }
+tbody td {
+  padding: 13px 16px; font-size: .88rem; color: var(--gray-700);
+}
+
+/* ── Badges ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: var(--radius-full);
+  font-family: var(--font-heading); font-weight: 700; font-size: .75rem;
+}
+.badge-pending   { background: #fef3c7; color: #92400e; }
+.badge-approved  { background: #d1fae5; color: #065f46; }
+.badge-scheduled { background: var(--primary-100); color: var(--primary-800); }
+.badge-resolved  { background: #ede9fe; color: #4c1d95; }
+.badge-rejected  { background: #fee2e2; color: #991b1b; }
+.badge-completed { background: #d1fae5; color: #065f46; }
+.badge-cancelled { background: var(--gray-100); color: var(--gray-600); }
+
+/* ── Page layout helpers ── */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px;
+}
+.page-title {
+  font-family: var(--font-heading); font-weight: 800;
+  font-size: 1.6rem; color: var(--gray-900);
+}
+.page-subtitle {
+  font-size: .9rem; color: var(--gray-500); margin-top: 2px;
+}
+
+/* ── Grid helpers ── */
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+@media (max-width: 1024px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ── Utility ── */
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+.text-center { text-align: center; }
+.text-muted { color: var(--gray-500); }
+.text-sm { font-size: .85rem; }
+.flex { display: flex; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.gap-2 { gap: 10px; }
+.gap-3 { gap: 16px; }
+.w-full { width: 100%; }
+
+/* ── Spinner ── */
+.spinner-wrap { display: flex; align-items: center; justify-content: center; padding: 60px; }
+.spinner {
+  width: 38px; height: 38px;
+  border: 4px solid var(--primary-100);
+  border-top-color: var(--primary-600);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center; padding: 60px 20px; color: var(--gray-400);
+}
+.empty-state svg { font-size: 3rem; margin-bottom: 12px; }
+.empty-state p { font-size: .95rem; }
+
+/* ── Filters bar ── */
+.filter-bar {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  align-items: flex-end; margin-bottom: 20px;
+}
+.filter-bar .form-group { margin-bottom: 0; min-width: 160px; }
