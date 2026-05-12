@@ -11,6 +11,7 @@ const INIT = {
 export default function ResidentRegister() {
   const navigate = useNavigate()
   const [form, setForm] = useState(INIT)
+  const [documents, setDocuments] = useState([])
   const [errors, setErrors] = useState({})
   const [alert, setAlert] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -32,15 +33,56 @@ export default function ResidentRegister() {
     setErrors(p => ({ ...p, [e.target.name]: '' }))
   }
 
+  const handleFileChange = e => {
+    const files = Array.from(e.target.files || [])
+    if (documents.length + files.length > 3) {
+      setAlert({ type: 'error', message: 'Maximum 3 documents allowed.' })
+      return
+    }
+    const validTypes = ['image/jpeg', 'image/png', 'application/pdf']
+    const validFiles = files.filter(f => {
+      if (!validTypes.includes(f.type)) {
+        setAlert({ type: 'error', message: `Invalid file type: ${f.name}. Only JPG, PNG, PDF allowed.` })
+        return false
+      }
+      if (f.size > 5 * 1024 * 1024) {
+        setAlert({ type: 'error', message: `File too large: ${f.name}. Max 5MB.` })
+        return false
+      }
+      return true
+    })
+    setDocuments(p => [...p, ...validFiles])
+  }
+
+  const removeDocument = index => {
+    setDocuments(p => p.filter((_, i) => i !== index))
+  }
+
   const handleSubmit = async e => {
     e.preventDefault()
     const v = validate()
     if (Object.keys(v).length) { setErrors(v); return }
+    
     setLoading(true)
     try {
-      await axios.post('/api/auth/register', form)
-      setAlert({ type: 'success', message: 'Registration successful! Please log in.' })
-      setTimeout(() => navigate('/login'), 1800)
+      const formData = new FormData()
+      formData.append('first_name', form.first_name)
+      formData.append('last_name', form.last_name)
+      formData.append('email', form.email)
+      formData.append('phone', form.phone)
+      formData.append('address', form.address)
+      formData.append('password', form.password)
+      documents.forEach((doc, idx) => {
+        formData.append('documents', doc)
+      })
+
+      const res = await axios.post('/api/auth/register', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+
+      setAlert({ type: 'success', message: res.data.message })
+      localStorage.setItem('verification_email', form.email)
+      setTimeout(() => navigate('/verify-otp'), 1500)
     } catch (err) {
       const msg = err.response?.data?.message || 'Registration failed. Please try again.'
       setAlert({ type: 'error', message: msg })
@@ -120,6 +162,60 @@ export default function ResidentRegister() {
                   <input className="form-control" name="password_confirmation" type="password" value={form.password_confirmation} onChange={handleChange} placeholder="Repeat password"/>
                   {errors.password_confirmation && <div className="form-error">{errors.password_confirmation}</div>}
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Verification Documents (Proof of Residency)</label>
+                <div style={{
+                  border: '2px dashed var(--primary-300)', borderRadius: 8, padding: 24,
+                  textAlign: 'center', cursor: 'pointer', background: 'var(--primary-50)',
+                  transition: 'all 0.2s'
+                }} 
+                onDragOver={e => {
+                  e.preventDefault()
+                  e.currentTarget.style.borderColor = 'var(--primary-600)'
+                  e.currentTarget.style.background = 'var(--primary-100)'
+                }}
+                onDragLeave={e => {
+                  e.currentTarget.style.borderColor = 'var(--primary-300)'
+                  e.currentTarget.style.background = 'var(--primary-50)'
+                }}
+                onDrop={e => {
+                  e.preventDefault()
+                  e.currentTarget.style.borderColor = 'var(--primary-300)'
+                  e.currentTarget.style.background = 'var(--primary-50)'
+                  handleFileChange({ target: { files: e.dataTransfer.files } })
+                }}>
+                  <input type="file" multiple accept=".jpg,.jpeg,.png,.pdf" onChange={handleFileChange} style={{ display: 'none' }} id="file-input"/>
+                  <label htmlFor="file-input" style={{ cursor: 'pointer', display: 'block' }}>
+                    <div style={{ fontSize: 32, marginBottom: 8 }}>📄</div>
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Drag files here or click to browse</div>
+                    <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>JPG, PNG, PDF • Max 5MB each • Up to 3 files</div>
+                  </label>
+                </div>
+                {documents.length > 0 && (
+                  <div style={{ marginTop: 12 }}>
+                    {documents.map((doc, idx) => (
+                      <div key={idx} style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        padding: 12, background: 'var(--gray-50)', borderRadius: 6, marginBottom: 8
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontSize: 18 }}>📎</span>
+                          <div>
+                            <div style={{ fontWeight: 500, fontSize: 14 }}>{doc.name}</div>
+                            <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>
+                              {(doc.size / 1024 / 1024).toFixed(2)} MB
+                            </div>
+                          </div>
+                        </div>
+                        <button type="button" onClick={() => removeDocument(idx)} style={{
+                          background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 18
+                        }}>✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <button className="btn btn-primary w-full mt-2" disabled={loading}>

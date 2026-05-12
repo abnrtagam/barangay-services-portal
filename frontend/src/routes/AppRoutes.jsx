@@ -9,6 +9,7 @@ import AdminLayout from '../layouts/AdminLayout'
 import LandingPage from '../pages/LandingPage'
 import ResidentLogin from '../pages/ResidentLogin'
 import ResidentRegister from '../pages/ResidentRegister'
+import VerifyOTP from '../pages/VerifyOTP'
 import AdminLogin from '../pages/AdminLogin'
 
 // Resident pages
@@ -21,6 +22,7 @@ import Announcements from '../pages/Announcements'
 
 // Admin pages
 import AdminDashboard from '../pages/AdminDashboard'
+import AccountVerifications from '../pages/AccountVerifications'
 import ManageComplaints from '../pages/ManageComplaints'
 import ManageAppointments from '../pages/ManageAppointments'
 import ManageResidents from '../pages/ManageResidents'
@@ -44,6 +46,7 @@ export default function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<ResidentLogin />} />
       <Route path="/register" element={<ResidentRegister />} />
+      <Route path="/verify-otp" element={<VerifyOTP />} />
       <Route path="/admin/login" element={<AdminLogin />} />
 
       {/* Resident Protected */}
@@ -61,6 +64,7 @@ export default function AppRoutes() {
       <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="verifications" element={<AccountVerifications />} />
         <Route path="complaints" element={<ManageComplaints />} />
         <Route path="appointments" element={<ManageAppointments />} />
         <Route path="residents" element={<ManageResidents />} />

@@ -3,6 +3,7 @@ const express  = require('express')
 const cors     = require('cors')
 const morgan   = require('morgan')
 const path     = require('path')
+const emailService = require('./services/emailService')
 
 const app = express()
 
@@ -18,12 +19,16 @@ app.use(morgan('dev'))
 // Static uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
+// ── Verify Email Service ────────────────────────────────────
+emailService.verifyConnection()
+
 // ── Routes ──────────────────────────────────────────────────
 app.use('/api/auth',          require('./routes/authRoutes'))
 app.use('/api/complaints',    require('./routes/complaintRoutes'))
 app.use('/api/appointments',  require('./routes/appointmentRoutes'))
 app.use('/api/residents',     require('./routes/residentRoutes'))
 app.use('/api/admin',         require('./routes/adminRoutes'))
+app.use('/api/admin/verifications', require('./routes/verificationRoutes'))
 app.use('/api/announcements', require('./routes/announcementRoutes'))
 
 // ── Health check ────────────────────────────────────────────

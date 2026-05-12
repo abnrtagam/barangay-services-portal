@@ -1,7 +1,15 @@
 // ── authRoutes.js ─────────────────────────────────────────
 const router = require('express').Router()
 const ctrl   = require('../controllers/authController')
-router.post('/register',    ctrl.register)
-router.post('/login',       ctrl.login)
+const upload = require('../middleware/uploadMiddleware')
+
+// Registration with OTP and document upload
+router.post('/register', upload.array('documents', 3), ctrl.register)
+router.post('/verify-otp', ctrl.verifyOTP)
+router.post('/resend-otp', ctrl.resendOTP)
+
+// Login
+router.post('/login', ctrl.login)
 router.post('/admin-login', ctrl.adminLogin)
+
 module.exports = router

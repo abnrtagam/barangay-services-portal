@@ -23,7 +23,35 @@ export default function ResidentLogin() {
       localStorage.setItem('resident_user', JSON.stringify(data.user))
       navigate('/resident/dashboard')
     } catch (err) {
-      setAlert({ type: 'error', message: err.response?.data?.message || 'Invalid credentials.' })
+      const errorData = err.response?.data
+      const status = errorData?.status
+      
+      // Handle different account statuses
+      if (status === 'pending') {
+        setAlert({ 
+          type: 'warning', 
+          message: 'Your account is pending admin verification. You will receive an email once approved.' 
+        })
+      } else if (status === 'rejected') {
+        setAlert({ 
+          type: 'error', 
+          message: 'Your account was rejected. Please contact the barangay office for more information.' 
+        })
+      } else if (status === 'suspended') {
+        setAlert({ 
+          type: 'error', 
+          message: 'Your account has been suspended. Please contact the barangay office.' 
+        })
+      } else if (errorData?.requiresOTP) {
+        setAlert({ 
+          type: 'warning', 
+          message: 'Please verify your email first. You will be redirected to verify your OTP.' 
+        })
+        localStorage.setItem('verification_email', form.email)
+        setTimeout(() => navigate('/verify-otp'), 2000)
+      } else {
+        setAlert({ type: 'error', message: errorData?.message || 'Invalid credentials.' })
+      }
     } finally {
       setLoading(false)
     }

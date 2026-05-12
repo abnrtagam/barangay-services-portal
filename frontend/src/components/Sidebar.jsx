@@ -7,6 +7,7 @@ import {
 
 const NAV = [
   { label: 'Dashboard',     icon: <FiGrid />,        to: '/admin/dashboard' },
+  { label: 'Verifications', icon: <FiFileText />,    to: '/admin/verifications' },
   { label: 'Complaints',    icon: <FiAlertCircle />, to: '/admin/complaints' },
   { label: 'Appointments',  icon: <FiCalendar />,    to: '/admin/appointments' },
   { label: 'Residents',     icon: <FiUsers />,       to: '/admin/residents' },
