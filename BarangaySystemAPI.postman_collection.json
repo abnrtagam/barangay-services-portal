@@ -1,0 +1,525 @@
+{
+  "info": {
+    "name": "Barangay Complaint System API",
+    "description": "Complete API collection for testing the Barangay Complaint and Appointment Booking System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "resident_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register Resident",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "first_name",
+                  "value": "John",
+                  "type": "text"
+                },
+                {
+                  "key": "last_name",
+                  "value": "Doe",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "john.doe@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "phone",
+                  "value": "09123456789",
+                  "type": "text"
+                },
+                {
+                  "key": "address",
+                  "value": "123 Main Street, Barangay ABC",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "password123",
+                  "type": "text"
+                },
+                {
+                  "key": "documents",
+                  "type": "file",
+                  "description": "Optional: Upload verification documents (max 3 files)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new resident account with optional document upload"
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/verify-otp",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "verify-otp"]
+            },
+            "description": "Verify email address with OTP code sent during registration"
+          }
+        },
+        {
+          "name": "Resend OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/resend-otp",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "resend-otp"]
+            },
+            "description": "Resend OTP code to email address"
+          }
+        },
+        {
+          "name": "Resident Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('resident_token', response.token);",
+                  "    pm.collectionVariables.set('user_id', response.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login as resident. Token will be saved automatically."
+          }
+        },
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('admin_token', response.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@barangay.gov\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/admin-login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "admin-login"]
+            },
+            "description": "Login as admin. Token will be saved automatically."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Verification",
+      "item": [
+        {
+          "name": "Get Verification Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/verifications/stats",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "verifications", "stats"]
+            },
+            "description": "Get verification statistics (pending, approved, rejected, suspended counts)"
+          }
+        },
+        {
+          "name": "Get All Accounts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/verifications",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "verifications"]
+            },
+            "description": "Get all resident accounts with optional filtering by status and search"
+          }
+        },
+        {
+          "name": "Get Pending Accounts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/verifications/pending",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "verifications", "pending"]
+            },
+            "description": "Get only pending resident accounts"
+          }
+        },
+        {
+          "name": "Get Reactivation Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/verifications/reactivation-requests",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "verifications", "reactivation-requests"]
+            },
+            "description": "Get pending reactivation requests from suspended users"
+          }
+        },
+        {
+          "name": "Get Account Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/verifications/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "verifications", "{{user_id}}"]
+            },
+            "description": "Get detailed information about a specific account including verification history"
+          }
+        },
+        {
+          "name": "Approve Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Account approved after document verification\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/verifications/{{user_id}}/approve",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "verifications", "{{user_id}}", "approve"]
+            },
+            "description": "Approve a pending resident account"
+          }
+        },
+        {
+          "name": "Reject Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Documents incomplete - please resubmit with clearer images\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/verifications/{{user_id}}/reject",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "verifications", "{{user_id}}", "reject"]
+            },
+            "description": "Reject a pending resident account (requires notes)"
+          }
+        },
+        {
+          "name": "Suspend Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Account suspended due to policy violation\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/verifications/{{user_id}}/suspend",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "verifications", "{{user_id}}", "suspend"]
+            },
+            "description": "Suspend an approved resident account (requires notes)"
+          }
+        },
+        {
+          "name": "Reactivate Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/verifications/{{user_id}}/reactivate",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "verifications", "{{user_id}}", "reactivate"]
+            },
+            "description": "Reactivate a suspended resident account"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Resident Features",
+      "item": [
+        {
+          "name": "Get Complaint Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{resident_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/complaints/categories",
+              "host": ["{{base_url}}"],
+              "path": ["complaints", "categories"]
+            },
+            "description": "Get available complaint categories"
+          }
+        },
+        {
+          "name": "Create Complaint",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{resident_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "category_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Street light on Main Street is broken and needs repair",
+                  "type": "text"
+                },
+                {
+                  "key": "attachment",
+                  "type": "file",
+                  "description": "Optional: Upload photo evidence"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/complaints",
+              "host": ["{{base_url}}"],
+              "path": ["complaints"]
+            },
+            "description": "Create a new complaint with optional attachment"
+          }
+        },
+        {
+          "name": "Get Taken Appointment Slots",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{resident_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appointments/taken-slots?date=2024-01-15",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "taken-slots"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2024-01-15",
+                  "description": "Date in YYYY-MM-DD format"
+                }
+              ]
+            },
+            "description": "Get taken appointment slots for a specific date"
+          }
+        },
+        {
+          "name": "Create Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{resident_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category_id\": 1,\n  \"scheduled_date\": \"2024-01-15\",\n  \"scheduled_time\": \"10:00\",\n  \"purpose\": \"Document pickup and verification\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appointments",
+              "host": ["{{base_url}}"],
+              "path": ["appointments"]
+            },
+            "description": "Book a new appointment with barangay office"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/../health",
+              "host": ["{{base_url}}"],
+              "path": ["..", "health"]
+            },
+            "description": "Check if the API server is running and healthy"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -32,7 +32,7 @@ exports.getAllAccounts = async (req, res) => {
   let where = 'WHERE u.role = "resident"'
   const params = []
 
-  if (status) {
+  if (status && status !== 'all') {
     where += ' AND u.status = ?'
     params.push(status)
   }
