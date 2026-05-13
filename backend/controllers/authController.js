@@ -81,8 +81,8 @@ exports.register = async (req, res) => {
   }
 
   // Password strength validation
-  if (password.length < 8) {
-    return res.status(422).json({ message: 'Password must be at least 8 characters.' })
+  if (password.length < 5) {
+    return res.status(422).json({ message: 'Password must be at least 5 characters.' })
   }
 
   // Phone validation (Philippine format)

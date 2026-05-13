@@ -23,7 +23,7 @@ export default function ResidentRegister() {
     if (!form.email.trim() || !/\S+@\S+\.\S+/.test(form.email)) e.email = 'Valid email required.'
     if (!form.phone.trim()) e.phone = 'Phone number is required.'
     if (!form.address.trim()) e.address = 'Address is required.'
-    if (form.password.length < 8) e.password = 'Password must be at least 8 characters.'
+    if (form.password.length < 5) e.password = 'Password must be at least 5 characters.'
     if (form.password !== form.password_confirmation) e.password_confirmation = 'Passwords do not match.'
     return e
   }
@@ -154,7 +154,7 @@ export default function ResidentRegister() {
               <div className="grid-2">
                 <div className="form-group">
                   <label className="form-label">Password *</label>
-                  <input className="form-control" name="password" type="password" value={form.password} onChange={handleChange} placeholder="Min. 8 characters"/>
+                  <input className="form-control" name="password" type="password" value={form.password} onChange={handleChange} placeholder="Min. 5 characters"/>
                   {errors.password && <div className="form-error">{errors.password}</div>}
                 </div>
                 <div className="form-group">
