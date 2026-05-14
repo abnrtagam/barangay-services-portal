@@ -1,5 +1,16 @@
 const db = require('../config/db')
 
+const getComplaintStatusHistory = async (complaint_id) => {
+  const [rows] = await db.query(
+    `SELECT id, old_status, new_status, notes, changed_at
+     FROM complaint_status_history
+     WHERE complaint_id = ?
+     ORDER BY changed_at ASC`,
+    [complaint_id]
+  )
+  return rows
+}
+
 // GET /api/complaints/categories
 exports.getCategories = async (req, res) => {
   try {
@@ -19,9 +30,15 @@ exports.create = async (req, res) => {
   }
   try {
     const attachment = req.file ? req.file.filename : null
-    await db.query(
+    const [result] = await db.query(
       'INSERT INTO complaints (resident_id, category_id, subject, details, attachment_path, status) VALUES (?,?,?,?,?,?)',
       [resident_id, category_id, subject, details, attachment, 'Pending']
+    )
+    const complaintId = result.insertId
+    await db.query(
+      `INSERT INTO complaint_status_history (complaint_id, old_status, new_status, changed_by, changed_at)
+       VALUES (?, NULL, ?, NULL, NOW())`,
+      [complaintId, 'Pending']
     )
     res.status(201).json({ message: 'Complaint submitted successfully.' })
   } catch (err) {
@@ -58,5 +75,30 @@ exports.getMyComplaints = async (req, res) => {
   } catch (err) {
     console.error(err)
     res.status(500).json({ message: 'Failed to fetch complaints.' })
+  }
+}
+
+// GET /api/residents/complaints/:id
+exports.getMyComplaintById = async (req, res) => {
+  const { id } = req.params
+  const resident_id = req.user.resident_id
+  try {
+    const [[complaint]] = await db.query(
+      `SELECT c.*, cc.name AS category_name
+       FROM complaints c
+       JOIN complaint_categories cc ON c.category_id = cc.id
+       JOIN residents r ON c.resident_id = r.id
+       WHERE c.id = ? AND r.id = ?`,
+      [id, resident_id]
+    )
+    if (!complaint) {
+      return res.status(404).json({ message: 'Complaint not found.' })
+    }
+
+    const history = await getComplaintStatusHistory(id)
+    res.json({ ...complaint, history })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Failed to fetch complaint.' })
   }
 }

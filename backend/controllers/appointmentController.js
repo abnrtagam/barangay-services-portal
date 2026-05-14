@@ -1,5 +1,16 @@
 const db = require('../config/db')
 
+const getAppointmentStatusHistory = async (appointment_id) => {
+  const [rows] = await db.query(
+    `SELECT id, old_status, new_status, notes, changed_at
+     FROM appointment_status_history
+     WHERE appointment_id = ?
+     ORDER BY changed_at ASC`,
+    [appointment_id]
+  )
+  return rows
+}
+
 // GET /api/appointments/taken-slots?date=YYYY-MM-DD
 exports.getTakenSlots = async (req, res) => {
   const { date } = req.query
@@ -45,10 +56,16 @@ exports.create = async (req, res) => {
     if (dup.length) {
       return res.status(409).json({ message: 'You already have an appointment on this date.' })
     }
-    await db.query(
+    const [result] = await db.query(
       `INSERT INTO appointments (resident_id, appointment_date, time_slot, purpose, notes, status)
        VALUES (?,?,?,?,?,?)`,
       [resident_id, appointment_date, time_slot, purpose, notes || null, 'Pending']
+    )
+    const appointmentId = result.insertId
+    await db.query(
+      `INSERT INTO appointment_status_history (appointment_id, old_status, new_status, changed_by, changed_at)
+       VALUES (?, NULL, ?, NULL, NOW())`,
+      [appointmentId, 'Pending']
     )
     res.status(201).json({ message: 'Appointment booked successfully.' })
   } catch (err) {
@@ -76,5 +93,28 @@ exports.getMyAppointments = async (req, res) => {
     res.json({ data: rows, total, page: parseInt(page), limit: parseInt(limit) })
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch appointments.' })
+  }
+}
+
+// GET /api/residents/appointments/:id
+exports.getMyAppointmentById = async (req, res) => {
+  const { id } = req.params
+  const resident_id = req.user.resident_id
+  try {
+    const [[appointment]] = await db.query(
+      `SELECT a.* FROM appointments a
+       JOIN residents r ON a.resident_id = r.id
+       WHERE a.id = ? AND r.id = ?`,
+      [id, resident_id]
+    )
+    if (!appointment) {
+      return res.status(404).json({ message: 'Appointment not found.' })
+    }
+
+    const history = await getAppointmentStatusHistory(id)
+    res.json({ ...appointment, history })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Failed to fetch appointment.' })
   }
 }

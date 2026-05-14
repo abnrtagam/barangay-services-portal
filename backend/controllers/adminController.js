@@ -96,6 +96,13 @@ exports.updateComplaintStatus = async (req, res) => {
     )
     if (!result.affectedRows) return res.status(404).json({ message: 'Complaint not found.' })
 
+    const adminId = req.user.admin_id || req.user.id
+    await db.query(
+      `INSERT INTO complaint_status_history (complaint_id, old_status, new_status, changed_by, notes, changed_at)
+       VALUES (?, ?, ?, ?, ?, NOW())`,
+      [id, complaintRow.current_status, status, adminId, admin_remarks || null]
+    )
+
     try {
       const emailService = require('../services/emailService')
       const emailResult = await emailService.sendComplaintStatusEmail(
@@ -174,6 +181,13 @@ exports.updateAppointmentStatus = async (req, res) => {
       [status, admin_remarks || null, id]
     )
     if (!result.affectedRows) return res.status(404).json({ message: 'Appointment not found.' })
+
+    const adminId = req.user.admin_id || req.user.id
+    await db.query(
+      `INSERT INTO appointment_status_history (appointment_id, old_status, new_status, changed_by, notes, changed_at)
+       VALUES (?, ?, ?, ?, ?, NOW())`,
+      [id, appointmentRow.current_status, status, adminId, admin_remarks || null]
+    )
 
     try {
       const emailService = require('../services/emailService')
