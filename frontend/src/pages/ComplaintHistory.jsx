@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { StatusBadge, Modal } from '../components/DashboardCard'
+import StatusTimeline from '../components/StatusTimeline'
 import { FiEye, FiPlus, FiFilter } from 'react-icons/fi'
 import { formatDate } from '../utils/date'
 
@@ -25,6 +26,17 @@ export default function ComplaintHistory() {
   }
 
   useEffect(() => { load() }, [filter.status])
+
+  const loadComplaintDetail = async (id) => {
+    try {
+      const res = await axios.get(`/api/residents/complaints/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      setSelected(res.data)
+    } catch (err) {
+      console.error('Failed to load complaint details:', err)
+    }
+  }
 
   const STATUS_OPTS = ['', 'Pending', 'Approved', 'Scheduled', 'Resolved', 'Rejected']
 
@@ -98,7 +110,7 @@ export default function ComplaintHistory() {
                       {c.admin_remarks || <span style={{ color: 'var(--gray-300)' }}>—</span>}
                     </td>
                     <td>
-                      <button className="btn btn-secondary btn-sm" onClick={() => setSelected(c)}>
+                      <button className="btn btn-secondary btn-sm" onClick={() => loadComplaintDetail(c.id)}>
                         <FiEye /> View
                       </button>
                     </td>
@@ -149,6 +161,14 @@ export default function ComplaintHistory() {
                 >
                   View Attachment
                 </a>
+              </div>
+            )}
+            {selected.history && (
+              <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid var(--gray-200)' }}>
+                <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, marginBottom: 16 }}>
+                  Status History
+                </div>
+                <StatusTimeline history={selected.history} type="complaint" />
               </div>
             )}
           </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { StatusBadge, Modal } from '../components/DashboardCard'
+import StatusTimeline from '../components/StatusTimeline'
 import { FiEye, FiPlus } from 'react-icons/fi'
 import { formatDate } from '../utils/date'
 
@@ -19,6 +20,17 @@ export default function AppointmentHistory() {
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [statusFilter])
+
+  const loadAppointmentDetail = async (id) => {
+    try {
+      const res = await axios.get(`/api/residents/appointments/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      setSelected(res.data)
+    } catch (err) {
+      console.error('Failed to load appointment details:', err)
+    }
+  }
 
   const STATUS_OPTS = ['', 'Pending', 'Approved', 'Completed', 'Cancelled', 'Rejected']
 
@@ -72,7 +84,7 @@ export default function AppointmentHistory() {
                     <td><StatusBadge status={a.status}/></td>
                     <td style={{ fontSize: '.82rem', color: 'var(--gray-500)' }}>{formatDate(a.created_at)}</td>
                     <td>
-                      <button className="btn btn-secondary btn-sm" onClick={() => setSelected(a)}>
+                      <button className="btn btn-secondary btn-sm" onClick={() => loadAppointmentDetail(a.id)}>
                         <FiEye/> View
                       </button>
                     </td>
@@ -113,6 +125,14 @@ export default function AppointmentHistory() {
               <div style={{ background: 'var(--primary-50)', border: '1px solid var(--primary-200)', borderRadius: 'var(--radius-md)', padding: '12px 14px' }}>
                 <div style={{ fontWeight: 700, fontSize: '.85rem', color: 'var(--primary-700)', marginBottom: 4 }}>Admin Remarks</div>
                 <div style={{ color: 'var(--gray-700)' }}>{selected.admin_remarks}</div>
+              </div>
+            )}
+            {selected.history && (
+              <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid var(--gray-200)' }}>
+                <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, marginBottom: 16 }}>
+                  Status History
+                </div>
+                <StatusTimeline history={selected.history} type="appointment" />
               </div>
             )}
           </div>
