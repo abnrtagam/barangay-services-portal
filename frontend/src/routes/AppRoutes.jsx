@@ -10,6 +10,7 @@ import LandingPage from '../pages/LandingPage'
 import ResidentLogin from '../pages/ResidentLogin'
 import ResidentRegister from '../pages/ResidentRegister'
 import VerifyOTP from '../pages/VerifyOTP'
+import ForgotPassword from '../pages/ForgotPassword'
 import AdminLogin from '../pages/AdminLogin'
 
 // Resident pages
@@ -47,6 +48,7 @@ export default function AppRoutes() {
       <Route path="/login" element={<ResidentLogin />} />
       <Route path="/register" element={<ResidentRegister />} />
       <Route path="/verify-otp" element={<VerifyOTP />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/admin/login" element={<AdminLogin />} />
 
       {/* Resident Protected */}

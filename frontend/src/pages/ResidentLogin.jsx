@@ -88,6 +88,11 @@ export default function ResidentLogin() {
                 <label className="form-label">Password</label>
                 <input className="form-control" name="password" type="password" value={form.password} onChange={handleChange} placeholder="••••••••"/>
               </div>
+              <div style={{ textAlign: 'right', marginBottom: 16 }}>
+                <Link to="/forgot-password" style={{ fontSize: '13px', color: 'var(--primary-600)', textDecoration: 'none' }}>
+                  Forgot password?
+                </Link>
+              </div>
               <button className="btn btn-primary w-full mt-2" disabled={loading}>
                 {loading ? 'Signing in...' : 'Sign In'}
               </button>
