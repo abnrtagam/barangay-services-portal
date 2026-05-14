@@ -167,7 +167,7 @@ exports.updateAppointmentStatus = async (req, res) => {
   }
   try {
     const [[appointmentRow]] = await db.query(
-      `SELECT a.appointment_date, a.time_slot, a.purpose, u.email, u.first_name
+      `SELECT a.status, a.appointment_date, a.time_slot, a.purpose, u.email, u.first_name
        FROM appointments a
        JOIN residents r ON a.resident_id = r.id
        JOIN users u ON r.user_id = u.id
@@ -175,6 +175,10 @@ exports.updateAppointmentStatus = async (req, res) => {
       [id]
     )
     if (!appointmentRow) return res.status(404).json({ message: 'Appointment not found.' })
+
+    if (appointmentRow.status === 'Completed') {
+      return res.status(400).json({ message: 'Completed appointments cannot be updated.' })
+    }
 
     const [result] = await db.query(
       'UPDATE appointments SET status = ?, admin_remarks = ?, updated_at = NOW() WHERE id = ?',
@@ -186,7 +190,7 @@ exports.updateAppointmentStatus = async (req, res) => {
     await db.query(
       `INSERT INTO appointment_status_history (appointment_id, old_status, new_status, changed_by, notes, changed_at)
        VALUES (?, ?, ?, ?, ?, NOW())`,
-      [id, appointmentRow.current_status, status, adminId, admin_remarks || null]
+      [id, appointmentRow.status, status, adminId, admin_remarks || null]
     )
 
     try {
