@@ -3,31 +3,49 @@ import React from 'react'
 const COLOR_MAP = {
   blue: {
     background: 'var(--info-100)',
+    iconBg: 'var(--info-200)',
     icon: 'var(--info-700)',
     text: 'var(--gray-950)',
   },
   info: {
     background: 'var(--info-100)',
+    iconBg: 'var(--info-200)',
     icon: 'var(--info-700)',
     text: 'var(--gray-950)',
   },
   success: {
     background: 'var(--success-100)',
+    iconBg: 'var(--success-200)',
+    icon: 'var(--success-700)',
+    text: 'var(--gray-950)',
+  },
+  green: {
+    background: 'var(--success-100)',
+    iconBg: 'var(--success-200)',
     icon: 'var(--success-700)',
     text: 'var(--gray-950)',
   },
   warning: {
     background: 'var(--warning-100)',
+    iconBg: 'var(--warning-200)',
     icon: 'var(--warning-700)',
     text: 'var(--gray-950)',
   },
   danger: {
     background: 'var(--danger-100)',
+    iconBg: 'var(--danger-200)',
+    icon: 'var(--danger-700)',
+    text: 'var(--gray-950)',
+  },
+  red: {
+    background: 'var(--danger-100)',
+    iconBg: 'var(--danger-200)',
     icon: 'var(--danger-700)',
     text: 'var(--gray-950)',
   },
   neutral: {
     background: 'var(--gray-100)',
+    iconBg: 'var(--gray-200)',
     icon: 'var(--gray-700)',
     text: 'var(--gray-950)',
   },
@@ -38,7 +56,14 @@ export function DashboardCard({ title, value, icon, color = 'blue', sub }) {
 
   return (
     <article className="dashboard-card">
-      <div className="dashboard-card-icon" style={{ background: palette.background, color: palette.icon }}>
+      <div 
+        className="dashboard-card-icon" 
+        style={{ 
+          background: palette.iconBg, 
+          color: palette.icon,
+          borderRadius: 'var(--radius-md)',
+        }}
+      >
         {icon}
       </div>
       <div className="dashboard-card-content">

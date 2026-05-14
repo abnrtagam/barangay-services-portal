@@ -234,25 +234,25 @@ export default function AccountVerifications() {
           <DashboardCard
             title="Pending"
             value={stats.pending}
-            icon={FiClock}
+            icon={<FiClock/>}
             color="warning"
           />
           <DashboardCard
             title="Approved"
             value={stats.approved}
-            icon={FiCheck}
+            icon={<FiCheck/>}
             color="green"
           />
           <DashboardCard
             title="Rejected"
             value={stats.rejected}
-            icon={FiX}
+            icon={<FiX/>}
             color="red"
           />
           <DashboardCard
             title="Total Accounts"
             value={stats.total}
-            icon={FiUser}
+            icon={<FiUser/>}
             color="blue"
           />
         </div>
