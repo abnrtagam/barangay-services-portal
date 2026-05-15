@@ -1,23 +1,79 @@
 import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 import { 
   FiUser, FiMail, FiPhone, FiMapPin, FiShield, 
-  FiFileText, FiCamera, FiEdit2, FiCheckCircle 
+  FiFileText, FiCamera, FiEdit2, FiCheckCircle, FiSave, FiX 
 } from 'react-icons/fi'
 
 export default function ResidentProfile() {
   const [user, setUser] = useState(null)
   const [activeTab, setActiveTab] = useState('info')
+  const [isEditing, setIsEditing] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [form, setForm] = useState({
+    first_name: '',
+    last_name: '',
+    phone: '',
+    address: ''
+  })
 
   useEffect(() => {
+    fetchProfile()
+  }, [])
+
+  const fetchProfile = () => {
     try {
       const storedUser = localStorage.getItem('resident_user')
       if (storedUser) {
-        setUser(JSON.parse(storedUser))
+        const parsed = JSON.parse(storedUser)
+        setUser(parsed)
+        setForm({
+          first_name: parsed.first_name || '',
+          last_name: parsed.last_name || '',
+          phone: parsed.phone || '',
+          address: parsed.address || ''
+        })
       }
     } catch (err) {
       console.error("Error parsing user data", err)
     }
-  }, [])
+  }
+
+  const handleEditToggle = () => {
+    if (isEditing) {
+      // Cancel: Reset form to current user data
+      setForm({
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
+        phone: user.phone || '',
+        address: user.address || ''
+      })
+    }
+    setIsEditing(!isEditing)
+  }
+
+  const handleSave = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const token = localStorage.getItem('resident_token')
+      const res = await axios.patch('/api/residents/profile', form, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      
+      const updatedUser = res.data.user
+      setUser(updatedUser)
+      localStorage.setItem('resident_user', JSON.stringify(updatedUser))
+      setIsEditing(false)
+      toast.success('Profile updated successfully!')
+    } catch (err) {
+      console.error(err)
+      toast.error(err.response?.data?.message || 'Failed to update profile.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   if (!user) {
     return (
@@ -89,9 +145,20 @@ export default function ResidentProfile() {
               </p>
             </div>
             <div style={{ marginBottom: 8 }}>
-              <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 12 }}>
-                <FiEdit2 size={16} /> Edit Profile
-              </button>
+              {!isEditing ? (
+                <button onClick={handleEditToggle} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 12 }}>
+                  <FiEdit2 size={16} /> Edit Profile
+                </button>
+              ) : (
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button onClick={handleSave} disabled={loading} className="btn btn-success" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 12 }}>
+                    <FiSave size={16} /> {loading ? 'Saving...' : 'Save Changes'}
+                  </button>
+                  <button onClick={handleEditToggle} disabled={loading} className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 12 }}>
+                    <FiX size={16} /> Cancel
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -147,35 +214,72 @@ export default function ResidentProfile() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>First Name</label>
-                  <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--gray-800)', padding: '12px 16px', background: 'var(--gray-50)', borderRadius: 12, border: '1px solid var(--gray-100)' }}>
-                    {user.first_name}
-                  </div>
+                  {!isEditing ? (
+                    <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--gray-800)', padding: '12px 16px', background: 'var(--gray-50)', borderRadius: 12, border: '1px solid var(--gray-100)' }}>
+                      {user.first_name}
+                    </div>
+                  ) : (
+                    <input 
+                      className="form-control"
+                      value={form.first_name}
+                      onChange={(e) => setForm({...form, first_name: e.target.value})}
+                      style={{ borderRadius: 12 }}
+                    />
+                  )}
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Last Name</label>
-                  <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--gray-800)', padding: '12px 16px', background: 'var(--gray-50)', borderRadius: 12, border: '1px solid var(--gray-100)' }}>
-                    {user.last_name}
-                  </div>
+                  {!isEditing ? (
+                    <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--gray-800)', padding: '12px 16px', background: 'var(--gray-50)', borderRadius: 12, border: '1px solid var(--gray-100)' }}>
+                      {user.last_name}
+                    </div>
+                  ) : (
+                    <input 
+                      className="form-control"
+                      value={form.last_name}
+                      onChange={(e) => setForm({...form, last_name: e.target.value})}
+                      style={{ borderRadius: 12 }}
+                    />
+                  )}
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Email Address</label>
-                  <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--gray-800)', padding: '12px 16px', background: 'var(--gray-50)', borderRadius: 12, border: '1px solid var(--gray-100)', display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--gray-400)', padding: '12px 16px', background: 'var(--gray-50)', borderRadius: 12, border: '1px solid var(--gray-100)', display: 'flex', alignItems: 'center', gap: 10 }}>
                     <FiMail size={16} color="var(--gray-400)" /> {user.email}
                   </div>
+                  {isEditing && <p style={{ fontSize: '0.75rem', color: 'var(--gray-400)', marginTop: 4 }}>Email cannot be changed.</p>}
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Phone Number</label>
-                  <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--gray-800)', padding: '12px 16px', background: 'var(--gray-50)', borderRadius: 12, border: '1px solid var(--gray-100)', display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <FiPhone size={16} color="var(--gray-400)" /> {user.phone}
-                  </div>
+                  {!isEditing ? (
+                    <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--gray-800)', padding: '12px 16px', background: 'var(--gray-50)', borderRadius: 12, border: '1px solid var(--gray-100)', display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <FiPhone size={16} color="var(--gray-400)" /> {user.phone}
+                    </div>
+                  ) : (
+                    <input 
+                      className="form-control"
+                      value={form.phone}
+                      onChange={(e) => setForm({...form, phone: e.target.value})}
+                      style={{ borderRadius: 12 }}
+                    />
+                  )}
                 </div>
               </div>
 
               <div style={{ marginTop: 32 }}>
                 <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Home Address</label>
-                <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--gray-800)', padding: '16px', background: 'var(--gray-50)', borderRadius: 12, border: '1px solid var(--gray-100)', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                  <FiMapPin size={16} color="var(--gray-400)" style={{ marginTop: 3 }} /> {user.address}
-                </div>
+                {!isEditing ? (
+                  <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--gray-800)', padding: '16px', background: 'var(--gray-50)', borderRadius: 12, border: '1px solid var(--gray-100)', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                    <FiMapPin size={16} color="var(--gray-400)" style={{ marginTop: 3 }} /> {user.address}
+                  </div>
+                ) : (
+                  <textarea 
+                    className="form-control"
+                    value={form.address}
+                    onChange={(e) => setForm({...form, address: e.target.value})}
+                    style={{ borderRadius: 12, minHeight: 100 }}
+                  />
+                )}
               </div>
             </div>
           )}
