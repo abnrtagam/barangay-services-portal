@@ -90,10 +90,11 @@ exports.updateComplaintStatus = async (req, res) => {
     )
     if (!complaintRow) return res.status(404).json({ message: 'Complaint not found.' })
 
-    if (complaintRow.status === 'Resolved') {
+    const finalComplaintStatuses = ['Resolved', 'Rejected']
+  if (finalComplaintStatuses.includes(complaintRow.status)) {
       return res.status(400).json({
         success: false,
-        message: 'This complaint has already been resolved and is locked from further updates.'
+        message: 'This complaint has already been finalized and is locked from further updates.'
       })
     }
 
@@ -183,10 +184,11 @@ exports.updateAppointmentStatus = async (req, res) => {
     )
     if (!appointmentRow) return res.status(404).json({ message: 'Appointment not found.' })
 
-    if (appointmentRow.status === 'Completed') {
+    const finalAppointmentStatuses = ['Completed', 'Cancelled', 'Rejected']
+    if (finalAppointmentStatuses.includes(appointmentRow.status)) {
       return res.status(400).json({
         success: false,
-        message: 'This appointment has already been completed and is locked from further updates.'
+        message: 'This appointment has already been finalized and is locked from further updates.'
       })
     }
 

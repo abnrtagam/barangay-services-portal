@@ -5,6 +5,7 @@ import { StatusBadge, Modal, AlertMessage } from '../components/DashboardCard'
 import { FiEye, FiCheck, FiX } from 'react-icons/fi'
 
 const APPT_STATUSES = ['Pending', 'Approved', 'Completed', 'Cancelled', 'Rejected']
+const FINAL_APPT_STATUSES = ['Completed', 'Cancelled', 'Rejected']
 
 export default function ManageAppointments() {
   const [appointments, setAppointments] = useState([])
@@ -13,6 +14,7 @@ export default function ManageAppointments() {
   const [newStatus, setNewStatus]       = useState('')
   const [remarks, setRemarks]           = useState('')
   const [alert, setAlert]               = useState(null)
+  const [submitting, setSubmitting]     = useState(false)
   const [filter, setFilter]             = useState({ status: '', date: '' })
   const token = localStorage.getItem('admin_token')
 
@@ -30,18 +32,25 @@ export default function ManageAppointments() {
 
   const openModal = (a) => { setSelected(a); setNewStatus(a.status); setRemarks(a.admin_remarks || '') }
 
+  const isFinalized = selected && FINAL_APPT_STATUSES.includes(selected.status)
+
   const handleUpdate = async () => {
-    if (!selected) return
+    if (!newStatus || !selected || isFinalized) return
+
+    setSubmitting(true)
     try {
       await axios.patch(`/api/admin/appointments/${selected.id}/status`,
         { status: newStatus, admin_remarks: remarks },
         { headers: { Authorization: `Bearer ${token}` } }
       )
       setAlert({ type: 'success', title: 'Appointment updated', message: 'The appointment status has been updated successfully.' })
-      setSelected(null); load()
+      setSelected(null)
+      load()
     } catch (error) {
       const message = error?.response?.data?.message || 'Unable to update appointment. Please try again.'
       setAlert({ type: 'error', title: 'Update blocked', message })
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -114,21 +123,40 @@ export default function ManageAppointments() {
       <Modal open={!!selected} onClose={() => setSelected(null)} title="Manage Appointment"
         footer={<>
           <button className="btn btn-secondary" onClick={() => setSelected(null)}>Cancel</button>
-          <button className="btn btn-primary" onClick={handleUpdate} disabled={selected?.status === 'Completed'}>
-            {selected?.status === 'Completed' ? 'Finalized' : 'Save'}
+          <button className="btn btn-primary" onClick={handleUpdate} disabled={submitting || selected?.status === 'Completed'}>
+            {selected?.status === 'Completed' ? 'Finalized' : submitting ? 'Saving...' : 'Save'}
           </button>
         </>}
       >
         {selected && (
           <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div>
+                <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, marginBottom: 4 }}>{selected.purpose}</div>
+                <div style={{ fontSize: '.88rem', color: 'var(--gray-500)' }}>{selected.appointment_date} · {selected.time_slot}</div>
+              </div>
+              {isFinalized && (
+                <span style={{
+                  background: 'var(--gray-100)',
+                  color: 'var(--gray-700)',
+                  padding: '6px 12px',
+                  borderRadius: '999px',
+                  fontSize: '.75rem',
+                  fontWeight: 700,
+                  letterSpacing: '.02em'
+                }}>
+                  Finalized
+                </span>
+              )}
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', gap: '6px 14px', marginBottom: 16, fontSize: '.88rem' }}>
               <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Resident</span><span>{selected.resident_name}</span>
               <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Date & Time</span><span>{selected.appointment_date} — {selected.time_slot}</span>
               <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Purpose</span><span>{selected.purpose}</span>
             </div>
             <div style={{ marginBottom: 16, padding: 12, borderRadius: 'var(--radius-md)', background: 'var(--gray-50)', border: '1px solid var(--gray-150)', color: 'var(--gray-700)' }}>
-              {selected.status === 'Completed'
-                ? 'This appointment has been completed and is locked from further status changes.'
+              {isFinalized
+                ? 'This appointment has been finalized and is locked from further status changes.'
                 : 'You can update the appointment status and remarks below.'}
             </div>
             <div className="form-group">
@@ -137,8 +165,8 @@ export default function ManageAppointments() {
                 className="form-control"
                 value={newStatus}
                 onChange={e => setNewStatus(e.target.value)}
-                disabled={selected.status === 'Completed'}
-                style={selected.status === 'Completed' ? { background: 'var(--gray-100)', cursor: 'not-allowed' } : {}}
+                disabled={isFinalized}
+                style={isFinalized ? { background: 'var(--gray-100)', cursor: 'not-allowed' } : {}}
               >
                 {APPT_STATUSES.map(s => <option key={s}>{s}</option>)}
               </select>
@@ -150,8 +178,8 @@ export default function ManageAppointments() {
                 rows={3}
                 value={remarks}
                 onChange={e => setRemarks(e.target.value)}
-                disabled={selected.status === 'Completed'}
-                style={selected.status === 'Completed' ? { background: 'var(--gray-100)', cursor: 'not-allowed' } : {}}
+                disabled={isFinalized}
+                style={isFinalized ? { background: 'var(--gray-100)', cursor: 'not-allowed' } : {}}
               />
             </div>
           </div>

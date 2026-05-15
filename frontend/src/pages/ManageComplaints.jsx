@@ -5,6 +5,7 @@ import { FiEye, FiFilter, FiCheck, FiX, FiCalendar, FiCheckSquare } from 'react-
 import { formatDate } from '../utils/date'
 
 const STATUS_OPTS = ['', 'Pending', 'Approved', 'Scheduled', 'Resolved', 'Rejected']
+const FINAL_COMPLAINT_STATUSES = ['Resolved', 'Rejected']
 
 export default function ManageComplaints() {
   const [complaints, setComplaints] = useState([])
@@ -37,8 +38,10 @@ export default function ManageComplaints() {
     setNewStatus(c.status)
   }
 
+  const isFinalized = selected && FINAL_COMPLAINT_STATUSES.includes(selected.status)
+
   const handleUpdate = async () => {
-    if (!newStatus || !selected) return
+    if (!newStatus || !selected || isFinalized) return
     setSubmitting(true)
     try {
       await axios.patch(`/api/admin/complaints/${selected.id}/status`, {
@@ -162,27 +165,45 @@ export default function ManageComplaints() {
             <button
               className="btn btn-primary"
               onClick={handleUpdate}
-              disabled={submitting || selected?.status === 'Resolved'}
+              disabled={submitting || isFinalized}
             >
-              {selected?.status === 'Resolved' ? 'Finalized' : submitting ? 'Saving...' : 'Save Changes'}
+              {isFinalized ? 'Finalized' : submitting ? 'Saving...' : 'Save Changes'}
             </button>
           </>
         }
       >
         {selected && (
           <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div>
+                <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, marginBottom: 4 }}>{selected.subject}</div>
+                <div style={{ fontSize: '.88rem', color: 'var(--gray-500)' }}>{selected.resident_name} · {selected.category_name}</div>
+              </div>
+              {isFinalized && (
+                <span style={{
+                  background: 'var(--gray-100)',
+                  color: 'var(--gray-700)',
+                  padding: '6px 12px',
+                  borderRadius: '999px',
+                  fontSize: '.75rem',
+                  fontWeight: 700,
+                  letterSpacing: '.02em'
+                }}>
+                  Finalized
+                </span>
+              )}
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '6px 14px', marginBottom: 18, fontSize: '.88rem' }}>
               <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Resident</span><span>{selected.resident_name}</span>
               <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Category</span><span>{selected.category_name}</span>
               <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Filed</span><span>{formatDate(selected.created_at)}</span>
             </div>
-            <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, marginBottom: 4 }}>{selected.subject}</div>
             <div style={{ background: 'var(--gray-50)', borderRadius: 'var(--radius-md)', padding: '12px 14px', marginBottom: 18, fontSize: '.88rem', color: 'var(--gray-700)', whiteSpace: 'pre-wrap' }}>
               {selected.details}
             </div>
             <div style={{ marginBottom: 16, padding: 12, borderRadius: 'var(--radius-md)', background: 'var(--gray-50)', border: '1px solid var(--gray-150)', color: 'var(--gray-700)' }}>
-              {selected.status === 'Resolved'
-                ? 'This complaint has been resolved and is locked from further status updates.'
+              {isFinalized
+                ? 'This complaint has been finalized and is locked from further status updates.'
                 : 'You can update the status and remarks for this complaint.'}
             </div>
             <div className="form-group">
@@ -191,8 +212,8 @@ export default function ManageComplaints() {
                 className="form-control"
                 value={newStatus}
                 onChange={e => setNewStatus(e.target.value)}
-                disabled={selected.status === 'Resolved'}
-                style={selected.status === 'Resolved' ? { background: 'var(--gray-100)', cursor: 'not-allowed' } : {}}
+                disabled={isFinalized}
+                style={isFinalized ? { background: 'var(--gray-100)', cursor: 'not-allowed' } : {}}
               >
                 {STATUS_OPTS.filter(Boolean).map(s => <option key={s} value={s}>{s}</option>)}
               </select>
@@ -205,8 +226,8 @@ export default function ManageComplaints() {
                 value={remarks}
                 onChange={e => setRemarks(e.target.value)}
                 placeholder="Add remarks for the resident..."
-                disabled={selected.status === 'Resolved'}
-                style={selected.status === 'Resolved' ? { background: 'var(--gray-100)', cursor: 'not-allowed' } : {}}
+                disabled={isFinalized}
+                style={isFinalized ? { background: 'var(--gray-100)', cursor: 'not-allowed' } : {}}
               />
             </div>
           </div>
