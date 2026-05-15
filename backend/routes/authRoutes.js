@@ -9,11 +9,10 @@ router.post('/verify-otp', ctrl.verifyOTP)
 router.post('/resend-otp', ctrl.resendOTP)
 
 // Login
-router.post('/login', ctrl.login)
-router.post('/admin-login', ctrl.adminLogin)
-
-// Forgot Password
+router.post('/login',        ctrl.login)
+router.post('/admin-login',  ctrl.adminLogin)
 router.post('/forgot-password', ctrl.forgotPassword)
-router.post('/reset-password', ctrl.resetPassword)
+router.post('/reset-password',  ctrl.resetPassword)
+router.post('/reactivate',      ctrl.requestReactivation)
 
 module.exports = router

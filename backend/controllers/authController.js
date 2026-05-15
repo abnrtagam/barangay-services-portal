@@ -522,4 +522,63 @@ exports.resetPassword = async (req, res) => {
   }
 }
 
+// POST /api/auth/reactivate (suspended users only)
+exports.requestReactivation = async (req, res) => {
+  const { email, reason } = req.body
+
+  if (!email || !reason) {
+    return res.status(422).json({ message: 'Email and reason are required.' })
+  }
+
+  try {
+    // Check if user exists and is suspended
+    const [users] = await db.query(
+      'SELECT id, status FROM users WHERE email = ? AND role = "resident"',
+      [email]
+    )
+
+    if (!users.length) {
+      return res.status(404).json({ message: 'Account not found.' })
+    }
+
+    const user = users[0]
+    if (user.status !== 'suspended') {
+      return res.status(400).json({ message: 'Only suspended accounts can request reactivation.' })
+    }
+
+    // Check if there's already a pending request
+    const [existing] = await db.query(
+      'SELECT id FROM reactivation_requests WHERE user_id = ? AND status = "Pending"',
+      [user.id]
+    )
+
+    if (existing.length) {
+      return res.status(409).json({ message: 'You already have a pending reactivation request.' })
+    }
+
+    // Create request (Create table if not exists - better to do in setup but here for robustness)
+    await db.query(
+      `CREATE TABLE IF NOT EXISTS reactivation_requests (
+        id INT AUTO_INCREMENT PRIMARY KEY, 
+        user_id INT NOT NULL, 
+        reason TEXT NOT NULL, 
+        status ENUM('Pending', 'Reviewed', 'Approved', 'Rejected') DEFAULT 'Pending', 
+        admin_notes TEXT, 
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )`
+    )
+
+    await db.query(
+      'INSERT INTO reactivation_requests (user_id, reason) VALUES (?, ?)',
+      [user.id, reason]
+    )
+
+    res.status(201).json({ message: 'Reactivation request submitted. The barangay office will review your appeal.' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Failed to submit reactivation request.' })
+  }
+}
+
 module.exports = exports
