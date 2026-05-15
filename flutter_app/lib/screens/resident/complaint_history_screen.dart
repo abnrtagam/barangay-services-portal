@@ -4,6 +4,7 @@ import '../../providers/complaint_provider.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/empty_state.dart';
 import '../../models/complaint_model.dart';
+import '../../constants/app_colors.dart';
 import 'complaint_detail_screen.dart';
 import 'submit_complaint_screen.dart';
 import 'package:intl/intl.dart';
@@ -32,20 +33,16 @@ class _ComplaintHistoryScreenState extends State<ComplaintHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppColors.gray50,
       appBar: AppBar(
-        title: const Text('My Complaints'),
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF2D3748),
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
+        title: const Text('MY COMPLAINTS'),
       ),
       body: Column(
         children: [
-          // Filter chips
+          // Professional filter chips
           Container(
-            color: Colors.white,
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            color: AppColors.white,
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -53,21 +50,23 @@ class _ComplaintHistoryScreenState extends State<ComplaintHistoryScreen> {
                     .map((status) => Padding(
                           padding: const EdgeInsets.only(right: 8),
                           child: FilterChip(
-                            label: Text(status),
+                            label: Text(status.toUpperCase()),
                             selected: _filterStatus == status,
                             onSelected: (selected) {
                               setState(() => _filterStatus = status);
                             },
-                            selectedColor: const Color(0xFF3B82F6).withValues(alpha: 0.15),
-                            checkmarkColor: const Color(0xFF3B82F6),
+                            selectedColor: AppColors.primary100,
+                            checkmarkColor: AppColors.primary700,
                             labelStyle: TextStyle(
-                              color: _filterStatus == status
-                                  ? const Color(0xFF3B82F6)
-                                  : Colors.grey[600],
-                              fontWeight: _filterStatus == status
-                                  ? FontWeight.w600
-                                  : FontWeight.normal,
-                              fontSize: 13,
+                              color: _filterStatus == status ? AppColors.primary700 : AppColors.gray500,
+                              fontWeight: _filterStatus == status ? FontWeight.w800 : FontWeight.w600,
+                              fontSize: 10,
+                              letterSpacing: 0.5,
+                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            side: BorderSide(
+                              color: _filterStatus == status ? AppColors.primary200 : AppColors.gray200,
+                              width: 1,
                             ),
                           ),
                         ))
@@ -89,19 +88,13 @@ class _ComplaintHistoryScreenState extends State<ComplaintHistoryScreen> {
                 if (filtered.isEmpty) {
                   return EmptyState(
                     icon: Icons.description_outlined,
-                    title: _filterStatus == 'All'
-                        ? 'No complaints yet'
-                        : 'No $_filterStatus complaints',
-                    subtitle: _filterStatus == 'All'
-                        ? 'Submit your first complaint to get started'
-                        : 'You don\'t have any complaints with this status',
-                    actionLabel: _filterStatus == 'All' ? 'Submit Complaint' : null,
+                    title: 'No Records Found',
+                    subtitle: 'You do not have any complaint records matches your current selection.',
+                    actionLabel: _filterStatus == 'All' ? 'SUBMIT NEW COMPLAINT' : null,
                     onAction: _filterStatus == 'All'
                         ? () => Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                builder: (_) => const SubmitComplaintScreen(),
-                              ),
+                              MaterialPageRoute(builder: (_) => const SubmitComplaintScreen()),
                             )
                         : null,
                   );
@@ -110,7 +103,7 @@ class _ComplaintHistoryScreenState extends State<ComplaintHistoryScreen> {
                 return RefreshIndicator(
                   onRefresh: () => provider.fetchComplaints(),
                   child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
                     itemCount: filtered.length,
                     itemBuilder: (context, index) {
                       return _buildComplaintCard(filtered[index]);
@@ -124,18 +117,14 @@ class _ComplaintHistoryScreenState extends State<ComplaintHistoryScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const SubmitComplaintScreen()),
-          ).then((_) {
-            // Refresh after returning from submit screen
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const SubmitComplaintScreen())).then((_) {
             context.read<ComplaintProvider>().fetchComplaints();
           });
         },
-        backgroundColor: const Color(0xFF3B82F6),
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.primary900,
+        foregroundColor: AppColors.white,
         icon: const Icon(Icons.add_rounded),
-        label: const Text('New Complaint'),
+        label: const Text('NEW COMPLAINT', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 0.5, fontSize: 13)),
       ),
     );
   }
@@ -143,22 +132,18 @@ class _ComplaintHistoryScreenState extends State<ComplaintHistoryScreen> {
   Widget _buildComplaintCard(Complaint complaint) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ComplaintDetailScreen(complaint: complaint),
-          ),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (_) => ComplaintDetailScreen(complaint: complaint)));
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.gray200, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: AppColors.gray950.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -174,8 +159,9 @@ class _ComplaintHistoryScreenState extends State<ComplaintHistoryScreen> {
                     complaint.subject,
                     style: const TextStyle(
                       fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2D3748),
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.gray900,
+                      fontFamily: 'Plus Jakarta Sans',
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -185,35 +171,36 @@ class _ComplaintHistoryScreenState extends State<ComplaintHistoryScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            if (complaint.categoryName != null)
-              Row(
-                children: [
-                  Icon(Icons.category_outlined, size: 14, color: Colors.grey[400]),
-                  const SizedBox(width: 4),
-                  Text(
-                    complaint.categoryName!,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-                  ),
-                ],
-              ),
-            const SizedBox(height: 4),
             Text(
               complaint.details,
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: const TextStyle(fontSize: 13, color: AppColors.gray600, height: 1.5, fontFamily: 'DM Sans'),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
+            const Divider(height: 1, color: AppColors.gray150),
+            const SizedBox(height: 12),
             Row(
               children: [
-                Icon(Icons.access_time_rounded, size: 14, color: Colors.grey[400]),
+                const Icon(Icons.access_time_rounded, size: 14, color: AppColors.gray400),
                 const SizedBox(width: 4),
                 Text(
                   DateFormat('MMM d, y').format(complaint.createdAt),
-                  style: TextStyle(fontSize: 12, color: Colors.grey[400]),
+                  style: const TextStyle(fontSize: 12, color: AppColors.gray500, fontWeight: FontWeight.w600),
                 ),
-                const Spacer(),
-                Icon(Icons.chevron_right_rounded, size: 20, color: Colors.grey[400]),
+                if (complaint.categoryName != null) ...[
+                  const SizedBox(width: 12),
+                  const Icon(Icons.category_outlined, size: 14, color: AppColors.gray400),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      complaint.categoryName!,
+                      style: const TextStyle(fontSize: 12, color: AppColors.gray500, fontWeight: FontWeight.w600),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+                const Icon(Icons.chevron_right_rounded, size: 18, color: AppColors.gray300),
               ],
             ),
           ],
