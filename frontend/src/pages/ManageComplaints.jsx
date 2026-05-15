@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { StatusBadge, Modal, AlertMessage } from '../components/DashboardCard'
-import { FiEye, FiFilter, FiCheck, FiX, FiCalendar, FiCheckSquare } from 'react-icons/fi'
+import { FiEye, FiFilter, FiCheck, FiX, FiCalendar, FiCheckSquare, FiAlertCircle } from 'react-icons/fi'
 import { formatDate } from '../utils/date'
 
 const STATUS_OPTS = ['', 'Pending', 'Approved', 'Scheduled', 'Resolved', 'Rejected']
@@ -70,44 +70,54 @@ export default function ManageComplaints() {
 
   return (
     <div>
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Manage Complaints</h1>
-          <p className="page-subtitle">Review, approve, and resolve resident complaints.</p>
+      {/* Premium Gradient Header Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)',
+        padding: '32px 40px',
+        borderRadius: '16px',
+        marginBottom: '24px',
+        color: 'white',
+        boxShadow: '0 10px 30px rgba(37, 99, 235, 0.15)'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 8px 0', fontFamily: 'var(--font-heading)', color: '#ffffff' }}>Manage Complaints</h1>
+            <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', letterSpacing: '0.02em' }}>Review, approve, and resolve resident complaints.</p>
+          </div>
         </div>
       </div>
 
       {alert && <AlertMessage type={alert.type} message={alert.message} onClose={() => setAlert(null)}/>}
 
-      {/* Filters */}
-      <div className="card mb-3">
-        <div className="card-body" style={{ padding: '14px 24px' }}>
+      {/* Filters (Elevated Card) */}
+      <div className="card mb-3" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <div className="card-body" style={{ padding: '18px 24px' }}>
           <div className="filter-bar">
             <div className="form-group">
-              <label className="form-label">Status</label>
-              <select className="form-control" value={filter.status} onChange={e => setFilter(p => ({ ...p, status: e.target.value }))}>
+              <label className="form-label" style={{ fontWeight: 700, color: 'var(--gray-600)', fontSize: '.75rem', textTransform: 'uppercase' }}>Status</label>
+              <select className="form-control" style={{ borderRadius: '8px', border: '1px solid var(--gray-200)', background: 'var(--gray-50)' }} value={filter.status} onChange={e => setFilter(p => ({ ...p, status: e.target.value }))}>
                 {STATUS_OPTS.map(s => <option key={s} value={s}>{s || 'All Statuses'}</option>)}
               </select>
             </div>
             <div className="form-group">
-              <label className="form-label">Date Filed</label>
-              <input className="form-control" type="date" value={filter.date} onChange={e => setFilter(p => ({ ...p, date: e.target.value }))}/>
+              <label className="form-label" style={{ fontWeight: 700, color: 'var(--gray-600)', fontSize: '.75rem', textTransform: 'uppercase' }}>Date Filed</label>
+              <input className="form-control" style={{ borderRadius: '8px', border: '1px solid var(--gray-200)', background: 'var(--gray-50)' }} type="date" value={filter.date} onChange={e => setFilter(p => ({ ...p, date: e.target.value }))}/>
             </div>
             <div className="form-group" style={{ flex: 1 }}>
-              <label className="form-label">Search</label>
-              <input className="form-control" placeholder="Search by name or subject..." value={filter.search}
+              <label className="form-label" style={{ fontWeight: 700, color: 'var(--gray-600)', fontSize: '.75rem', textTransform: 'uppercase' }}>Search</label>
+              <input className="form-control" style={{ borderRadius: '8px', border: '1px solid var(--gray-200)', background: 'var(--gray-50)' }} placeholder="Search by name or subject..." value={filter.search}
                 onChange={e => setFilter(p => ({ ...p, search: e.target.value }))}
                 onKeyDown={e => e.key === 'Enter' && load()}
               />
             </div>
             <div style={{ paddingBottom: 2 }}>
-              <button className="btn btn-primary" onClick={load}><FiFilter/> Apply</button>
+              <button className="btn btn-primary" style={{ borderRadius: '8px', fontWeight: 700, padding: '10px 24px' }} onClick={load}><FiFilter/> Apply</button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="card">
+      <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
         {loading ? (
           <div className="spinner-wrap"><div className="spinner"/></div>
         ) : (
@@ -122,8 +132,10 @@ export default function ManageComplaints() {
               <tbody>
                 {complaints.length === 0
                   ? <tr><td colSpan={7} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: 30 }}>No complaints found.</td></tr>
-                  : complaints.map((c, i) => (
-                    <tr key={c.id}>
+                  : complaints.map((c, i) => {
+                    if (!c) return null
+                    return (
+                      <tr key={c.id || i}>
                       <td style={{ color: 'var(--gray-400)', fontSize: '.8rem' }}>{i + 1}</td>
                       <td style={{ fontWeight: 600, fontFamily: 'var(--font-heading)', fontSize: '.88rem' }}>{c.resident_name}</td>
                       <td style={{ fontSize: '.85rem' }}>{c.category_name}</td>
@@ -149,7 +161,8 @@ export default function ManageComplaints() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    )
+                  })}
               </tbody>
             </table>
           </div>

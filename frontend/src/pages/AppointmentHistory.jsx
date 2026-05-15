@@ -36,28 +36,44 @@ export default function AppointmentHistory() {
 
   return (
     <div>
-      <div className="page-header">
+      {/* Premium Gradient Header Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)',
+        padding: '32px 40px',
+        borderRadius: '16px',
+        marginBottom: '24px',
+        color: 'white',
+        boxShadow: '0 10px 30px rgba(37, 99, 235, 0.15)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
         <div>
-          <h1 className="page-title">Appointment History</h1>
-          <p className="page-subtitle">View and track all your appointment requests.</p>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '2rem', marginBottom: 8, color: 'white' }}>
+            Appointment History
+          </h1>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '.95rem', letterSpacing: '0.02em', margin: 0 }}>View and track all your appointment requests.</p>
         </div>
-        <Link to="/resident/appointments/book" className="btn btn-primary"><FiPlus/> Book Appointment</Link>
+        <Link to="/resident/appointments/book" className="btn btn-primary" style={{ background: 'white', color: 'var(--primary-700)', border: 'none', fontWeight: 700, borderRadius: '8px', padding: '12px 24px' }}>
+          <FiPlus/> Book Appointment
+        </Link>
       </div>
 
-      <div className="card mb-3">
-        <div className="card-body" style={{ padding: '14px 24px' }}>
+      {/* Filter Card (Elevated) */}
+      <div className="card mb-3" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <div className="card-body" style={{ padding: '18px 24px' }}>
           <div className="filter-bar">
             <div className="form-group">
-              <label className="form-label">Filter by Status</label>
-              <select className="form-control" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-                {STATUS_OPTS.map(s => <option key={s} value={s}>{s || 'All'}</option>)}
+              <label className="form-label" style={{ fontWeight: 700, color: 'var(--gray-600)', fontSize: '.75rem', textTransform: 'uppercase' }}>Filter Status</label>
+              <select className="form-control" style={{ borderRadius: '8px', border: '1px solid var(--gray-200)', background: 'var(--gray-50)' }} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+                {STATUS_OPTS.map(s => <option key={s} value={s}>{s || 'All Statuses'}</option>)}
               </select>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="card">
+      <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
         {loading ? (
           <div className="spinner-wrap"><div className="spinner"/></div>
         ) : appointments.length === 0 ? (

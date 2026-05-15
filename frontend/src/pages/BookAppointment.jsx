@@ -101,15 +101,26 @@ export default function BookAppointment() {
 
   return (
     <div>
-      <div className="page-header">
+      {/* Premium Gradient Header Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)',
+        padding: '32px 40px',
+        borderRadius: '16px',
+        marginBottom: '24px',
+        color: 'white',
+        boxShadow: '0 10px 30px rgba(37, 99, 235, 0.15)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
         <div>
-          <h1 className="page-title">Book an Appointment</h1>
-          <p className="page-subtitle">Schedule your visit to the barangay hall.</p>
+          <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 8px 0', fontFamily: 'var(--font-heading)', color: 'white' }}>Book an Appointment</h1>
+          <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', letterSpacing: '0.02em' }}>Schedule your visit to the barangay hall.</p>
         </div>
       </div>
 
       <div className="grid-2" style={{ alignItems: 'start' }}>
-        <div className="card">
+        <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
           <div className="card-header">
             <span className="card-title">Appointment Form</span>
           </div>
@@ -211,7 +222,7 @@ export default function BookAppointment() {
 
         {/* Info Panel */}
         <div>
-          <div className="card" style={{ marginBottom: 16 }}>
+          <div className="card" style={{ marginBottom: 16, border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
             <div className="card-body">
               <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, marginBottom: 14, fontSize: '.95rem' }}>Office Hours</h3>
               {[['Monday – Friday', '8:00 AM – 12:00 PM, 1:00 PM – 5:00 PM'], ['Saturday & Sunday', 'Closed']].map(([day, time]) => (
@@ -222,7 +233,7 @@ export default function BookAppointment() {
               ))}
             </div>
           </div>
-          <div className="card">
+          <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
             <div className="card-body">
               <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, marginBottom: 14, fontSize: '.95rem' }}>What to Bring</h3>
               {['Valid government ID', 'Proof of residency', 'Supporting documents (if needed)', 'Completed forms (if applicable)'].map(item => (

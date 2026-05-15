@@ -17,10 +17,21 @@ export default function Announcements() {
 
   return (
     <div>
-      <div className="page-header">
+      {/* Premium Gradient Header Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)',
+        padding: '32px 40px',
+        borderRadius: '16px',
+        marginBottom: '24px',
+        color: 'white',
+        boxShadow: '0 10px 30px rgba(37, 99, 235, 0.15)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
         <div>
-          <h1 className="page-title">Announcements</h1>
-          <p className="page-subtitle">Latest news and updates from your barangay.</p>
+          <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 8px 0', fontFamily: 'var(--font-heading)', color: 'white' }}>Announcements</h1>
+          <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', letterSpacing: '0.02em' }}>Latest news and updates from your barangay.</p>
         </div>
       </div>
 
@@ -34,7 +45,7 @@ export default function Announcements() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {announcements.map(a => (
-            <div key={a.id} className="card" style={{ overflow: 'hidden' }}>
+            <div key={a.id} className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
               <div style={{
                 height: 4,
                 background: a.priority === 'High'

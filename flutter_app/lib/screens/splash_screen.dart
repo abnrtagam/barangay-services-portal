@@ -26,11 +26,27 @@ class SplashScreen extends StatelessWidget {
               children: [
                 // Logo Container
                 Center(
-                  child: Image.asset(
-                    'assets/images/logo.png',
+                  child: Container(
+                    width: 140,
                     height: 140,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.account_balance_rounded, size: 80, color: AppColors.white),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        )
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => const Icon(Icons.account_balance_rounded, size: 80, color: AppColors.primary800),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 32),

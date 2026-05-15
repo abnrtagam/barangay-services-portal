@@ -38,24 +38,38 @@ export default function Reports() {
 
   return (
     <div>
-      <div className="page-header">
-        <div><h1 className="page-title">Reports & Analytics</h1><p className="page-subtitle">Generate and export barangay service reports.</p></div>
+      {/* Premium Gradient Header Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)',
+        padding: '32px 40px',
+        borderRadius: '16px',
+        marginBottom: '24px',
+        color: 'white',
+        boxShadow: '0 10px 30px rgba(37, 99, 235, 0.15)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <div>
+          <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 8px 0', fontFamily: 'var(--font-heading)', color: '#ffffff' }}>Reports & Analytics</h1>
+          <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', letterSpacing: '0.02em' }}>Generate and export barangay service reports.</p>
+        </div>
       </div>
 
-      {/* Date Filter */}
-      <div className="card mb-3">
-        <div className="card-body" style={{ padding: '14px 24px' }}>
+      {/* Date Filter (Elevated Card) */}
+      <div className="card mb-3" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <div className="card-body" style={{ padding: '18px 24px' }}>
           <div className="filter-bar">
             <div className="form-group">
-              <label className="form-label">From</label>
-              <input className="form-control" type="date" value={dateRange.from} onChange={e => setDateRange(p => ({ ...p, from: e.target.value }))}/>
+              <label className="form-label" style={{ fontWeight: 700, color: 'var(--gray-600)', fontSize: '.75rem', textTransform: 'uppercase' }}>From</label>
+              <input className="form-control" style={{ borderRadius: '8px', border: '1px solid var(--gray-200)', background: 'var(--gray-50)' }} type="date" value={dateRange.from} onChange={e => setDateRange(p => ({ ...p, from: e.target.value }))}/>
             </div>
             <div className="form-group">
-              <label className="form-label">To</label>
-              <input className="form-control" type="date" value={dateRange.to} onChange={e => setDateRange(p => ({ ...p, to: e.target.value }))}/>
+              <label className="form-label" style={{ fontWeight: 700, color: 'var(--gray-600)', fontSize: '.75rem', textTransform: 'uppercase' }}>To</label>
+              <input className="form-control" style={{ borderRadius: '8px', border: '1px solid var(--gray-200)', background: 'var(--gray-50)' }} type="date" value={dateRange.to} onChange={e => setDateRange(p => ({ ...p, to: e.target.value }))}/>
             </div>
             <div style={{ paddingBottom: 2 }}>
-              <button className="btn btn-primary" onClick={load}>Generate</button>
+              <button className="btn btn-primary" style={{ borderRadius: '8px', fontWeight: 700, padding: '10px 24px' }} onClick={load}>Generate</button>
             </div>
           </div>
         </div>
@@ -70,9 +84,9 @@ export default function Reports() {
             <DashboardCard title="Resolved Cases"     value={stats.resolvedComplaints || 0} icon={<FiFileText/>}  color="green"/>
           </div>
 
-          {/* Complaint Breakdown */}
+          {/* Breakdown Cards */}
           <div className="grid-2 mb-3">
-            <div className="card">
+            <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
               <div className="card-header">
                 <span className="card-title">Complaints by Status</span>
                 <button className="btn btn-secondary btn-sm" onClick={() => exportCsv('complaints')}>Export CSV</button>
@@ -101,7 +115,7 @@ export default function Reports() {
               </div>
             </div>
 
-            <div className="card">
+            <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
               <div className="card-header">
                 <span className="card-title">Appointments by Status</span>
                 <button className="btn btn-secondary btn-sm" onClick={() => exportCsv('appointments')}>Export CSV</button>
@@ -133,7 +147,7 @@ export default function Reports() {
 
           {/* Complaints by Category */}
           {stats.complaintsByCategory && stats.complaintsByCategory.length > 0 && (
-            <div className="card">
+            <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
               <div className="card-header">
                 <span className="card-title">Complaints by Category</span>
               </div>

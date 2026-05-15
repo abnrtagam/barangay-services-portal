@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { StatusBadge, Modal, AlertMessage } from '../components/DashboardCard'
-import { FiEye, FiCheck, FiX } from 'react-icons/fi'
+import { FiEye, FiCheck, FiX, FiCalendar } from 'react-icons/fi'
 
 const APPT_STATUSES = ['Pending', 'Approved', 'Completed', 'Cancelled', 'Rejected']
 const FINAL_APPT_STATUSES = ['Completed', 'Cancelled', 'Rejected']
@@ -61,31 +61,48 @@ export default function ManageAppointments() {
 
   return (
     <div>
-      <div className="page-header">
-        <div><h1 className="page-title">Manage Appointments</h1><p className="page-subtitle">Review and manage appointment requests.</p></div>
+      {/* Premium Gradient Header Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)',
+        padding: '32px 40px',
+        borderRadius: '16px',
+        marginBottom: '24px',
+        color: 'white',
+        boxShadow: '0 10px 30px rgba(37, 99, 235, 0.15)'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 8px 0', fontFamily: 'var(--font-heading)', color: '#ffffff' }}>Manage Appointments</h1>
+            <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', letterSpacing: '0.02em' }}>Review and manage resident appointment requests.</p>
+          </div>
+        </div>
       </div>
+      
       {alert && <AlertMessage type={alert.type} message={alert.message} onClose={() => setAlert(null)}/>}
-      <div className="card mb-3">
-        <div className="card-body" style={{ padding: '14px 24px' }}>
+      
+      {/* Filters (Elevated Card) */}
+      <div className="card mb-3" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <div className="card-body" style={{ padding: '18px 24px' }}>
           <div className="filter-bar">
             <div className="form-group">
-              <label className="form-label">Status</label>
-              <select className="form-control" value={filter.status} onChange={e => setFilter(p => ({ ...p, status: e.target.value }))}>
-                <option value="">All</option>
+              <label className="form-label" style={{ fontWeight: 700, color: 'var(--gray-600)', fontSize: '.75rem', textTransform: 'uppercase' }}>Status</label>
+              <select className="form-control" style={{ borderRadius: '8px', border: '1px solid var(--gray-200)', background: 'var(--gray-50)' }} value={filter.status} onChange={e => setFilter(p => ({ ...p, status: e.target.value }))}>
+                <option value="">All Statuses</option>
                 {APPT_STATUSES.map(s => <option key={s}>{s}</option>)}
               </select>
             </div>
             <div className="form-group">
-              <label className="form-label">Date</label>
-              <input className="form-control" type="date" value={filter.date} onChange={e => setFilter(p => ({ ...p, date: e.target.value }))}/>
+              <label className="form-label" style={{ fontWeight: 700, color: 'var(--gray-600)', fontSize: '.75rem', textTransform: 'uppercase' }}>Date</label>
+              <input className="form-control" style={{ borderRadius: '8px', border: '1px solid var(--gray-200)', background: 'var(--gray-50)' }} type="date" value={filter.date} onChange={e => setFilter(p => ({ ...p, date: e.target.value }))}/>
             </div>
             <div style={{ paddingBottom: 2 }}>
-              <button className="btn btn-primary" onClick={load}>Apply</button>
+              <button className="btn btn-primary" style={{ borderRadius: '8px', fontWeight: 700, padding: '10px 24px' }} onClick={load}>Apply</button>
             </div>
           </div>
         </div>
       </div>
-      <div className="card">
+      
+      <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
         {loading ? <div className="spinner-wrap"><div className="spinner"/></div> : (
           <div className="table-wrapper">
             <table>
@@ -93,8 +110,10 @@ export default function ManageAppointments() {
               <tbody>
                 {appointments.length === 0
                   ? <tr><td colSpan={7} style={{ textAlign: 'center', padding: 30, color: 'var(--gray-400)' }}>No appointments found.</td></tr>
-                  : appointments.map((a, i) => (
-                    <tr key={a.id}>
+                  : appointments.map((a, i) => {
+                    if (!a) return null
+                    return (
+                      <tr key={a.id || i}>
                       <td style={{ color: 'var(--gray-400)', fontSize: '.8rem' }}>{i + 1}</td>
                       <td style={{ fontWeight: 600, fontFamily: 'var(--font-heading)', fontSize: '.88rem' }}>{a.resident_name}</td>
                       <td style={{ fontSize: '.85rem' }}>{a.purpose}</td>
@@ -114,7 +133,8 @@ export default function ManageAppointments() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    )
+                  })}
               </tbody>
             </table>
           </div>

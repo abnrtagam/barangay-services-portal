@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { Modal } from '../components/DashboardCard'
-import { FiEye, FiSearch, FiUser } from 'react-icons/fi'
+import { FiEye, FiSearch, FiUser, FiUsers } from 'react-icons/fi'
 import { formatDate } from '../utils/date'
 
 export default function ManageResidents() {
@@ -23,22 +23,38 @@ export default function ManageResidents() {
 
   return (
     <div>
-      <div className="page-header">
-        <div><h1 className="page-title">Manage Residents</h1><p className="page-subtitle">View all registered residents and their records.</p></div>
-      </div>
-      <div className="card mb-3">
-        <div className="card-body" style={{ padding: '14px 24px' }}>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
-            <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-              <label className="form-label">Search Residents</label>
-              <input className="form-control" placeholder="Search by name, email, or phone..." value={search}
-                onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && load(search)}/>
-            </div>
-            <button className="btn btn-primary" onClick={() => load(search)}><FiSearch/> Search</button>
+      {/* Premium Gradient Header Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)',
+        padding: '32px 40px',
+        borderRadius: '16px',
+        marginBottom: '24px',
+        color: 'white',
+        boxShadow: '0 10px 30px rgba(37, 99, 235, 0.15)'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 8px 0', fontFamily: 'var(--font-heading)', color: '#ffffff' }}>Manage Residents</h1>
+            <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', letterSpacing: '0.02em' }}>View all registered residents and their records.</p>
           </div>
         </div>
       </div>
-      <div className="card">
+      
+      {/* Filters (Elevated Card) */}
+      <div className="card mb-3" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <div className="card-body" style={{ padding: '18px 24px' }}>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-end' }}>
+            <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+              <label className="form-label" style={{ fontWeight: 700, color: 'var(--gray-600)', fontSize: '.75rem', textTransform: 'uppercase' }}>Search Residents</label>
+              <input className="form-control" style={{ borderRadius: '8px', border: '1px solid var(--gray-200)', background: 'var(--gray-50)' }} placeholder="Search by name, email, or phone..." value={search}
+                onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && load(search)}/>
+            </div>
+            <button className="btn btn-primary" style={{ borderRadius: '8px', fontWeight: 700, padding: '10px 24px' }} onClick={() => load(search)}><FiSearch/> Search</button>
+          </div>
+        </div>
+      </div>
+      
+      <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
         {loading ? <div className="spinner-wrap"><div className="spinner"/></div> : (
           <div className="table-wrapper">
             <table>

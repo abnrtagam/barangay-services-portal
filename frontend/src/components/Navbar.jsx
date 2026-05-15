@@ -26,15 +26,12 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-        <div className="brand-logo">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <rect width="32" height="32" rx="8" fill="white" fillOpacity="0.2"/>
-            <path d="M16 4L4 11v2h24v-2L16 4zM6 14v10h4V14H6zm8 0v10h4V14h-4zm8 0v10h4V14h-4zM4 26h24v2H4v-2z" fill="white"/>
-          </svg>
+        <div className="brand-logo" style={{ overflow: 'hidden', borderRadius: '50%', width: 36, height: 36, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
         <div>
-          <span className="brand-name">Barangay Portal</span>
-          <span className="brand-sub">Citizen Services</span>
+          <span className="brand-name">Barangay Bulua</span>
+          <span className="brand-sub">Online Appointment & Complaint System</span>
         </div>
       </div>
 

@@ -13,14 +13,14 @@ const COLOR_MAP = {
 
 const cardStyle = {
   background: '#ffffff',
-  borderRadius: '14px',
+  borderRadius: '16px',
   padding: '24px',
   display: 'flex',
   flexDirection: 'column',
   gap: '16px',
-  boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)',
-  border: '1px solid #e8edf4',
-  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+  boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+  border: 'none',
+  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
   cursor: 'default',
   position: 'relative',
   overflow: 'hidden',
@@ -34,15 +34,22 @@ export function DashboardCard({ title, value, icon, color = 'blue', sub }) {
     <article
       style={{
         ...cardStyle,
-        borderTop: `4px solid ${palette.border}`,
-        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
+        transform: hovered ? 'translateY(-5px)' : 'translateY(0)',
         boxShadow: hovered
-          ? '0 8px 24px rgba(0,0,0,0.10)'
+          ? '0 12px 30px rgba(0,0,0,0.08)'
           : cardStyle.boxShadow,
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '4px',
+        height: '100%',
+        background: palette.border
+      }} />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <p style={{
           fontSize: '0.72rem',
@@ -126,13 +133,13 @@ export function StatusBadge({ status }) {
     <span style={{
       background: style.bg,
       color: style.color,
-      border: `1px solid ${style.border}`,
       borderRadius: '999px',
-      padding: '3px 10px',
-      fontSize: '0.75rem',
-      fontWeight: 600,
+      padding: '4px 12px',
+      fontSize: '0.72rem',
+      fontWeight: 700,
       letterSpacing: '0.03em',
       display: 'inline-block',
+      textTransform: 'uppercase'
     }}>
       {normalized}
     </span>

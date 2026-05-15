@@ -62,23 +62,29 @@ export default function ResidentDashboard() {
   return (
     <div>
       {error && <AlertMessage type="error" message={error} onClose={() => setError(null)} />}
-      {/* Welcome */}
+      {/* Premium Gradient Welcome Banner */}
       <div style={{
-        background: 'var(--primary-700)',
-        borderRadius: 'var(--radius-xl)', padding: '28px 32px', marginBottom: 28,
-        color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)',
+        padding: '32px 40px',
+        borderRadius: '16px',
+        marginBottom: '28px',
+        color: 'white',
+        boxShadow: '0 10px 30px rgba(37, 99, 235, 0.15)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
       }}>
         <div>
-          <h1 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.6rem', marginBottom: 6, color: 'var(--white)' }}>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '2rem', marginBottom: 8, color: 'white' }}>
             Welcome back, {user.first_name || 'Resident'}
           </h1>
-          <p style={{ color: 'var(--primary-100)', fontSize: '.95rem' }}>Here is your current barangay service overview.</p>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '.95rem', letterSpacing: '0.02em', margin: 0 }}>Here is your current barangay service overview.</p>
         </div>
-        <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
-          <Link to="/resident/complaints/submit" className="btn btn-secondary btn-sm" style={{ background: 'white', color: 'var(--primary-700)' }}>
+        <div style={{ display: 'flex', gap: 12, flexShrink: 0 }}>
+          <Link to="/resident/complaints/submit" className="btn btn-primary" style={{ background: 'white', color: 'var(--primary-700)', border: 'none', fontWeight: 700, borderRadius: '8px', padding: '12px 24px' }}>
             File Complaint
           </Link>
-          <Link to="/resident/appointments/book" className="btn btn-sm" style={{ background: 'rgba(255,255,255,.15)', color: 'white', border: '1.5px solid rgba(255,255,255,.3)' }}>
+          <Link to="/resident/appointments/book" className="btn" style={{ background: 'rgba(255,255,255,.15)', color: 'white', border: 'none', fontWeight: 700, borderRadius: '8px', padding: '12px 24px' }}>
             Book Appointment
           </Link>
         </div>
@@ -92,10 +98,10 @@ export default function ResidentDashboard() {
         <DashboardCard title="Upcoming Appointments" value={stats.upcomingAppointments} icon={<FiCheckCircle/>} color="success" />
       </div>
 
-      {/* Recent */}
+      {/* Recent Activity (Elevated Cards) */}
       <div className="grid-2">
         {/* Recent Complaints */}
-        <div className="card">
+        <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
           <div className="card-header">
             <span className="card-title">Recent Complaints</span>
             <Link to="/resident/complaints/history" className="btn btn-secondary btn-sm">View All <FiArrowRight/></Link>
@@ -119,7 +125,7 @@ export default function ResidentDashboard() {
         </div>
 
         {/* Recent Appointments */}
-        <div className="card">
+        <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
           <div className="card-header">
             <span className="card-title">Recent Appointments</span>
             <Link to="/resident/appointments/history" className="btn btn-secondary btn-sm">View All <FiArrowRight/></Link>

@@ -71,6 +71,12 @@ exports.getMyComplaints = async (req, res) => {
       `SELECT COUNT(*) AS total FROM complaints c JOIN complaint_categories cc ON c.category_id = cc.id ${where}`,
       params
     )
+
+    // Attach history to each complaint for the mobile app timeline
+    for (let i = 0; i < rows.length; i++) {
+      rows[i].history = await getComplaintStatusHistory(rows[i].id);
+    }
+
     res.json({ data: rows, total, page: parseInt(page), limit: parseInt(limit) })
   } catch (err) {
     console.error(err)

@@ -42,41 +42,52 @@ export default function ComplaintHistory() {
 
   return (
     <div>
-      <div className="page-header">
+      {/* Premium Gradient Header Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)',
+        padding: '32px 40px',
+        borderRadius: '16px',
+        marginBottom: '24px',
+        color: 'white',
+        boxShadow: '0 10px 30px rgba(37, 99, 235, 0.15)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
         <div>
-          <h1 className="page-title">Complaint History</h1>
-          <p className="page-subtitle">Track all your filed complaints and their status.</p>
+          <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 8px 0', fontFamily: 'var(--font-heading)', color: 'white' }}>Complaint History</h1>
+          <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', letterSpacing: '0.02em' }}>Track all your filed complaints and their progress.</p>
         </div>
-        <Link to="/resident/complaints/submit" className="btn btn-primary">
+        <Link to="/resident/complaints/submit" className="btn btn-primary" style={{ background: 'white', color: 'var(--primary-700)', border: 'none', fontWeight: 700, borderRadius: '8px', padding: '12px 24px' }}>
           <FiPlus /> New Complaint
         </Link>
       </div>
 
-      {/* Filters */}
-      <div className="card mb-3">
-        <div className="card-body" style={{ paddingTop: 16, paddingBottom: 16 }}>
+      {/* Filters (Elevated Card) */}
+      <div className="card mb-3" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <div className="card-body" style={{ padding: '18px 24px' }}>
           <div className="filter-bar">
             <div className="form-group">
-              <label className="form-label">Filter by Status</label>
-              <select className="form-control" value={filter.status} onChange={e => setFilter(p => ({ ...p, status: e.target.value }))}>
+              <label className="form-label" style={{ fontWeight: 700, color: 'var(--gray-600)', fontSize: '.75rem', textTransform: 'uppercase' }}>Filter Status</label>
+              <select className="form-control" style={{ borderRadius: '8px', border: '1px solid var(--gray-200)', background: 'var(--gray-50)' }} value={filter.status} onChange={e => setFilter(p => ({ ...p, status: e.target.value }))}>
                 {STATUS_OPTS.map(s => <option key={s} value={s}>{s || 'All Statuses'}</option>)}
               </select>
             </div>
             <div className="form-group" style={{ flex: 1 }}>
-              <label className="form-label">Search</label>
-              <input className="form-control" placeholder="Search by subject..." value={filter.search}
+              <label className="form-label" style={{ fontWeight: 700, color: 'var(--gray-600)', fontSize: '.75rem', textTransform: 'uppercase' }}>Search</label>
+              <input className="form-control" style={{ borderRadius: '8px', border: '1px solid var(--gray-200)', background: 'var(--gray-50)' }} placeholder="Search by subject..." value={filter.search}
                 onChange={e => setFilter(p => ({ ...p, search: e.target.value }))}
                 onKeyDown={e => e.key === 'Enter' && load()}
               />
             </div>
             <div style={{ paddingBottom: 2 }}>
-              <button className="btn btn-secondary" onClick={load}><FiFilter /> Filter</button>
+              <button className="btn btn-primary" style={{ borderRadius: '8px', fontWeight: 700, padding: '10px 24px' }} onClick={load}><FiFilter /> Filter</button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="card">
+      <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
         {loading ? (
           <div className="spinner-wrap"><div className="spinner"/></div>
         ) : complaints.length === 0 ? (

@@ -35,15 +35,48 @@ class _AppointmentHistoryScreenState extends State<AppointmentHistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.gray50,
-      appBar: AppBar(
-        title: const Text('MY APPOINTMENTS'),
-      ),
       body: Column(
         children: [
+          // Dynamic Header Banner
+          Container(
+            padding: const EdgeInsets.fromLTRB(24, 64, 24, 24),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppColors.primary900, AppColors.primary700],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'My Appointments',
+                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: AppColors.white, fontFamily: 'Plus Jakarta Sans'),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), shape: BoxShape.circle),
+                      child: const Icon(Icons.calendar_month_rounded, color: AppColors.white),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Manage and track your barangay schedules.',
+                  style: TextStyle(fontSize: 14, color: AppColors.primary100, fontFamily: 'DM Sans'),
+                ),
+              ],
+            ),
+          ),
+
           // Filter chips
           Container(
             color: AppColors.white,
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -51,15 +84,16 @@ class _AppointmentHistoryScreenState extends State<AppointmentHistoryScreen> {
                     .map((status) => Padding(
                           padding: const EdgeInsets.only(right: 8),
                           child: FilterChip(
-                            label: Text(status.toUpperCase(), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                            label: Text(status.toUpperCase(), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _filterStatus == status ? AppColors.white : AppColors.gray600, letterSpacing: 0.5)),
                             selected: _filterStatus == status,
                             onSelected: (selected) {
                               setState(() => _filterStatus = status);
                             },
-                            backgroundColor: AppColors.gray50,
-                            selectedColor: AppColors.primary100,
-                            checkmarkColor: AppColors.primary700,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                            backgroundColor: AppColors.gray100,
+                            selectedColor: AppColors.primary600,
+                            showCheckmark: false,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30), side: BorderSide.none),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           ),
                         ))
                     .toList(),
@@ -85,9 +119,13 @@ class _AppointmentHistoryScreenState extends State<AppointmentHistoryScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.calendar_today_outlined, size: 64, color: AppColors.gray300),
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(color: AppColors.primary50, shape: BoxShape.circle),
+                          child: const Icon(Icons.calendar_today_outlined, size: 48, color: AppColors.primary300),
+                        ),
                         const SizedBox(height: 16),
-                        Text('No appointments found', style: TextStyle(color: AppColors.gray500, fontSize: 16)),
+                        const Text('No appointments found', style: TextStyle(color: AppColors.gray500, fontSize: 16, fontWeight: FontWeight.w600)),
                       ],
                     ),
                   );
@@ -95,6 +133,7 @@ class _AppointmentHistoryScreenState extends State<AppointmentHistoryScreen> {
 
                 return RefreshIndicator(
                   onRefresh: () => provider.fetchAppointments(),
+                  color: AppColors.primary600,
                   child: ListView.builder(
                     padding: const EdgeInsets.all(20),
                     itemCount: appointments.length,
@@ -111,8 +150,10 @@ class _AppointmentHistoryScreenState extends State<AppointmentHistoryScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BookAppointmentScreen())),
-        label: const Text('BOOK APPOINTMENT', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, letterSpacing: 1)),
-        icon: const Icon(Icons.add_rounded),
+        backgroundColor: AppColors.primary600,
+        elevation: 4,
+        label: const Text('BOOK APPOINTMENT', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, letterSpacing: 1, color: AppColors.white)),
+        icon: const Icon(Icons.add_rounded, color: AppColors.white),
       ),
     );
   }
@@ -123,13 +164,13 @@ class _AppointmentHistoryScreenState extends State<AppointmentHistoryScreen> {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: InkWell(
         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AppointmentDetailScreen(appointment: appointment))),
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -137,39 +178,47 @@ class _AppointmentHistoryScreenState extends State<AppointmentHistoryScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   StatusBadge(status: appointment.status),
-                  Text(
-                    DateFormat('MMM dd, yyyy').format(DateTime.parse(appointment.appointmentDate)),
-                    style: const TextStyle(color: AppColors.primary700, fontWeight: FontWeight.bold, fontSize: 12),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                appointment.purpose,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primary900),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(Icons.access_time_rounded, size: 14, color: AppColors.gray500),
-                  const SizedBox(width: 4),
-                  Text(
-                    appointment.timeSlot,
-                    style: const TextStyle(color: AppColors.gray600, fontSize: 13),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(color: AppColors.primary50, borderRadius: BorderRadius.circular(8)),
+                    child: Text(
+                      DateFormat('MMM dd, yyyy').format(DateTime.parse(appointment.appointmentDate)),
+                      style: const TextStyle(color: AppColors.primary700, fontWeight: FontWeight.w800, fontSize: 11),
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              Text(
+                appointment.purpose,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.primary900, fontFamily: 'Plus Jakarta Sans'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 12),
+              Row(
                 children: [
+                  const Icon(Icons.access_time_filled_rounded, size: 16, color: AppColors.gray400),
+                  const SizedBox(width: 6),
+                  Text(
+                    appointment.timeSlot,
+                    style: const TextStyle(color: AppColors.gray600, fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                child: Divider(color: AppColors.gray100, thickness: 1.5),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: const [
                   Text(
                     'View Details',
-                    style: TextStyle(color: AppColors.primary600, fontWeight: FontWeight.bold, fontSize: 12),
+                    style: TextStyle(color: AppColors.primary600, fontWeight: FontWeight.w800, fontSize: 12, letterSpacing: 0.5),
                   ),
-                  Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.primary600),
+                  SizedBox(width: 4),
+                  Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.primary600),
                 ],
               ),
             ],

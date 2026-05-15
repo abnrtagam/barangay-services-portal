@@ -116,94 +116,138 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               title: const Text('BOOK APPOINTMENT'),
             ),
             body: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text('VISIT SCHEDULE', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.gray500, letterSpacing: 1.2, fontFamily: 'Plus Jakarta Sans')),
-                  const SizedBox(height: 16),
-                  
+                  // Dynamic Header Banner
                   Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppColors.gray200, width: 1),
+                    padding: const EdgeInsets.fromLTRB(24, 32, 24, 48),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [AppColors.primary900, AppColors.primary700],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _inputLabel('SELECT DATE'),
-                        InkWell(
-                          onTap: _pickDate,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.gray300),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(children: [
-                              const Icon(Icons.calendar_month_rounded, color: AppColors.primary600, size: 20),
-                              const SizedBox(width: 12),
-                              Text(
-                                _selectedDate != null ? DateFormat('MMMM d, y (EEEE)').format(_selectedDate!) : 'Select a weekday',
-                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: _selectedDate != null ? AppColors.primary900 : AppColors.gray400),
-                              ),
-                            ]),
-                          ),
+                      children: const [
+                        Text(
+                          'Schedule a Visit',
+                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.white, fontFamily: 'Plus Jakarta Sans'),
                         ),
-                        const SizedBox(height: 20),
-
-                        if (_selectedDate != null) ...[
-                          _inputLabel('AVAILABLE TIME SLOTS'),
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: _timeSlots.map((slot) {
-                              final isTaken = provider.takenSlots.contains(slot);
-                              final isSelected = _selectedSlot == slot;
-                              return ChoiceChip(
-                                label: Text(slot, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isTaken ? AppColors.gray400 : (isSelected ? Colors.white : AppColors.primary900))),
-                                selected: isSelected,
-                                onSelected: isTaken ? null : (sel) => setState(() => _selectedSlot = sel ? slot : null),
-                                selectedColor: AppColors.primary600,
-                                backgroundColor: AppColors.gray50,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: BorderSide(color: isSelected ? AppColors.primary600 : AppColors.gray200)),
-                                showCheckmark: false,
-                              );
-                            }).toList(),
-                          ),
-                          const SizedBox(height: 24),
-                        ],
-
-                        _inputLabel('PURPOSE OF VISIT'),
-                        TextField(
-                          controller: _purposeController,
-                          decoration: const InputDecoration(
-                            hintText: 'e.g. Requesting Clearance, Certification',
-                            prefixIcon: Icon(Icons.assignment_outlined, size: 20),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        _inputLabel('ADDITIONAL NOTES (OPTIONAL)'),
-                        TextField(
-                          controller: _notesController,
-                          maxLines: 3,
-                          decoration: const InputDecoration(
-                            hintText: 'Any other details the admin should know...',
-                            alignLabelWithHint: true,
-                          ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Book an appointment for barangay services, clearances, or consultations.',
+                          style: TextStyle(fontSize: 14, color: AppColors.primary100, fontFamily: 'DM Sans', height: 1.5),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
-                  
-                  ElevatedButton(
-                    onPressed: provider.isSubmitting ? null : _handleBook,
-                    child: const Text('CONFIRM APPOINTMENT'),
+
+                  // Overlapping Form Card
+                  Transform.translate(
+                    offset: const Offset(0, -24),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 24, offset: const Offset(0, 8))
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _inputLabel('SELECT DATE'),
+                          InkWell(
+                            onTap: _pickDate,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              decoration: BoxDecoration(
+                                color: AppColors.gray50,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(children: [
+                                const Icon(Icons.calendar_month_rounded, color: AppColors.primary600, size: 20),
+                                const SizedBox(width: 12),
+                                Text(
+                                  _selectedDate != null ? DateFormat('MMMM d, y (EEEE)').format(_selectedDate!) : 'Select a weekday',
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: _selectedDate != null ? AppColors.primary900 : AppColors.gray400),
+                                ),
+                              ]),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          if (_selectedDate != null) ...[
+                            _inputLabel('AVAILABLE TIME SLOTS'),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: _timeSlots.map((slot) {
+                                final isTaken = provider.takenSlots.contains(slot);
+                                final isSelected = _selectedSlot == slot;
+                                return ChoiceChip(
+                                  label: Text(slot, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isTaken ? AppColors.gray400 : (isSelected ? Colors.white : AppColors.primary900))),
+                                  selected: isSelected,
+                                  onSelected: isTaken ? null : (sel) => setState(() => _selectedSlot = sel ? slot : null),
+                                  selectedColor: AppColors.primary600,
+                                  backgroundColor: AppColors.gray50,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: BorderSide(color: isSelected ? AppColors.primary600 : Colors.transparent)),
+                                  showCheckmark: false,
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+
+                          _inputLabel('PURPOSE OF VISIT'),
+                          TextField(
+                            controller: _purposeController,
+                            decoration: InputDecoration(
+                              hintText: 'e.g. Requesting Clearance...',
+                              prefixIcon: const Icon(Icons.assignment_outlined, size: 20, color: AppColors.primary600),
+                              filled: true,
+                              fillColor: AppColors.gray50,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          _inputLabel('ADDITIONAL NOTES (OPTIONAL)'),
+                          TextField(
+                            controller: _notesController,
+                            maxLines: 3,
+                            decoration: InputDecoration(
+                              hintText: 'Any other details...',
+                              alignLabelWithHint: true,
+                              filled: true,
+                              fillColor: AppColors.gray50,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                              contentPadding: const EdgeInsets.all(16),
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          
+                          ElevatedButton(
+                            onPressed: provider.isSubmitting ? null : _handleBook,
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 56),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              backgroundColor: AppColors.primary600,
+                              foregroundColor: AppColors.white,
+                              elevation: 0,
+                            ),
+                            child: const Text('CONFIRM APPOINTMENT', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 1)),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),

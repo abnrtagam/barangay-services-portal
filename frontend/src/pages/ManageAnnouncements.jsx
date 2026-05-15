@@ -53,16 +53,34 @@ export default function ManageAnnouncements() {
 
   return (
     <div>
-      <div className="page-header">
-        <div><h1 className="page-title">Manage Announcements</h1><p className="page-subtitle">Post and manage barangay announcements.</p></div>
-        <button className="btn btn-primary" onClick={openNew}><FiPlus/> New Announcement</button>
+      {/* Premium Gradient Header Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)',
+        padding: '32px 40px',
+        borderRadius: '16px',
+        marginBottom: '24px',
+        color: 'white',
+        boxShadow: '0 10px 30px rgba(37, 99, 235, 0.15)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <div>
+          <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 8px 0', fontFamily: 'var(--font-heading)', color: '#ffffff' }}>Manage Announcements</h1>
+          <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', letterSpacing: '0.02em' }}>Post and manage barangay announcements.</p>
+        </div>
+        <button className="btn btn-primary" style={{ borderRadius: '8px', fontWeight: 700, padding: '12px 24px', background: 'white', color: 'var(--primary-700)', border: 'none' }} onClick={openNew}>
+          <FiPlus/> New Announcement
+        </button>
       </div>
+      
       {alert && <AlertMessage type={alert.type} message={alert.message} onClose={() => setAlert(null)}/>}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {loading ? <div className="spinner-wrap"><div className="spinner"/></div>
           : announcements.length === 0 ? <div className="empty-state"><p>No announcements yet.</p></div>
           : announcements.map(a => (
-            <div key={a.id} className="card" style={{ overflow: 'hidden' }}>
+            <div key={a.id} className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
               <div style={{ height: 3, background: a.priority === 'High' ? 'var(--danger)' : a.priority === 'Medium' ? 'var(--warning)' : 'var(--primary-500)' }}/>
               <div className="card-body" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
                 <div style={{ flex: 1 }}>

@@ -24,103 +24,103 @@ export default function Sidebar() {
     navigate('/admin/login')
   }
 
-  const admin = JSON.parse(localStorage.getItem('admin_user') || '{}')
+  const getAdminUser = () => {
+    try {
+      const data = localStorage.getItem('admin_user')
+      if (!data || data === 'undefined') return {}
+      return JSON.parse(data)
+    } catch (e) {
+      return {}
+    }
+  }
+  const admin = getAdminUser()
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-brand">
-        <div className="brand-icon">
-          <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-            <rect width="32" height="32" rx="8" fill="white" fillOpacity="0.15"/>
-            <path d="M16 4L4 11v2h24v-2L16 4zM6 14v10h4V14H6zm8 0v10h4V14h-4zm8 0v10h4V14h-4zM4 26h24v2H4v-2z" fill="white"/>
-          </svg>
+    <aside style={{
+      width: 'var(--sidebar-w)', height: '100vh',
+      background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)',
+      display: 'flex', flexDirection: 'column', flexShrink: 0,
+      position: 'sticky', top: 0, overflowY: 'auto',
+      boxShadow: '4px 0 24px rgba(0,0,0,.15)',
+      zIndex: 100
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '14px',
+        padding: '32px 24px 24px',
+        borderBottom: '1px solid rgba(255,255,255,.05)'
+      }}>
+        <div style={{ overflow: 'hidden', borderRadius: '50%', width: 44, height: 44, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
         <div>
-          <div className="brand-title">Barangay</div>
-          <div className="brand-sub">Admin Portal</div>
+          <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.15rem', color: 'white', letterSpacing: '-0.01em' }}>Barangay Bulua</div>
+          <div style={{ fontSize: '.72rem', color: '#94a3b8', letterSpacing: '.06em', textTransform: 'uppercase', marginTop: '2px' }}>Admin Portal</div>
         </div>
       </div>
 
-      <div className="sidebar-admin-info">
-        <div className="admin-avatar">{admin.name?.[0] || 'A'}</div>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '12px',
+        padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,.05)'
+      }}>
+        <div style={{
+          width: 40, height: 40, border_radius: '12px',
+          background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)', color: 'white',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '1.1rem',
+          boxShadow: '0 4px 10px rgba(37, 99, 235, 0.2)',
+          borderRadius: '12px'
+        }}>
+          {admin.name?.[0] || 'A'}
+        </div>
         <div>
-          <div className="admin-name">{admin.name || 'Administrator'}</div>
-          <div className="admin-role">System Admin</div>
+          <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: '.9rem', color: 'white' }}>{admin.name || 'Administrator'}</div>
+          <div style={{ fontSize: '.72rem', color: '#64748b' }}>System Admin</div>
         </div>
       </div>
 
-      <nav className="sidebar-nav">
-        <div className="nav-section-label">Main Menu</div>
+      <nav style={{ flex: 1, padding: '24px 16px' }}>
+        <div style={{
+          fontSize: '.68rem', letterSpacing: '.12em', textTransform: 'uppercase',
+          color: '#475569', fontFamily: 'var(--font-heading)', fontWeight: 800,
+          padding: '0 12px 14px'
+        }}>Main Menu</div>
         {NAV.map(item => (
           <NavLink
             key={item.to}
             to={item.to}
             className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+            style={({ isActive }) => ({
+              display: 'flex', alignItems: 'center', gap: '12px',
+              padding: '12px 16px', borderRadius: '12px',
+              fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: '0.92rem',
+              color: isActive ? 'white' : '#94a3b8', cursor: 'pointer', border: 'none',
+              background: isActive ? '#2563eb' : 'transparent', width: '100%', textDecoration: 'none',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)', marginBottom: '6px',
+              boxShadow: isActive ? '0 8px 20px rgba(37, 99, 235, 0.25)' : 'none'
+            })}
           >
-            <span className="link-icon">{item.icon}</span>
+            <span style={{ display: 'flex', alignItems: 'center', fontSize: '1.1rem' }}>{item.icon}</span>
             <span>{item.label}</span>
           </NavLink>
         ))}
       </nav>
 
-      <div className="sidebar-footer">
-        <button className="sidebar-link logout-btn" onClick={handleLogout}>
-          <span className="link-icon"><FiLogOut /></span>
+      <div style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,.05)' }}>
+        <button 
+          onClick={handleLogout}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '12px',
+            padding: '12px 16px', borderRadius: '12px',
+            fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: '0.92rem',
+            color: '#f87171', cursor: 'pointer', border: 'none',
+            background: 'none', width: '100%', textAlign: 'left',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <span style={{ display: 'flex', alignItems: 'center', fontSize: '1.1rem' }}><FiLogOut /></span>
           <span>Logout</span>
         </button>
       </div>
-
-      <style>{`
-        .sidebar {
-          width: var(--sidebar-w); height: 100vh;
-          background: linear-gradient(180deg, var(--primary-900) 0%, var(--primary-800) 100%);
-          display: flex; flex-direction: column; flex-shrink: 0;
-          position: sticky; top: 0; overflow-y: auto;
-          box-shadow: 2px 0 12px rgba(0,0,0,.15);
-        }
-        .sidebar-brand {
-          display: flex; align-items: center; gap: 14px;
-          padding: 28px 22px 22px;
-          border-bottom: 1px solid rgba(255,255,255,.1);
-        }
-        .brand-title { font-family: var(--font-heading); font-weight: 800; font-size: 1.1rem; color: white; }
-        .brand-sub   { font-size: .7rem; color: var(--primary-300); letter-spacing: .04em; }
-        .sidebar-admin-info {
-          display: flex; align-items: center; gap: 12px;
-          padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,.08);
-        }
-        .admin-avatar {
-          width: 38px; height: 38px; border-radius: 10px;
-          background: rgba(255,255,255,.15); color: white;
-          display: flex; align-items: center; justify-content: center;
-          font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem;
-        }
-        .admin-name { font-family: var(--font-heading); font-weight: 600; font-size: .9rem; color: white; }
-        .admin-role { font-size: .72rem; color: var(--primary-300); }
-        .sidebar-nav { flex: 1; padding: 18px 14px; }
-        .nav-section-label {
-          font-size: .68rem; letter-spacing: .08em; text-transform: uppercase;
-          color: var(--primary-400); font-family: var(--font-heading); font-weight: 700;
-          padding: 0 10px 10px;
-        }
-        .sidebar-link {
-          display: flex; align-items: center; gap: 12px;
-          padding: 12px 14px; border-radius: var(--radius-md);
-          font-family: var(--font-heading); font-weight: 600; font-size: .9rem;
-          color: var(--primary-200); cursor: pointer; border: none;
-          background: none; width: 100%; text-align: left;
-          transition: var(--transition); margin-bottom: 8px;
-        }
-        .sidebar-link:hover { background: rgba(255,255,255,.1); color: white; }
-        .sidebar-link.active { background: rgba(255,255,255,.15); color: white; }
-        .sidebar-link.active .link-icon { color: var(--primary-300); }
-        .link-icon { display: flex; align-items: center; font-size: 1.05rem; }
-        .sidebar-footer {
-          padding: 12px; border-top: 1px solid rgba(255,255,255,.1);
-        }
-        .logout-btn { color: #fca5a5 !important; }
-        .logout-btn:hover { background: rgba(239,68,68,.15) !important; }
-      `}</style>
     </aside>
   )
 }

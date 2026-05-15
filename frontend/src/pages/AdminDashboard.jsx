@@ -149,9 +149,9 @@ export default function AdminDashboard() {
       <div className="grid-2">
 
         <div style={{
-          background: '#ffffff', borderRadius: '14px',
-          border: '1px solid #e8edf4',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden',
+          background: '#ffffff', borderRadius: '16px',
+          border: 'none',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden',
         }}>
           <div style={{
             padding: '18px 24px', borderBottom: '1px solid #f1f5f9',
@@ -207,9 +207,9 @@ export default function AdminDashboard() {
         </div>
 
         <div style={{
-          background: '#ffffff', borderRadius: '14px',
-          border: '1px solid #e8edf4',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden',
+          background: '#ffffff', borderRadius: '16px',
+          border: 'none',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden',
         }}>
           <div style={{
             padding: '18px 24px', borderBottom: '1px solid #f1f5f9',

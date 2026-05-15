@@ -90,6 +90,12 @@ exports.getMyAppointments = async (req, res) => {
     const [[{ total }]] = await db.query(
       `SELECT COUNT(*) AS total FROM appointments a ${where}`, params
     )
+    
+    // Attach history to each appointment for the mobile app timeline
+    for (let i = 0; i < rows.length; i++) {
+      rows[i].history = await getAppointmentStatusHistory(rows[i].id);
+    }
+
     res.json({ data: rows, total, page: parseInt(page), limit: parseInt(limit) })
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch appointments.' })

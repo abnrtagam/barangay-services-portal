@@ -67,15 +67,26 @@ export default function SubmitComplaint() {
 
   return (
     <div>
-      <div className="page-header">
+      {/* Premium Gradient Header Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)',
+        padding: '32px 40px',
+        borderRadius: '16px',
+        marginBottom: '24px',
+        color: 'white',
+        boxShadow: '0 10px 30px rgba(37, 99, 235, 0.15)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
         <div>
-          <h1 className="page-title">File a Complaint</h1>
-          <p className="page-subtitle">Submit your complaint and we'll address it promptly.</p>
+          <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 8px 0', fontFamily: 'var(--font-heading)', color: 'white' }}>File a Complaint</h1>
+          <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', letterSpacing: '0.02em' }}>Submit your complaint and we'll address it promptly.</p>
         </div>
       </div>
 
       <div style={{ maxWidth: 680 }}>
-        <div className="card">
+        <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
           <div className="card-header">
             <span className="card-title">Complaint Details</span>
             <span style={{ fontSize: '.8rem', color: 'var(--gray-400)' }}>* Required fields</span>

@@ -221,64 +221,57 @@ export default function AccountVerifications() {
 
   return (
     <div>
-      <div style={{ marginBottom: 32 }}>
-        <h1 className="page-title">Account Verifications</h1>
-        <p className="text-muted">Review and manage resident account registrations</p>
+      {/* Premium Gradient Header Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)',
+        padding: '32px 40px',
+        borderRadius: '16px',
+        marginBottom: '24px',
+        color: 'white',
+        boxShadow: '0 10px 30px rgba(37, 99, 235, 0.15)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <div>
+          <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 8px 0', fontFamily: 'var(--font-heading)', color: '#ffffff' }}>Account Verifications</h1>
+          <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', letterSpacing: '0.02em' }}>Review and manage resident account registrations.</p>
+        </div>
       </div>
 
       {alert && <AlertMessage type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
 
-      {/* Statistics */}
+      {/* Statistics Row (Elevated Cards) */}
       {stats && (
         <div className="grid-4" style={{ marginBottom: 24 }}>
-          <DashboardCard
-            title="Pending"
-            value={stats.pending}
-            icon={<FiClock/>}
-            color="warning"
-          />
-          <DashboardCard
-            title="Approved"
-            value={stats.approved}
-            icon={<FiCheck/>}
-            color="green"
-          />
-          <DashboardCard
-            title="Rejected"
-            value={stats.rejected}
-            icon={<FiX/>}
-            color="red"
-          />
-          <DashboardCard
-            title="Total Accounts"
-            value={stats.total}
-            icon={<FiUser/>}
-            color="blue"
-          />
+          <DashboardCard title="Pending" value={stats.pending} icon={<FiClock/>} color="warning" />
+          <DashboardCard title="Approved" value={stats.approved} icon={<FiCheck/>} color="green" />
+          <DashboardCard title="Rejected" value={stats.rejected} icon={<FiX/>} color="red" />
+          <DashboardCard title="Total Accounts" value={stats.total} icon={<FiUser/>} color="blue" />
         </div>
       )}
 
-      {/* Reactivation Requests */}
+      {/* Reactivation Requests (Elevated Card) */}
       {reactivationRequests.length > 0 && (
-        <div className="card" style={{ marginBottom: 24, background: 'var(--amber-50)', border: '2px solid var(--amber-200)' }}>
-          <div className="card-body">
+        <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 10px 30px rgba(245, 158, 11, 0.15)', marginBottom: 24, background: 'var(--amber-50)', overflow: 'hidden' }}>
+          <div className="card-body" style={{ padding: '24px' }}>
             <h3 style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
               <FiRefreshCw size={20} style={{ color: 'var(--amber-700)' }} />
-              <span style={{ color: 'var(--amber-900)' }}>Pending Reactivation Requests ({reactivationRequests.length})</span>
+              <span style={{ color: 'var(--amber-900)', fontFamily: 'var(--font-heading)', fontWeight: 700 }}>Pending Reactivation Requests ({reactivationRequests.length})</span>
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {reactivationRequests.map(req => (
                 <div key={req.id} style={{
                   background: 'white',
                   padding: 16,
-                  borderRadius: 10,
-                  border: '1px solid var(--amber-300)',
+                  borderRadius: 12,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                 }}>
                   <div>
-                    <p style={{ margin: 0, fontWeight: '600', color: 'var(--gray-800)' }}>
+                    <p style={{ margin: 0, fontWeight: '700', color: 'var(--gray-800)', fontFamily: 'var(--font-heading)' }}>
                       {req.first_name} {req.last_name} ({req.email})
                     </p>
                     <p style={{ margin: '4px 0 0', fontSize: '0.9rem', color: 'var(--gray-600)' }}>
@@ -290,6 +283,7 @@ export default function AccountVerifications() {
                   </div>
                   <button
                     className="btn btn-success"
+                    style={{ borderRadius: '8px', fontWeight: 700 }}
                     onClick={() => handleReactivate(req.user_id)}
                     disabled={actionLoading}
                   >
@@ -302,26 +296,28 @@ export default function AccountVerifications() {
         </div>
       )}
 
-      {/* Filters */}
-      <div className="card" style={{ marginBottom: 24 }}>
-        <div className="card-body">
-          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+      {/* Filters (Elevated Card) */}
+      <div className="card mb-3" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <div className="card-body" style={{ padding: '18px 24px' }}>
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'flex-end' }}>
             <div style={{ flex: '1 1 300px' }}>
+              <label className="form-label" style={{ fontWeight: 700, color: 'var(--gray-600)', fontSize: '.75rem', textTransform: 'uppercase' }}>Search Residents</label>
               <input
                 type="text"
                 className="form-control"
+                style={{ borderRadius: '8px', border: '1px solid var(--gray-200)', background: 'var(--gray-50)' }}
                 placeholder="Search by name or email..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <div style={{ display: 'flex', gap: 10 }}>
+            <div style={{ display: 'flex', gap: 8 }}>
               {['all', 'pending', 'approved', 'rejected', 'suspended'].map(status => (
                 <button
                   key={status}
                   className={`btn ${filter === status ? 'btn-primary' : 'btn-secondary'}`}
                   onClick={() => setFilter(status)}
-                  style={{ textTransform: 'capitalize' }}
+                  style={{ textTransform: 'capitalize', borderRadius: '8px', fontWeight: 600, fontSize: '.85rem', padding: '10px 16px' }}
                 >
                   {status === 'all' ? 'All' : status}
                 </button>
@@ -331,8 +327,8 @@ export default function AccountVerifications() {
         </div>
       </div>
 
-      {/* Accounts List */}
-      <div className="card">
+      {/* Accounts List (Elevated Card) */}
+      <div className="card" style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden' }}>
         <div className="card-body">
           {loading ? (
             <div style={{ textAlign: 'center', padding: 40 }}>
@@ -359,8 +355,10 @@ export default function AccountVerifications() {
                   </tr>
                 </thead>
                 <tbody>
-                  {accounts.map(account => (
-                    <tr key={account.id}>
+                  {accounts.map((account, idx) => {
+                    if (!account) return null
+                    return (
+                      <tr key={account.id || idx}>
                       <td style={{ fontWeight: '500' }}>
                         {account.first_name} {account.last_name}
                       </td>
@@ -388,7 +386,8 @@ export default function AccountVerifications() {
                         </button>
                       </td>
                     </tr>
-                  ))}
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
@@ -463,7 +462,16 @@ export default function AccountVerifications() {
                     Verification Documents
                   </h3>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-                    {JSON.parse(selectedAccount.verification_documents).map((filename, idx) => (
+                    {(() => {
+                      try {
+                        const docs = typeof selectedAccount.verification_documents === 'string' 
+                          ? JSON.parse(selectedAccount.verification_documents) 
+                          : selectedAccount.verification_documents
+                        return Array.isArray(docs) ? docs : []
+                      } catch {
+                        return []
+                      }
+                    })().map((filename, idx) => (
                       <button
                         key={idx}
                         onClick={() => viewDocument(filename)}

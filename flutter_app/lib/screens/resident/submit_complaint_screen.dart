@@ -84,102 +84,151 @@ class _SubmitComplaintScreenState extends State<SubmitComplaintScreen> {
               title: const Text('SUBMIT COMPLAINT'),
             ),
             body: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text('REPORT INCIDENT', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.gray500, letterSpacing: 1.2, fontFamily: 'Plus Jakarta Sans')),
-                  const SizedBox(height: 16),
-                  
+                  // Dynamic Header Banner
                   Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppColors.gray200, width: 1),
+                    padding: const EdgeInsets.fromLTRB(24, 32, 24, 48),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [AppColors.primary900, AppColors.primary700],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _inputLabel('COMPLAINT CATEGORY'),
-                        DropdownButtonFormField<ComplaintCategory>(
-                          decoration: const InputDecoration(
-                            hintText: 'Select category',
-                            prefixIcon: Icon(Icons.category_outlined, size: 20),
-                          ),
-                          items: provider.categories.map((cat) => DropdownMenuItem(value: cat, child: Text(cat.name))).toList(),
-                          onChanged: (val) => setState(() => _selectedCategory = val),
-                          value: _selectedCategory,
+                      children: const [
+                        Text(
+                          'Report an Incident',
+                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.white, fontFamily: 'Plus Jakarta Sans'),
                         ),
-                        const SizedBox(height: 20),
-
-                        _inputLabel('SUBJECT / TITLE'),
-                        TextField(
-                          controller: _subjectController,
-                          decoration: const InputDecoration(
-                            hintText: 'e.g. Noise complaint, Street light out',
-                            prefixIcon: Icon(Icons.title_rounded, size: 20),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        _inputLabel('INCIDENT DETAILS'),
-                        TextField(
-                          controller: _detailsController,
-                          maxLines: 5,
-                          decoration: const InputDecoration(
-                            hintText: 'Describe what happened, where, and when...',
-                            alignLabelWithHint: true,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        _inputLabel('ATTACH PROOF / PHOTO (OPTIONAL)'),
-                        const SizedBox(height: 8),
-                        if (_selectedImage != null)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary50,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: AppColors.primary200),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.image_outlined, size: 20, color: AppColors.primary700),
-                                  const SizedBox(width: 8),
-                                  Expanded(child: Text(_selectedImage!.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary800), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                                  IconButton(
-                                    icon: const Icon(Icons.close_rounded, size: 18, color: AppColors.danger),
-                                    onPressed: () => setState(() => _selectedImage = null),
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        OutlinedButton.icon(
-                          onPressed: _pickImage,
-                          icon: const Icon(Icons.add_a_photo_outlined, size: 18),
-                          label: const Text('SELECT INCIDENT PHOTO'),
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 48),
-                            side: const BorderSide(color: AppColors.primary500),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 0.5),
-                          ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Help us keep Barangay Bulua safe and clean. Please provide accurate details below.',
+                          style: TextStyle(fontSize: 14, color: AppColors.primary100, fontFamily: 'DM Sans', height: 1.5),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
-                  
-                  ElevatedButton(
-                    onPressed: provider.isSubmitting ? null : _handleSubmit,
-                    child: const Text('SUBMIT OFFICIAL REPORT'),
+
+                  // Overlapping Form Card
+                  Transform.translate(
+                    offset: const Offset(0, -24),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 24, offset: const Offset(0, 8))
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _inputLabel('COMPLAINT CATEGORY'),
+                          DropdownButtonFormField<ComplaintCategory>(
+                            decoration: InputDecoration(
+                              hintText: 'Select category',
+                              prefixIcon: const Icon(Icons.category_outlined, size: 20, color: AppColors.primary600),
+                              filled: true,
+                              fillColor: AppColors.gray50,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                            items: provider.categories.map((cat) => DropdownMenuItem(value: cat, child: Text(cat.name))).toList(),
+                            onChanged: (val) => setState(() => _selectedCategory = val),
+                            value: _selectedCategory,
+                          ),
+                          const SizedBox(height: 20),
+
+                          _inputLabel('SUBJECT / TITLE'),
+                          TextField(
+                            controller: _subjectController,
+                            decoration: InputDecoration(
+                              hintText: 'e.g. Noise complaint...',
+                              prefixIcon: const Icon(Icons.title_rounded, size: 20, color: AppColors.primary600),
+                              filled: true,
+                              fillColor: AppColors.gray50,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          _inputLabel('INCIDENT DETAILS'),
+                          TextField(
+                            controller: _detailsController,
+                            maxLines: 5,
+                            decoration: InputDecoration(
+                              hintText: 'Describe what happened...',
+                              alignLabelWithHint: true,
+                              filled: true,
+                              fillColor: AppColors.gray50,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                              contentPadding: const EdgeInsets.all(16),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          _inputLabel('ATTACH PROOF / PHOTO (OPTIONAL)'),
+                          const SizedBox(height: 8),
+                          if (_selectedImage != null)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary50,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: AppColors.primary200),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.image_outlined, size: 20, color: AppColors.primary700),
+                                    const SizedBox(width: 8),
+                                    Expanded(child: Text(_selectedImage!.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primary800), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                                    IconButton(
+                                      icon: const Icon(Icons.close_rounded, size: 20, color: AppColors.danger),
+                                      onPressed: () => setState(() => _selectedImage = null),
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          OutlinedButton.icon(
+                            onPressed: _pickImage,
+                            icon: const Icon(Icons.add_a_photo_outlined, size: 18),
+                            label: const Text('SELECT INCIDENT PHOTO'),
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 52),
+                              side: const BorderSide(color: AppColors.primary400, width: 1.5),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              foregroundColor: AppColors.primary700,
+                              textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, letterSpacing: 0.5),
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          
+                          ElevatedButton(
+                            onPressed: provider.isSubmitting ? null : _handleSubmit,
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 56),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              backgroundColor: AppColors.primary600,
+                              foregroundColor: AppColors.white,
+                              elevation: 0,
+                            ),
+                            child: const Text('SUBMIT OFFICIAL REPORT', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 1)),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
