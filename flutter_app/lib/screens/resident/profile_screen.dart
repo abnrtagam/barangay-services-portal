@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../constants/app_colors.dart';
+import '../../widgets/status_badge.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -11,47 +13,49 @@ class ProfileScreen extends StatelessWidget {
     final user = authProvider.user;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppColors.gray50,
       body: CustomScrollView(
         slivers: [
-          // Profile header
+          // Header with background and profile info
           SliverAppBar(
-            expandedHeight: 200,
-            floating: false,
+            expandedHeight: 240,
             pinned: true,
             automaticallyImplyLeading: false,
-            backgroundColor: const Color(0xFF1A56DB),
+            backgroundColor: AppColors.primary900,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF1A56DB), Color(0xFF7C3AED)],
-                  ),
-                ),
+                color: AppColors.primary900,
                 child: SafeArea(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.white.withValues(alpha: 0.2),
-                        child: Text(
-                          user?.firstName.isNotEmpty == true ? user!.firstName[0].toUpperCase() : '?',
-                          style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold),
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.white24,
+                          shape: BoxShape.circle,
+                        ),
+                        child: CircleAvatar(
+                          radius: 44,
+                          backgroundColor: AppColors.primary100,
+                          child: Text(
+                            user?.firstName.isNotEmpty == true ? user!.firstName[0].toUpperCase() : '?',
+                            style: const TextStyle(color: AppColors.primary700, fontSize: 32, fontWeight: FontWeight.w800, fontFamily: 'Plus Jakarta Sans'),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
                       Text(
-                        user?.fullName ?? 'Resident',
-                        style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
+                        user?.fullName.toUpperCase() ?? 'RESIDENT',
+                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: 1, fontFamily: 'Plus Jakarta Sans'),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         user?.email ?? '',
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14),
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 14, fontFamily: 'DM Sans'),
                       ),
+                      const SizedBox(height: 12),
+                      StatusBadge(status: user?.status ?? 'pending'),
                     ],
                   ),
                 ),
@@ -59,65 +63,68 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
 
-          // Profile info
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Personal Info
-                  _buildSection(
-                    'Personal Information',
-                    Icons.person_outline_rounded,
-                    [
-                      _infoTile(Icons.badge_outlined, 'Full Name', user?.fullName ?? 'N/A'),
-                      _infoTile(Icons.email_outlined, 'Email', user?.email ?? 'N/A'),
-                      _infoTile(Icons.phone_outlined, 'Phone', user?.phone ?? 'N/A'),
-                      _infoTile(Icons.location_on_outlined, 'Address', user?.address ?? 'N/A'),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Account Info
-                  _buildSection(
-                    'Account Information',
-                    Icons.security_outlined,
-                    [
-                      _infoTile(Icons.verified_user_outlined, 'Status', user?.status ?? 'N/A'),
-                      _infoTile(Icons.mark_email_read_outlined, 'Email Verified', user?.emailVerified == true ? 'Yes' : 'No'),
-                      _infoTile(Icons.person_pin_outlined, 'Role', (user?.role ?? 'resident').toUpperCase()),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // About section
-                  _buildSection(
-                    'About',
-                    Icons.info_outline_rounded,
-                    [
-                      _infoTile(Icons.apps_rounded, 'App Version', '1.0.0'),
-                      _infoTile(Icons.business_rounded, 'System', 'Barangay Complaint & Appointment System'),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Logout button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () => _showLogoutDialog(context),
-                      icon: const Icon(Icons.logout_rounded),
-                      label: const Text('Sign Out', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFEF4444),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 0,
-                      ),
+                  const Text('ACCOUNT DETAILS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.gray500, letterSpacing: 1.2)),
+                  const SizedBox(height: 12),
+                  
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppColors.gray200),
+                    ),
+                    child: Column(
+                      children: [
+                        _infoRow(Icons.person_outline_rounded, 'FIRST NAME', user?.firstName ?? '--'),
+                        _divider(),
+                        _infoRow(Icons.person_outline_rounded, 'LAST NAME', user?.lastName ?? '--'),
+                        _divider(),
+                        _infoRow(Icons.phone_iphone_rounded, 'PHONE NUMBER', user?.phone ?? '--'),
+                        _divider(),
+                        _infoRow(Icons.home_outlined, 'HOME ADDRESS', user?.address ?? '--'),
+                      ],
                     ),
                   ),
+                  
+                  const SizedBox(height: 24),
+                  const Text('SECURITY & VERIFICATION', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.gray500, letterSpacing: 1.2)),
+                  const SizedBox(height: 12),
+                  
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppColors.gray200),
+                    ),
+                    child: Column(
+                      children: [
+                        _infoRow(Icons.mail_outline_rounded, 'EMAIL VERIFIED', user?.emailVerified == true ? 'YES' : 'NO'),
+                        _divider(),
+                        _infoRow(Icons.security_rounded, 'ACCOUNT ROLE', user?.role.toUpperCase() ?? 'RESIDENT'),
+                      ],
+                    ),
+                  ),
+
                   const SizedBox(height: 32),
+                  
+                  OutlinedButton.icon(
+                    onPressed: () => _showLogoutDialog(context),
+                    icon: const Icon(Icons.logout_rounded, size: 18),
+                    label: const Text('SIGN OUT OF PORTAL'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.danger,
+                      side: const BorderSide(color: AppColors.danger),
+                      minimumSize: const Size(double.infinity, 52),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, letterSpacing: 0.5),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
@@ -127,63 +134,48 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSection(String title, IconData icon, List<Widget> children) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _infoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-            child: Row(children: [
-              Icon(icon, size: 18, color: const Color(0xFF3B82F6)),
-              const SizedBox(width: 8),
-              Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF2D3748))),
-            ]),
+          Icon(icon, size: 20, color: AppColors.primary600),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.gray400, letterSpacing: 0.5)),
+              const SizedBox(height: 4),
+              Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.primary900, fontFamily: 'DM Sans')),
+            ],
           ),
-          ...children,
-          const SizedBox(height: 8),
         ],
       ),
     );
   }
 
-  Widget _infoTile(IconData icon, String label, String value) {
-    return ListTile(
-      dense: true,
-      leading: Icon(icon, size: 20, color: Colors.grey[400]),
-      title: Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
-      subtitle: Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF2D3748))),
-    );
+  Widget _divider() {
+    return const Divider(height: 1, indent: 52, color: AppColors.gray100);
   }
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
+        title: const Text('SIGN OUT'),
+        content: const Text('Are you sure you want to end your session? You will need to log in again to access your dashboard.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: const Text('CANCEL'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
               context.read<AuthProvider>().logout();
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEF4444),
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Sign Out'),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            child: const Text('SIGN OUT'),
           ),
         ],
       ),

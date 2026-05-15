@@ -7,6 +7,7 @@ import '../../providers/announcement_provider.dart';
 import '../../widgets/stat_card.dart';
 import '../../models/announcement_model.dart';
 import '../../constants/app_colors.dart';
+import 'announcement_history_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -78,7 +79,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     ),
                                   ),
                                   Text(
-                                    user?.fullName ?? 'Resident',
+                                    user?.fullName ?? 'RESIDENT',
                                     style: const TextStyle(
                                       color: AppColors.white,
                                       fontSize: 22,
@@ -175,7 +176,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const AnnouncementHistoryScreen()),
+                            );
+                          },
                           child: const Text('View All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                         ),
                       ],
