@@ -29,17 +29,32 @@ class User {
 
   // Create a User from JSON (what the backend sends)
   factory User.fromJson(Map<String, dynamic> json) {
+    // Robust parsing for id (can be int or string from backend)
+    int parseId(dynamic value) {
+      if (value is int) return value;
+      if (value is String) return int.tryParse(value) ?? 0;
+      return 0;
+    }
+
+    // Robust parsing for residentId
+    int? parseResidentId(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return value;
+      if (value is String) return int.tryParse(value);
+      return null;
+    }
+
     return User(
-      id: json['id'],
-      firstName: json['first_name'] ?? '',
-      lastName: json['last_name'] ?? '',
-      email: json['email'] ?? '',
-      phone: json['phone'] ?? '',
-      address: json['address'] ?? '',
-      role: json['role'] ?? 'resident',
-      status: json['status'] ?? 'pending',
-      emailVerified: json['email_verified'] ?? false,
-      residentId: json['resident_id'],
+      id: parseId(json['id']),
+      firstName: json['first_name']?.toString() ?? '',
+      lastName: json['last_name']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      phone: json['phone']?.toString() ?? '',
+      address: json['address']?.toString() ?? '',
+      role: json['role']?.toString() ?? 'resident',
+      status: json['status']?.toString() ?? 'pending',
+      emailVerified: json['email_verified'] == true || json['email_verified'] == 1,
+      residentId: parseResidentId(json['resident_id']),
     );
   }
 

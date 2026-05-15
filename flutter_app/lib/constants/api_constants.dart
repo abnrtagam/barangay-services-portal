@@ -1,21 +1,6 @@
 class ApiConstants {
-  // ============================================================
-  // Backend API Base URL
-  // ============================================================
-  // IMPORTANT: Change this based on how you're testing:
-  //
-  // 1. Android Emulator:  'http://10.0.2.2:5000/api'
-  //    (10.0.2.2 is the emulator's alias for your PC's localhost)
-  //
-  // 2. Physical Phone (USB or WiFi):  'http://YOUR_PC_IP:5000/api'
-  //    Find your IP: open CMD → type 'ipconfig' → look for IPv4 Address
-  //    Example: 'http://192.168.1.100:5000/api'
-  //
-  // 3. Chrome/Web testing:  'http://localhost:5000/api'
-  //
-  // Make sure your phone and PC are on the same WiFi network.
-  // ============================================================
-  static const String baseUrl = 'http://10.0.2.2:5000/api';
+  // TO TEST ON REAL DEVICE: Change '10.0.2.2' to your PC's IP address
+  static const String baseUrl = 'http://192.168.100.3:5000/api';
 
   // Authentication Endpoints
   static const String register = '$baseUrl/auth/register';
@@ -24,6 +9,7 @@ class ApiConstants {
   static const String resendOtp = '$baseUrl/auth/resend-otp';
   static const String forgotPassword = '$baseUrl/auth/forgot-password';
   static const String resetPassword = '$baseUrl/auth/reset-password';
+  static const String reactivate = '$baseUrl/auth/reactivate';
 
   // Resident Endpoints
   static const String dashboardStats = '$baseUrl/residents/dashboard-stats';
