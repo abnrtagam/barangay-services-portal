@@ -4,6 +4,9 @@
 
 A premium, full-stack digital governance solution designed for **Barangay Bulua**. This system streamlines resident interactions, automates document requests, and provides a secure platform for complaint management and appointment booking.
 
+> [!NOTE]
+> **Academic Project:** This system was developed as part of a school project to demonstrate modern development practices. Beyond the academic requirements, this project served as a deep learning journey—building this system from the ground up allowed for a hands-on exploration of full-stack architecture, premium UI/UX design, and the impact of digital governance on local communities.
+
 ## 🚀 Key Features
 
 ### 💻 Resident Web Portal (React)
