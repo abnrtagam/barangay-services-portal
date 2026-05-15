@@ -1,248 +1,103 @@
-﻿# Barangay Complaint and Appointment Booking System
+# 🏛️ Barangay Services Portal (Multi-Platform)
 
-## Project Overview
-
-This is a full-stack barangay service system for managing resident accounts, complaint submissions, appointment bookings, and admin review workflows.
-
-The system is built with:
-- React.js for the frontend user interface
-- Node.js + Express.js for the main API middleware
-- Laravel for additional backend services
-- MySQL for the database
-- XAMPP to run Apache and MySQL locally
-
-Residents can:
-- register and verify their email
-- submit complaints with file attachments
-- book appointments with barangay staff
-- track complaint and appointment status updates
-- view announcements
-
-Admins can:
-- review and approve resident verifications
-- manage complaint records and change statuses
-- approve or reject appointments
-- suspend and reactivate accounts
-- post announcements and monitor system activity
-
-Complaint handling includes filing, admin review, status updates, and notification of residents. Appointment booking includes scheduling requests, admin approval, and resident updates.
-
-## System Features
-
-- Resident Registration
-- Email Verification
-- Admin Verification Approval
-- Complaint Submission
-- File Attachment Uploads
-- Appointment Booking
-- Complaint Status Tracking
-- Dashboard Management
-- Account Suspension / Reactivation
-- Announcements Management
-- Complaint Resolution Workflow
-
-## System Workflow
-
-### Resident Registration Workflow
-
-```text
-Register
-→ Email Verification
-→ Pending Verification
-→ Admin Review
-→ Approved or Rejected
-→ User Gains Access
-```
-
-Each step explained:
-- Register: Resident creates an account with name, email, and password.
-- Email Verification: The system sends an OTP or verification message to the resident email.
-- Pending Verification: The request is stored while admin review is pending.
-- Admin Review: An admin checks the resident details and confirms identity.
-- Approved or Rejected: The admin grants or denies access.
-- User Gains Access: Approved residents can submit complaints and book appointments.
-
-### Complaint Workflow
-
-```text
-Resident Submits Complaint
-→ Admin Reviews Complaint
-→ Status Updates
-→ Resident Receives Update
-→ Complaint Resolved
-```
-
-### Appointment Workflow
-
-```text
-Resident Books Appointment
-→ Admin Reviews Appointment
-→ Schedule Approval/Rejection
-→ Resident Receives Update
-```
-
-### Account Suspension/Reactivation Workflow
-
-```text
-Admin Suspends Account
-→ User Loses Access
-→ User Requests Reactivation
-→ Admin Reviews Request
-→ Account Reactivated
-```
-
-## Project Structure
-
-```text
-frontend/           React frontend application
-backend/            Node.js + Express backend middleware
-laravel-backend/    Laravel backend services
-uploads/            Uploaded file storage
-barangay_complaint_system.sql  MySQL schema import file
-```
-
-## Requirements
-
-- Node.js
-- npm
-- Composer
-- PHP 8.2+
-- XAMPP
-- MySQL
-- Git
-
-## Step-by-Step Installation Guide
-
-### 1. Clone the Repository
-
-```bash
-git clone <repository-url>
-cd barangay-system/barangay-system
-```
-
-> Make sure you are in the folder that contains `frontend/`, `backend/`, and `laravel-backend/`.
-
-### 2. Setup XAMPP
-
-1. Open the XAMPP Control Panel.
-2. Start **Apache**.
-3. Start **MySQL**.
-4. Open **phpMyAdmin** at `http://localhost/phpmyadmin`.
-
-### 3. Create Database
-
-1. In phpMyAdmin, click **New** and create the database `barangay_complaint_system`.
-2. Click **Import**.
-3. Choose `barangay_complaint_system.sql`.
-4. Click **Go**.
-
-This imports all required tables, seed data, and the initial admin account.
-
-### 4. Configure Backend Environment
-
-#### Node backend
-
-Edit `backend/.env` and confirm the MySQL settings:
-
-```env
-PORT=5000
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=
-DB_NAME=barangay_complaint_system
-JWT_SECRET=your_jwt_secret_here
-```
-
-#### Laravel backend
-
-Edit `laravel-backend/.env` and confirm:
-
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=barangay_complaint_system
-DB_USERNAME=root
-DB_PASSWORD=
-```
-
-If `.env` is missing, copy from `.env.example`:
-- macOS/Linux: `cp .env.example .env`
-- Windows PowerShell: `Copy-Item .env.example .env`
-
-### 5. Install Frontend Dependencies
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-The React app will start at `http://localhost:3000`.
-
-### 6. Install Backend Dependencies
-
-```bash
-cd ../backend
-npm install
-npm run dev
-```
-
-The Node backend runs on `http://localhost:5000`.
-
-### 7. Install Laravel Backend
-
-```bash
-cd ../laravel-backend
-composer install
-php artisan key:generate
-php artisan serve --port=8000
-```
-
-The Laravel backend runs on `http://localhost:8000`.
-
-## Running the System
-
-Open these URLs:
-
-- Frontend: `http://localhost:3000`
-- Backend API: `http://localhost:5000/api`
-- Laravel Backend: `http://localhost:8000`
-
-## Admin Access
-
-Admin users can:
-- log in through the admin portal
-- approve or reject resident verifications
-- manage complaints and update statuses
-- approve or reject appointment bookings
-- suspend and reactivate resident accounts
-- create announcements
-
-Residents can:
-- register and verify accounts
-- submit complaints with attached files
-- book appointments and track responses
-- view announcements
-
-## Common Troubleshooting
-
-- npm install issues: delete `node_modules` and `package-lock.json`, then run `npm install` again.
-- composer install issues: ensure PHP is installed and run `composer install` inside `laravel-backend`.
-- MySQL connection issues: confirm XAMPP MySQL is running and the database name is `barangay_complaint_system`.
-- port already in use: use a different port for frontend, backend, or Laravel.
-- uploads not showing: ensure `backend/uploads` exists and `backend/server.js` is serving `/uploads`.
-- CORS issues: verify `backend/server.js` allows `http://localhost:3000`.
-- email verification issues: update SMTP/Gmail credentials in `backend/.env`.
-
-## Important Instructions
-
-- Do not commit `.env` files with credentials.
-- Start XAMPP before running the backend.
-- Use the SQL file to create the MySQL schema.
-- Run frontend, Node backend, and Laravel backend together for the full system.
+A comprehensive, production-ready government service ecosystem designed to digitize barangay operations. This system provides a seamless experience for both administrators and residents across Web and Mobile platforms.
 
 ---
 
-Thank you for using the Barangay Complaint and Appointment Booking System. This guide is designed for developers and beginners to install and run the project successfully.
+## 📱 Platform Ecosystem
+
+### 👨‍💼 Admin Dashboard (Web)
+The central nerve center for barangay officials to monitor and manage the community.
+*   **Verification Management**: Review resident registrations and verify proof of residency.
+*   **Complaint Resolution**: track, update, and resolve resident complaints.
+*   **Appointment Scheduling**: Approve or reschedule resident appointments.
+*   **Announcements**: Post news and updates that sync instantly to the mobile app.
+*   **Account Control**: Suspend or reactivate accounts based on community guidelines.
+
+### 🏠 Resident Portal (Web & Mobile)
+Empowering residents with on-the-go access to essential services.
+*   **Mobile App (Flutter)**: A premium, native experience for Android and iOS.
+*   **Secure Registration**: Sign up with document verification (Proof of Residency).
+*   **Incident Reporting**: Submit complaints with photo attachments directly from the camera.
+*   **Real-time Booking**: Schedule appointments with real-time slot validation.
+*   **Instant Updates**: Receive the latest barangay news and track the status of your requests.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technology |
+| :--- | :--- |
+| **Backend** | Node.js, Express.js |
+| **Database** | MySQL (Relational) |
+| **Web Frontend** | React.js, Vanilla CSS |
+| **Mobile App** | Flutter (Dart), Provider State Management |
+| **Legacy Services** | Laravel |
+| **Authentication** | JWT (JSON Web Tokens), OTP (One-Time Password) |
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+*   [Node.js](https://nodejs.org/) (v16+)
+*   [Flutter SDK](https://docs.flutter.dev/get-started/install)
+*   [XAMPP](https://www.apachefriends.org/index.html) (for MySQL)
+
+### 2. Database Setup
+1. Start **Apache** and **MySQL** in XAMPP.
+2. Create a database named `barangay_complaint_system` in phpMyAdmin.
+3. Import `barangay_complaint_system.sql` located in the root directory.
+
+### 3. Backend Configuration (`/backend`)
+1. Create a `.env` file in the `backend/` folder:
+   ```env
+   PORT=5000
+   DB_HOST=localhost
+   DB_USER=root
+   DB_PASSWORD=
+   DB_NAME=barangay_complaint_system
+   JWT_SECRET=your_secret_key
+   ```
+2. Install dependencies and start:
+   ```bash
+   npm install
+   npm start
+   ```
+
+### 4. Mobile App Setup (`/flutter_app`)
+1.  **Configure API Connection**: 
+    Open `lib/constants/api_constants.dart` and set the `baseUrl`:
+    *   **Emulator**: `http://10.0.2.2:5000/api`
+    *   **Physical Device**: `http://YOUR_LOCAL_IP:5000/api`
+2.  **Run the App**:
+    ```bash
+    flutter pub get
+    flutter run
+    ```
+
+---
+
+## 📑 System Workflows
+
+### Resident Verification
+`Register` ➔ `OTP Verification` ➔ `Admin Document Review` ➔ `Approved/Rejected`
+
+### Complaint Handling
+`Resident Submission (with Photos)` ➔ `Admin Review` ➔ `Status Update (In Progress/Resolved)`
+
+### Account Reactivation
+`Suspended User` ➔ `Submit Appeal Reason` ➔ `Admin Review` ➔ `Reactivation`
+
+---
+
+## 📸 Screen Preview (Coming Soon)
+*(Add your screenshots here to make your GitHub profile stand out!)*
+
+---
+
+## 🤝 Support & Contribution
+This system is designed to improve community service efficiency. If you encounter any bugs or have feature suggestions, please open an issue in the repository.
+
+---
+© 2024 Barangay Services Portal. All Rights Reserved.

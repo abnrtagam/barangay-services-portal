@@ -1,6 +1,6 @@
 class ApiConstants {
-  // TO TEST ON REAL DEVICE: Change '10.0.2.2' to your PC's IP address
-  static const String baseUrl = 'http://192.168.100.3:5000/api';
+  // TO TEST ON REAL DEVICE: Change '10.0.2.2' to your PC's IP address (e.g. 192.168.x.x)
+  static const String baseUrl = 'http://10.0.2.2:5000/api';
 
   // Authentication Endpoints
   static const String register = '$baseUrl/auth/register';
