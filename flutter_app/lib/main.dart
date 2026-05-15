@@ -4,6 +4,7 @@ import 'providers/auth_provider.dart';
 import 'providers/complaint_provider.dart';
 import 'providers/appointment_provider.dart';
 import 'providers/announcement_provider.dart';
+import 'constants/app_theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/navigation_shell.dart';
 
@@ -24,27 +25,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AnnouncementProvider()),
       ],
       child: MaterialApp(
-        title: 'Barangay System',
+        title: 'Barangay Services Portal',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF3B82F6),
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
-          fontFamily: 'Roboto',
-          appBarTheme: const AppBarTheme(
-            centerTitle: true,
-            elevation: 0,
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ),
+        theme: AppTheme.light,
         home: const AppRoot(),
       ),
     );
