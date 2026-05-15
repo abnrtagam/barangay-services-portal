@@ -602,4 +602,44 @@ exports.updateFcmToken = async (req, res) => {
   }
 }
 
+// POST /api/auth/change-password
+exports.changePassword = async (req, res) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body
+  const userId = req.user.id
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return res.status(422).json({ message: 'All fields are required.' })
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res.status(422).json({ message: 'New passwords do not match.' })
+  }
+
+  if (newPassword.length < 5) {
+    return res.status(422).json({ message: 'New password must be at least 5 characters.' })
+  }
+
+  try {
+    const [rows] = await db.query('SELECT password FROM users WHERE id = ?', [userId])
+    if (!rows.length) {
+      return res.status(404).json({ message: 'User not found.' })
+    }
+
+    const user = rows[0]
+    const match = await bcrypt.compare(currentPassword, user.password)
+    if (!match) {
+      return res.status(401).json({ message: 'Current password is incorrect.' })
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12)
+    await db.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, userId])
+
+    res.json({ message: 'Password changed successfully.' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Failed to change password.' })
+  }
+}
+
 module.exports = exports
+

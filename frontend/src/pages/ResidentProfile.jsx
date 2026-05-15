@@ -3,7 +3,7 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 import { 
   FiUser, FiMail, FiPhone, FiMapPin, FiShield, 
-  FiFileText, FiCamera, FiEdit2, FiCheckCircle, FiSave, FiX 
+  FiFileText, FiCamera, FiEdit2, FiCheckCircle, FiSave, FiX, FiLock, FiEye, FiEyeOff
 } from 'react-icons/fi'
 
 export default function ResidentProfile() {
@@ -11,11 +11,19 @@ export default function ResidentProfile() {
   const [activeTab, setActiveTab] = useState('info')
   const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [showPass, setShowPass] = useState({ current: false, new: false, confirm: false })
+  
   const [form, setForm] = useState({
     first_name: '',
     last_name: '',
     phone: '',
     address: ''
+  })
+
+  const [securityForm, setSecurityForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
   })
 
   useEffect(() => {
@@ -42,7 +50,6 @@ export default function ResidentProfile() {
 
   const handleEditToggle = () => {
     if (isEditing) {
-      // Cancel: Reset form to current user data
       setForm({
         first_name: user.first_name || '',
         last_name: user.last_name || '',
@@ -70,6 +77,31 @@ export default function ResidentProfile() {
     } catch (err) {
       console.error(err)
       toast.error(err.response?.data?.message || 'Failed to update profile.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault()
+    if (securityForm.newPassword !== securityForm.confirmPassword) {
+      return toast.error('New passwords do not match.')
+    }
+    if (securityForm.newPassword.length < 5) {
+      return toast.error('Password must be at least 5 characters.')
+    }
+
+    setLoading(true)
+    try {
+      const token = localStorage.getItem('resident_token')
+      await axios.post('/api/residents/change-password', securityForm, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      toast.success('Password changed successfully!')
+      setSecurityForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
+    } catch (err) {
+      console.error(err)
+      toast.error(err.response?.data?.message || 'Failed to change password.')
     } finally {
       setLoading(false)
     }
@@ -145,7 +177,7 @@ export default function ResidentProfile() {
               </p>
             </div>
             <div style={{ marginBottom: 8 }}>
-              {!isEditing ? (
+              {activeTab === 'info' && (!isEditing ? (
                 <button onClick={handleEditToggle} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 12 }}>
                   <FiEdit2 size={16} /> Edit Profile
                 </button>
@@ -158,7 +190,7 @@ export default function ResidentProfile() {
                     <FiX size={16} /> Cancel
                   </button>
                 </div>
-              )}
+              ))}
             </div>
           </div>
         </div>
@@ -168,7 +200,7 @@ export default function ResidentProfile() {
         {/* Navigation Tabs */}
         <div className="card" style={{ padding: 12, borderRadius: 20, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', background: 'white' }}>
           <button 
-            onClick={() => setActiveTab('info')}
+            onClick={() => { setActiveTab('info'); setIsEditing(false); }}
             style={{
               width: '100%', padding: '14px 16px', borderRadius: 12, border: 'none',
               display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
@@ -180,7 +212,7 @@ export default function ResidentProfile() {
             <FiUser size={18} /> Account Info
           </button>
           <button 
-            onClick={() => setActiveTab('docs')}
+            onClick={() => { setActiveTab('docs'); setIsEditing(false); }}
             style={{
               width: '100%', padding: '14px 16px', borderRadius: 12, border: 'none',
               display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
@@ -192,7 +224,7 @@ export default function ResidentProfile() {
             <FiFileText size={18} /> My Documents
           </button>
           <button 
-            onClick={() => setActiveTab('security')}
+            onClick={() => { setActiveTab('security'); setIsEditing(false); }}
             style={{
               width: '100%', padding: '14px 16px', borderRadius: 12, border: 'none',
               display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
@@ -308,38 +340,85 @@ export default function ResidentProfile() {
             <div className="card" style={{ padding: 32, borderRadius: 20, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', background: 'white' }}>
               <h2 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: 24, color: 'var(--gray-900)' }}>Security Settings</h2>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div style={{ padding: 20, background: 'var(--gray-50)', borderRadius: 16, border: '1px solid var(--gray-100)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-600)' }}>
-                      <FiLock size={20} />
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: 700, color: 'var(--gray-900)' }}>Change Password</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--gray-500)' }}>Update your account password regularly</div>
-                    </div>
+              <form onSubmit={handleChangePassword} style={{ maxWidth: '450px' }}>
+                <div className="form-group" style={{ marginBottom: 20 }}>
+                  <label className="form-label">Current Password</label>
+                  <div style={{ position: 'relative' }}>
+                    <FiLock style={{ position: 'absolute', left: 14, top: 13, color: 'var(--gray-400)' }} />
+                    <input 
+                      type={showPass.current ? "text" : "password"}
+                      className="form-control"
+                      placeholder="••••••••"
+                      style={{ paddingLeft: 40, borderRadius: 12 }}
+                      value={securityForm.currentPassword}
+                      onChange={(e) => setSecurityForm({...securityForm, currentPassword: e.target.value})}
+                      required
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => setShowPass({...showPass, current: !showPass.current})}
+                      style={{ position: 'absolute', right: 14, top: 13, background: 'none', border: 'none', color: 'var(--gray-400)', cursor: 'pointer' }}
+                    >
+                      {showPass.current ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
-                  <button className="btn btn-sm btn-secondary" style={{ borderRadius: 8 }}>Update</button>
                 </div>
 
-                <div style={{ padding: 20, background: 'var(--gray-50)', borderRadius: 16, border: '1px solid var(--gray-100)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--success-600)' }}>
-                      <FiShield size={20} />
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: 700, color: 'var(--gray-900)' }}>Two-Factor Authentication</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--gray-500)' }}>Add an extra layer of security</div>
-                    </div>
-                  </div>
-                  <div style={{ 
-                    background: 'var(--gray-200)', width: 40, height: 20, borderRadius: 20,
-                    position: 'relative', cursor: 'pointer'
-                  }}>
-                    <div style={{ width: 14, height: 14, borderRadius: '50%', background: 'white', position: 'absolute', left: 3, top: 3 }} />
+                <div className="form-group" style={{ marginBottom: 20 }}>
+                  <label className="form-label">New Password</label>
+                  <div style={{ position: 'relative' }}>
+                    <FiLock style={{ position: 'absolute', left: 14, top: 13, color: 'var(--gray-400)' }} />
+                    <input 
+                      type={showPass.new ? "text" : "password"}
+                      className="form-control"
+                      placeholder="••••••••"
+                      style={{ paddingLeft: 40, borderRadius: 12 }}
+                      value={securityForm.newPassword}
+                      onChange={(e) => setSecurityForm({...securityForm, newPassword: e.target.value})}
+                      required
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => setShowPass({...showPass, new: !showPass.new})}
+                      style={{ position: 'absolute', right: 14, top: 13, background: 'none', border: 'none', color: 'var(--gray-400)', cursor: 'pointer' }}
+                    >
+                      {showPass.new ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
                 </div>
-              </div>
+
+                <div className="form-group" style={{ marginBottom: 32 }}>
+                  <label className="form-label">Confirm New Password</label>
+                  <div style={{ position: 'relative' }}>
+                    <FiLock style={{ position: 'absolute', left: 14, top: 13, color: 'var(--gray-400)' }} />
+                    <input 
+                      type={showPass.confirm ? "text" : "password"}
+                      className="form-control"
+                      placeholder="••••••••"
+                      style={{ paddingLeft: 40, borderRadius: 12 }}
+                      value={securityForm.confirmPassword}
+                      onChange={(e) => setSecurityForm({...securityForm, confirmPassword: e.target.value})}
+                      required
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => setShowPass({...showPass, confirm: !showPass.confirm})}
+                      style={{ position: 'absolute', right: 14, top: 13, background: 'none', border: 'none', color: 'var(--gray-400)', cursor: 'pointer' }}
+                    >
+                      {showPass.confirm ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
+                  </div>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="btn btn-primary" 
+                  style={{ width: '100%', padding: '14px', borderRadius: 12, fontWeight: 700 }}
+                >
+                  {loading ? 'Updating Password...' : 'Update Password'}
+                </button>
+              </form>
             </div>
           )}
         </div>
