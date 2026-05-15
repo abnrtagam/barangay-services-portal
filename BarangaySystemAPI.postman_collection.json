@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "Barangay Complaint System API",
-    "description": "Complete API collection for testing the Barangay Complaint and Appointment Booking System",
+    "name": "Barangay Bulua Service Portal API",
+    "description": "Premium API collection for the Barangay Bulua Online Appointment and Complaint System. Designed for school project evaluation and learning demonstration.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -40,17 +40,17 @@
               "formdata": [
                 {
                   "key": "first_name",
-                  "value": "John",
+                  "value": "Juan",
                   "type": "text"
                 },
                 {
                   "key": "last_name",
-                  "value": "Doe",
+                  "value": "Dela Cruz",
                   "type": "text"
                 },
                 {
                   "key": "email",
-                  "value": "john.doe@example.com",
+                  "value": "juan.dc@example.com",
                   "type": "text"
                 },
                 {
@@ -60,7 +60,7 @@
                 },
                 {
                   "key": "address",
-                  "value": "123 Main Street, Barangay ABC",
+                  "value": "P-1, Barangay Bulua, CDO",
                   "type": "text"
                 },
                 {
@@ -71,7 +71,7 @@
                 {
                   "key": "documents",
                   "type": "file",
-                  "description": "Optional: Upload verification documents (max 3 files)"
+                  "description": "Required: Upload verification documents (max 3 files)"
                 }
               ]
             },
@@ -80,7 +80,7 @@
               "host": ["{{base_url}}"],
               "path": ["auth", "register"]
             },
-            "description": "Register a new resident account with optional document upload"
+            "description": "Register a new resident account for Barangay Bulua"
           }
         },
         {
@@ -95,7 +95,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"otp\": \"123456\"\n}"
+              "raw": "{\n  \"email\": \"juan.dc@example.com\",\n  \"otp\": \"123456\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/auth/verify-otp",
@@ -117,7 +117,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"john.doe@example.com\"\n}"
+              "raw": "{\n  \"email\": \"juan.dc@example.com\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/auth/resend-otp",
@@ -153,7 +153,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"email\": \"juan.dc@example.com\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/auth/login",
@@ -188,7 +188,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@barangay.gov\",\n  \"password\": \"admin123\"\n}"
+              "raw": "{\n  \"email\": \"admin@bulua.gov\",\n  \"password\": \"admin123\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/auth/admin-login",
@@ -344,50 +344,6 @@
             },
             "description": "Reject a pending resident account (requires notes)"
           }
-        },
-        {
-          "name": "Suspend Account",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"notes\": \"Account suspended due to policy violation\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/admin/verifications/{{user_id}}/suspend",
-              "host": ["{{base_url}}"],
-              "path": ["admin", "verifications", "{{user_id}}", "suspend"]
-            },
-            "description": "Suspend an approved resident account (requires notes)"
-          }
-        },
-        {
-          "name": "Reactivate Account",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/admin/verifications/{{user_id}}/reactivate",
-              "host": ["{{base_url}}"],
-              "path": ["admin", "verifications", "{{user_id}}", "reactivate"]
-            },
-            "description": "Reactivate a suspended resident account"
-          }
         }
       ]
     },
@@ -432,7 +388,7 @@
                 },
                 {
                   "key": "description",
-                  "value": "Street light on Main Street is broken and needs repair",
+                  "value": "Public lighting issue in Zone 3",
                   "type": "text"
                 },
                 {
@@ -447,7 +403,7 @@
               "host": ["{{base_url}}"],
               "path": ["complaints"]
             },
-            "description": "Create a new complaint with optional attachment"
+            "description": "Create a new complaint for Barangay Bulua"
           }
         },
         {
@@ -461,13 +417,13 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/appointments/taken-slots?date=2024-01-15",
+              "raw": "{{base_url}}/appointments/taken-slots?date=2024-05-20",
               "host": ["{{base_url}}"],
               "path": ["appointments", "taken-slots"],
               "query": [
                 {
                   "key": "date",
-                  "value": "2024-01-15",
+                  "value": "2024-05-20",
                   "description": "Date in YYYY-MM-DD format"
                 }
               ]
@@ -491,14 +447,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"category_id\": 1,\n  \"scheduled_date\": \"2024-01-15\",\n  \"scheduled_time\": \"10:00\",\n  \"purpose\": \"Document pickup and verification\"\n}"
+              "raw": "{\n  \"category_id\": 1,\n  \"scheduled_date\": \"2024-05-20\",\n  \"scheduled_time\": \"09:00\",\n  \"purpose\": \"Barangay Clearance Application\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/appointments",
               "host": ["{{base_url}}"],
               "path": ["appointments"]
             },
-            "description": "Book a new appointment with barangay office"
+            "description": "Book a new appointment with Bulua barangay office"
           }
         }
       ]
