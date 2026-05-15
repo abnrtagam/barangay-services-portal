@@ -15,7 +15,8 @@ router.get('/appointments',    aCtrl.getMyAppointments)
 router.get('/appointments/:id', aCtrl.getMyAppointmentById)
 router.get('/notifications',    rCtrl.getNotifications)
 router.patch('/profile',        rCtrl.updateProfile)
-router.post('/change-password', authCtrl.changePassword)
+
+
 
 
 

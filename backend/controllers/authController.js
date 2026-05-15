@@ -637,9 +637,9 @@ exports.changePassword = async (req, res) => {
     res.json({ message: 'Password changed successfully.' })
   } catch (err) {
     console.error(err)
+// ... changePassword logic ends above ...
     res.status(500).json({ message: 'Failed to change password.' })
   }
 }
 
-module.exports = exports
 

@@ -16,5 +16,7 @@ router.post('/admin-login',  ctrl.adminLogin)
 router.post('/forgot-password', ctrl.forgotPassword)
 router.post('/reset-password',  ctrl.resetPassword)
 router.post('/reactivate',      ctrl.requestReactivation)
+router.post('/change-password', authMiddleware, ctrl.changePassword)
+
 
 module.exports = router

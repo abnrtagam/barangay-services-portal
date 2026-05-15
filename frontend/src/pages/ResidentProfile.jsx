@@ -94,9 +94,10 @@ export default function ResidentProfile() {
     setLoading(true)
     try {
       const token = localStorage.getItem('resident_token')
-      await axios.post('/api/residents/change-password', securityForm, {
+      await axios.post('/api/auth/change-password', securityForm, {
         headers: { Authorization: `Bearer ${token}` }
       })
+
       toast.success('Password changed successfully!')
       setSecurityForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
     } catch (err) {
