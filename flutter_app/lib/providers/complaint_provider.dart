@@ -63,8 +63,7 @@ class ComplaintProvider with ChangeNotifier {
     required int categoryId,
     required String subject,
     required String details,
-    List<int>? attachmentBytes,
-    String? attachmentName,
+    String? attachmentPath,
   }) async {
     _isSubmitting = true;
     _errorMessage = null;
@@ -75,8 +74,7 @@ class ComplaintProvider with ChangeNotifier {
         categoryId: categoryId,
         subject: subject,
         details: details,
-        attachmentBytes: attachmentBytes,
-        attachmentName: attachmentName,
+        attachmentPath: attachmentPath,
       );
 
       if (result['success']) {

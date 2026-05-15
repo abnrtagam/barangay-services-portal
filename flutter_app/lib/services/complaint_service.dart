@@ -38,9 +38,14 @@ class ComplaintService {
   }) async {
     try {
       final response = await ApiService.post(
-        ApiConstants.complaintSubmit,
-        body,
-        isFormData: hasAttachment,
+        ApiConstants.complaints,
+        {
+          'category_id': categoryId.toString(),
+          'subject': subject,
+          'details': details,
+          if (attachmentPath != null) 'attachment': attachmentPath,
+        },
+        isFormData: true,
       );
 
       if (response['success']) {
