@@ -109,7 +109,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Create your resident account to access barangay services online.',
+                    'Create your account to access barangay services online. Exclusively for residents of Barangay Bulua.',
                     style: TextStyle(fontSize: 14, color: AppColors.primary100, fontFamily: 'DM Sans', height: 1.5),
                   ),
                 ],

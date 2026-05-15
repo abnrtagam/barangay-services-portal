@@ -69,9 +69,7 @@ a:hover { color: var(--primary-700); }
   box-shadow: var(--shadow-sm);
   border: var(--border);
   overflow: hidden;
-}
-.card + .card {
-  margin-top: var(--space-5);
+  transition: var(--transition);
 }
 .card:hover { box-shadow: var(--shadow-md); }
 .card-header {
@@ -381,9 +379,9 @@ textarea.form-control { resize: vertical; min-height: 120px; }
 }
 
 /* ── Grid helpers ── */
-.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); }
-.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-5); }
-.grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-5); }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); align-items: stretch; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-5); align-items: stretch; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-5); align-items: stretch; }
 
 @media (max-width: 1024px) {
   .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -461,3 +459,9 @@ textarea.form-control { resize: vertical; min-height: 120px; }
   align-items: flex-end; margin-bottom: var(--space-5);
 }
 .filter-bar .form-group { margin-bottom: 0; min-width: 160px; }
+
+/* ── Auth Layout ── */
+@media (max-width: 1024px) {
+  .auth-sidebar { display: none !important; }
+}
+

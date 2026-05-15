@@ -23,11 +23,10 @@ export default function LandingPage() {
           padding: '16px 0', borderBottom: '1px solid rgba(255,255,255,.12)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-              <rect width="32" height="32" rx="8" fill="white" fillOpacity="0.15"/>
-              <path d="M16 4L4 11v2h24v-2L16 4zM6 14v10h4V14H6zm8 0v10h4V14h-4zm8 0v10h4V14h-4zM4 26h24v2H4v-2z" fill="white"/>
-            </svg>
-            <span style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.1rem' }}>Barangay Portal</span>
+            <div style={{ overflow: 'hidden', borderRadius: '8px', width: 44, height: 44, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}>
+              <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
+            <span style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.2rem', color: 'white' }}>Barangay Bulua</span>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <Link to="/login" className="btn btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,.12)', color: 'white', border: '1.5px solid rgba(255,255,255,.3)' }}>Login</Link>
@@ -35,25 +34,31 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '90px 0 100px', textAlign: 'center' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '70px 0 100px', textAlign: 'center' }}>
+          <div style={{ 
+            width: 100, height: 100, borderRadius: '50%', background: 'white', 
+            margin: '0 auto 24px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.15)', padding: 12
+          }}>
+            <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          </div>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             background: 'rgba(255,255,255,.12)', borderRadius: 'var(--radius-full)',
-            padding: '8px 20px', marginBottom: 24, fontSize: '.82rem',
+            padding: '8px 20px', marginBottom: 20, fontSize: '.82rem',
             fontFamily: 'var(--font-heading)', fontWeight: 600,
           }}>
             Official Barangay Online Services
           </div>
           <h1 style={{
             fontFamily: 'var(--font-heading)', fontWeight: 800,
-            fontSize: 'clamp(2rem, 5vw, 3.2rem)', color: 'white',
-            lineHeight: 1.15, marginBottom: 20,
+            fontSize: 'clamp(1.8rem, 5vw, 2.8rem)', color: 'white',
+            lineHeight: 1.15, marginBottom: 20, maxWidth: 800, margin: '0 auto 20px'
           }}>
-            Serve Your Community<br />
-            <span style={{ color: 'var(--primary-200)' }}>Smarter & Faster</span>
+            Barangay Bulua: An Online Appointment and Complaint System
           </h1>
-          <p style={{ fontSize: '1.1rem', color: 'var(--primary-200)', maxWidth: 560, margin: '0 auto 40px', lineHeight: 1.7 }}>
-            File complaints, book appointments, and stay connected with your barangay. Access secure government services in one trusted portal.
+          <p style={{ fontSize: '1.1rem', color: 'var(--primary-200)', maxWidth: 650, margin: '0 auto 40px', lineHeight: 1.7 }}>
+            Empowering residents through digital innovation. Our mission is to provide efficient, transparent, and accessible barangay services for a smarter community.
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link to="/register" className="btn btn-lg" style={{ background: 'white', color: 'var(--primary-700)', fontFamily: 'var(--font-heading)' }}>
@@ -74,15 +79,27 @@ export default function LandingPage() {
         </div>
         <div className="grid-4">
           {FEATURES.map((f, i) => (
-            <div key={i} className="card" style={{ padding: 28, textAlign: 'center' }}>
+            <div key={i} className="card" style={{ 
+              padding: '40px 24px', 
+              textAlign: 'center', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center',
+              height: '100%',
+              margin: 0,
+              transition: 'var(--transition)',
+              cursor: 'default'
+            }}>
               <div style={{
-                width: 64, height: 64, borderRadius: 'var(--radius-lg)',
+                width: 68, height: 68, borderRadius: '20px',
                 background: 'var(--primary-50)', color: 'var(--primary-600)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                margin: '0 auto 18px',
+                margin: '0 auto 24px',
+                flexShrink: 0,
+                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.08)'
               }}>{f.icon}</div>
-              <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, marginBottom: 8, fontSize: '1rem' }}>{f.title}</h3>
-              <p style={{ color: 'var(--gray-500)', fontSize: '.88rem', lineHeight: 1.65 }}>{f.desc}</p>
+              <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, marginBottom: 12, fontSize: '1.15rem', color: 'var(--primary-900)', letterSpacing: '-0.01em' }}>{f.title}</h3>
+              <p style={{ color: 'var(--gray-500)', fontSize: '.92rem', lineHeight: 1.7, flexGrow: 1, margin: 0 }}>{f.desc}</p>
             </div>
           ))}
         </div>
@@ -91,13 +108,13 @@ export default function LandingPage() {
       {/* CTA */}
       <section style={{
         background: 'var(--primary-700)', color: 'white',
-        padding: '64px 24px', textAlign: 'center',
+        padding: '80px 24px', textAlign: 'center',
       }}>
-        <h2 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.8rem', marginBottom: 14 }}>
+        <h2 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '2.2rem', marginBottom: 14, color: 'white' }}>
           Ready to get started?
         </h2>
-        <p style={{ color: 'var(--primary-200)', marginBottom: 30, fontSize: '1rem' }}>
-          Create your free account and access all barangay services online.
+        <p style={{ color: 'var(--primary-100)', marginBottom: 36, fontSize: '1.1rem', maxWidth: 600, margin: '0 auto 36px' }}>
+          Create your free account and access all barangay services online. Empowering residents through efficient digital services.
         </p>
         <Link to="/register" className="btn btn-lg" style={{ background: 'white', color: 'var(--primary-700)' }}>
           Create an Account <FiArrowRight />
@@ -106,9 +123,10 @@ export default function LandingPage() {
 
       <footer style={{
         background: 'var(--primary-900)', color: 'var(--primary-300)',
-        padding: '24px', textAlign: 'center', fontSize: '.85rem',
+        padding: '32px 24px', textAlign: 'center', fontSize: '.85rem',
+        borderTop: '1px solid rgba(255,255,255,.05)'
       }}>
-        © {new Date().getFullYear()} Barangay Complaint & Appointment System · All rights reserved
+        © {new Date().getFullYear()} Barangay Bulua: An Online Appointment and Complaint System · All rights reserved
       </footer>
     </div>
   )

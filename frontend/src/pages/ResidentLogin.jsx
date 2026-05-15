@@ -2,6 +2,9 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { AlertMessage } from '../components/DashboardCard'
+import { 
+  FiMail, FiLock, FiArrowRight, FiShield, FiUser, FiCheckCircle 
+} from 'react-icons/fi'
 
 export default function ResidentLogin() {
   const navigate = useNavigate()
@@ -26,7 +29,6 @@ export default function ResidentLogin() {
       const errorData = err.response?.data
       const status = errorData?.status
       
-      // Handle different account statuses
       if (status === 'pending') {
         setAlert({ 
           type: 'warning', 
@@ -58,51 +60,134 @@ export default function ResidentLogin() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh', background: 'var(--primary-50)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
-    }}>
-      <div style={{ width: '100%', maxWidth: 420 }}>
-        <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{
-            width: 56, height: 56, borderRadius: 14, background: 'var(--primary-600)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px',
+    <div style={{ minHeight: '100vh', display: 'flex', background: 'white' }}>
+      {/* Left Side: Branding */}
+      <div style={{
+        flex: 1,
+        background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '60px',
+        color: 'white',
+        position: 'sticky',
+        top: 0,
+        height: '100vh'
+      }} className="auth-sidebar">
+        <div style={{ maxWidth: '400px', textAlign: 'center' }}>
+          <div style={{ 
+            width: 90, height: 90, background: 'white', borderRadius: '24px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 32px', padding: 12, boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
           }}>
-            <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-              <path d="M16 4L4 11v2h24v-2L16 4zM6 14v10h4V14H6zm8 0v10h4V14h-4zm8 0v10h4V14h-4zM4 26h24v2H4v-2z" fill="white"/>
-            </svg>
+            <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
-          <h1 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.6rem', marginBottom: 6 }}>Welcome Back</h1>
-          <p style={{ color: 'var(--gray-500)', fontSize: '.9rem' }}>Sign in to your resident account</p>
-        </div>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '3rem', marginBottom: 20, color: 'white', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
+            Welcome Back
+          </h1>
+          <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.25rem', lineHeight: 1.6, fontWeight: 500 }}>
+            Sign in to access your barangay services, track your requests, and stay connected.
+          </p>
 
-        <div className="card">
-          <div className="card-body">
-            {alert && <AlertMessage type={alert.type} message={alert.message} onClose={() => setAlert(null)}/>}
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">Email Address</label>
-                <input className="form-control" name="email" type="email" value={form.email} onChange={handleChange} placeholder="juan@email.com" autoFocus/>
+          <div style={{ marginTop: 60, display: 'flex', flexDirection: 'column', gap: 24, textAlign: 'left' }}>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <FiShield size={20} />
               </div>
-              <div className="form-group">
-                <label className="form-label">Password</label>
-                <input className="form-control" name="password" type="password" value={form.password} onChange={handleChange} placeholder="••••••••"/>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '1.05rem' }}>Secure Access</div>
+                <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>Your account is protected with multi-layer security.</div>
               </div>
-              <div style={{ textAlign: 'right', marginBottom: 16 }}>
-                <Link to="/forgot-password" style={{ fontSize: '13px', color: 'var(--primary-600)', textDecoration: 'none' }}>
+            </div>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <FiUser size={20} />
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '1.05rem' }}>Personal Dashboard</div>
+                <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>Manage all your barangay transactions in one place.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side: Form */}
+      <div style={{ flex: 1, padding: '60px 40px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'white' }}>
+        <div style={{ maxWidth: '420px', width: '100%' }}>
+          <div style={{ marginBottom: 40 }}>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--gray-900)', marginBottom: 8, letterSpacing: '-0.02em' }}>Sign In</h2>
+            <p style={{ color: 'var(--gray-500)', fontSize: '1.1rem' }}>Welcome back! Please enter your details.</p>
+          </div>
+
+          {alert && <AlertMessage type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
+
+          <form onSubmit={handleSubmit}>
+            <div className="form-group" style={{ marginBottom: 24 }}>
+              <label className="form-label" style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: 10 }}>Email Address</label>
+              <div style={{ position: 'relative' }}>
+                <FiMail style={{ position: 'absolute', left: 16, top: 15, color: 'var(--gray-400)' }} />
+                <input 
+                  className="form-control" 
+                  name="email"
+                  type="email" 
+                  value={form.email} 
+                  onChange={handleChange}
+                  placeholder="name@email.com" 
+                  style={{ paddingLeft: 48, background: 'var(--gray-50)', border: '1px solid var(--gray-200)', borderRadius: 14, height: '52px' }}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <label className="form-label" style={{ fontWeight: 700, fontSize: '0.9rem', margin: 0 }}>Password</label>
+                <Link to="/forgot-password" style={{ fontSize: '0.85rem', color: 'var(--primary-600)', fontWeight: 700, textDecoration: 'none' }}>
                   Forgot password?
                 </Link>
               </div>
-              <button className="btn btn-primary w-full mt-2" disabled={loading}>
-                {loading ? 'Signing in...' : 'Sign In'}
-              </button>
-            </form>
-            <p className="text-center mt-3 text-sm text-muted">
-              No account yet? <Link to="/register">Register here</Link>
+              <div style={{ position: 'relative' }}>
+                <FiLock style={{ position: 'absolute', left: 16, top: 15, color: 'var(--gray-400)' }} />
+                <input 
+                  className="form-control" 
+                  name="password"
+                  type="password" 
+                  value={form.password} 
+                  onChange={handleChange}
+                  placeholder="••••••••" 
+                  style={{ paddingLeft: 48, background: 'var(--gray-50)', border: '1px solid var(--gray-200)', borderRadius: 14, height: '52px' }}
+                  required
+                />
+              </div>
+            </div>
+
+            <button className="btn btn-primary w-full" disabled={loading} style={{
+              padding: '16px', borderRadius: 14, fontSize: '1rem', fontWeight: 700,
+              background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)', border: 'none',
+              boxShadow: '0 10px 20px rgba(37, 99, 235, 0.2)', marginTop: 20
+            }}>
+              {loading ? 'Signing in...' : (
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                  Sign In <FiArrowRight />
+                </span>
+              )}
+            </button>
+          </form>
+
+          <div style={{ textAlign: 'center', marginTop: 40, paddingTop: 30, borderTop: '1px solid var(--gray-100)' }}>
+            <p style={{ fontSize: '1rem', color: 'var(--gray-500)' }}>
+              Don't have an account? {' '}
+              <Link to="/register" style={{ color: 'var(--primary-600)', fontWeight: 800, textDecoration: 'none' }}>
+                Create one now
+              </Link>
             </p>
-            <p className="text-center text-sm text-muted">
-              <Link to="/admin/login" style={{ color: 'var(--gray-400)' }}>Admin Login →</Link>
-            </p>
+            <div style={{ marginTop: 24 }}>
+              <Link to="/admin/login" style={{ color: 'var(--gray-400)', fontSize: '0.85rem', textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <FiShield size={14} /> Admin Access
+              </Link>
+            </div>
           </div>
         </div>
       </div>

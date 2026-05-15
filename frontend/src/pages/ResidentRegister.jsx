@@ -2,229 +2,250 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { AlertMessage } from '../components/DashboardCard'
-
-const INIT = {
-  first_name: '', last_name: '', email: '',
-  phone: '', address: '', password: '', password_confirmation: '',
-}
+import { 
+  FiUser, FiMail, FiPhone, FiMapPin, FiLock, 
+  FiArrowRight, FiUploadCloud, FiFileText, FiX, FiCheckCircle, FiShield 
+} from 'react-icons/fi'
 
 export default function ResidentRegister() {
   const navigate = useNavigate()
-  const [form, setForm] = useState(INIT)
-  const [documents, setDocuments] = useState([])
-  const [errors, setErrors] = useState({})
-  const [alert, setAlert] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [alert, setAlert] = useState(null)
+  const [documents, setDocuments] = useState([])
+  const [form, setForm] = useState({
+    first_name: '', last_name: '', email: '', 
+    phone: '', address: '', password: '', password_confirmation: ''
+  })
+  const [errors, setErrors] = useState({})
 
-  const validate = () => {
-    const e = {}
-    if (!form.first_name.trim()) e.first_name = 'First name is required.'
-    if (!form.last_name.trim())  e.last_name  = 'Last name is required.'
-    if (!form.email.trim() || !/\S+@\S+\.\S+/.test(form.email)) e.email = 'Valid email required.'
-    if (!form.phone.trim()) e.phone = 'Phone number is required.'
-    if (!form.address.trim()) e.address = 'Address is required.'
-    if (form.password.length < 5) e.password = 'Password must be at least 5 characters.'
-    if (form.password !== form.password_confirmation) e.password_confirmation = 'Passwords do not match.'
-    return e
-  }
-
-  const handleChange = e => {
-    setForm(p => ({ ...p, [e.target.name]: e.target.value }))
-    setErrors(p => ({ ...p, [e.target.name]: '' }))
-  }
+  const handleChange = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }))
 
   const handleFileChange = e => {
-    const files = Array.from(e.target.files || [])
-    if (documents.length + files.length > 3) {
-      setAlert({ type: 'error', message: 'Maximum 3 documents allowed.' })
-      return
-    }
-    const validTypes = ['image/jpeg', 'image/png', 'application/pdf']
-    const validFiles = files.filter(f => {
-      if (!validTypes.includes(f.type)) {
-        setAlert({ type: 'error', message: `Invalid file type: ${f.name}. Only JPG, PNG, PDF allowed.` })
-        return false
-      }
-      if (f.size > 5 * 1024 * 1024) {
-        setAlert({ type: 'error', message: `File too large: ${f.name}. Max 5MB.` })
-        return false
-      }
-      return true
-    })
-    setDocuments(p => [...p, ...validFiles])
+    const files = Array.from(e.target.files)
+    setDocuments(prev => [...prev, ...files])
   }
 
   const removeDocument = index => {
-    setDocuments(p => p.filter((_, i) => i !== index))
+    setDocuments(prev => prev.filter((_, i) => i !== index))
   }
 
   const handleSubmit = async e => {
     e.preventDefault()
-    const v = validate()
-    if (Object.keys(v).length) { setErrors(v); return }
-    
+    setErrors({})
     setLoading(true)
+
+    const formData = new FormData()
+    Object.keys(form).forEach(key => formData.append(key, form[key]))
+    documents.forEach(doc => formData.append('documents', doc))
+
     try {
-      const formData = new FormData()
-      formData.append('first_name', form.first_name)
-      formData.append('last_name', form.last_name)
-      formData.append('email', form.email)
-      formData.append('phone', form.phone)
-      formData.append('address', form.address)
-      formData.append('password', form.password)
-      documents.forEach((doc, idx) => {
-        formData.append('documents', doc)
-      })
-
-      const res = await axios.post('/api/auth/register', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-
-      setAlert({ type: 'success', message: res.data.message })
+      await axios.post('/api/auth/register', formData)
+      setAlert({ type: 'success', message: 'Registration successful! Please check your email for the OTP.' })
       localStorage.setItem('verification_email', form.email)
-      setTimeout(() => navigate('/verify-otp'), 1500)
+      setTimeout(() => navigate('/verify-otp'), 2000)
     } catch (err) {
-      const msg = err.response?.data?.message || 'Registration failed. Please try again.'
-      setAlert({ type: 'error', message: msg })
+      if (err.response?.data?.errors) {
+        setErrors(err.response.data.errors)
+      } else {
+        setAlert({ type: 'error', message: err.response?.data?.message || 'Registration failed.' })
+      }
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div style={{
-      minHeight: '100vh', background: 'var(--primary-50)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '40px 16px',
-    }}>
-      <div style={{ width: '100%', maxWidth: 560 }}>
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 16 }}>
-            <div style={{
-              width: 48, height: 48, borderRadius: 12,
-              background: 'var(--primary-600)', display: 'flex',
-              alignItems: 'center', justifyContent: 'center',
-            }}>
-              <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
-                <path d="M16 4L4 11v2h24v-2L16 4zM6 14v10h4V14H6zm8 0v10h4V14h-4zm8 0v10h4V14h-4zM4 26h24v2H4v-2z" fill="white"/>
-              </svg>
+    <div style={{ minHeight: '100vh', display: 'flex', background: 'white' }}>
+      {/* Left Side: Branding */}
+      <div style={{
+        flex: 1,
+        background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '60px',
+        color: 'white',
+        position: 'sticky',
+        top: 0,
+        height: '100vh'
+      }} className="auth-sidebar">
+        <div style={{ maxWidth: '400px', textAlign: 'center' }}>
+          <div style={{ 
+            width: 90, height: 90, background: 'white', borderRadius: '24px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 32px', padding: 12, boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+          }}>
+            <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          </div>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '3rem', marginBottom: 20, color: 'white', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
+            Join the Community
+          </h1>
+          <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.25rem', lineHeight: 1.6, fontWeight: 500 }}>
+            Access efficient barangay services and stay connected. Please note that this portal is <strong>exclusively for residents of Barangay Bulua</strong>.
+          </p>
+
+          <div style={{ marginTop: 60, display: 'flex', flexDirection: 'column', gap: 24, textAlign: 'left' }}>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <FiCheckCircle size={20} />
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '1.05rem' }}>Fast Processing</div>
+                <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>Your requests are handled with priority and efficiency.</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <FiShield size={20} />
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '1.05rem' }}>Secure & Private</div>
+                <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>Your data is protected with industry-standard security.</div>
+              </div>
             </div>
           </div>
-          <h1 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.6rem', marginBottom: 6 }}>Create Account</h1>
-          <p style={{ color: 'var(--gray-500)', fontSize: '.9rem' }}>Register to access barangay services</p>
         </div>
+      </div>
 
-        <div className="card">
-          <div className="card-body">
-            {alert && <AlertMessage type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
+      {/* Right Side: Form */}
+      <div style={{ flex: 1, padding: '60px 40px', overflowY: 'auto', background: 'white' }}>
+        <div style={{ maxWidth: '580px', margin: '0 auto' }}>
+          <div style={{ marginBottom: 40 }}>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--gray-900)', marginBottom: 8, letterSpacing: '-0.02em' }}>Create Account</h2>
+            <p style={{ color: 'var(--gray-500)', fontSize: '1.1rem' }}>Enter your details to register as a resident.</p>
+          </div>
 
-            <form onSubmit={handleSubmit}>
-              <div className="grid-2">
-                <div className="form-group">
-                  <label className="form-label">First Name *</label>
-                  <input className="form-control" name="first_name" value={form.first_name} onChange={handleChange} placeholder="Juan"/>
-                  {errors.first_name && <div className="form-error">{errors.first_name}</div>}
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Last Name *</label>
-                  <input className="form-control" name="last_name" value={form.last_name} onChange={handleChange} placeholder="Dela Cruz"/>
-                  {errors.last_name && <div className="form-error">{errors.last_name}</div>}
-                </div>
-              </div>
+          {alert && <AlertMessage type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
 
+          <form onSubmit={handleSubmit}>
+            <div style={{ borderLeft: '4px solid var(--primary-600)', paddingLeft: 16, marginBottom: 32 }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--gray-900)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>Personal Information</h3>
+            </div>
+
+            <div className="grid-2">
               <div className="form-group">
-                <label className="form-label">Email Address *</label>
-                <input className="form-control" name="email" type="email" value={form.email} onChange={handleChange} placeholder="juan@email.com"/>
-                {errors.email && <div className="form-error">{errors.email}</div>}
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Phone Number *</label>
-                <input className="form-control" name="phone" value={form.phone} onChange={handleChange} placeholder="09XXXXXXXXX"/>
-                {errors.phone && <div className="form-error">{errors.phone}</div>}
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Home Address *</label>
-                <textarea className="form-control" name="address" value={form.address} onChange={handleChange} rows={2} placeholder="House No., Street, Barangay..."/>
-                {errors.address && <div className="form-error">{errors.address}</div>}
-              </div>
-
-              <div className="grid-2">
-                <div className="form-group">
-                  <label className="form-label">Password *</label>
-                  <input className="form-control" name="password" type="password" value={form.password} onChange={handleChange} placeholder="Min. 5 characters"/>
-                  {errors.password && <div className="form-error">{errors.password}</div>}
+                <label className="form-label">First Name *</label>
+                <div style={{ position: 'relative' }}>
+                  <FiUser style={{ position: 'absolute', left: 14, top: 13, color: 'var(--gray-400)' }} />
+                  <input className="form-control" name="first_name" value={form.first_name} onChange={handleChange} placeholder="Juan" style={{ paddingLeft: 40, background: 'var(--gray-50)', border: '1px solid var(--gray-200)', borderRadius: 12 }}/>
                 </div>
-                <div className="form-group">
-                  <label className="form-label">Confirm Password *</label>
-                  <input className="form-control" name="password_confirmation" type="password" value={form.password_confirmation} onChange={handleChange} placeholder="Repeat password"/>
-                  {errors.password_confirmation && <div className="form-error">{errors.password_confirmation}</div>}
-                </div>
+                {errors.first_name && <div className="form-error">{errors.first_name}</div>}
               </div>
-
               <div className="form-group">
-                <label className="form-label">Verification Documents (Proof of Residency)</label>
-                <div style={{
-                  border: '2px dashed var(--primary-300)', borderRadius: 8, padding: 24,
-                  textAlign: 'center', cursor: 'pointer', background: 'var(--primary-50)',
-                  transition: 'all 0.2s'
-                }} 
-                onDragOver={e => {
-                  e.preventDefault()
-                  e.currentTarget.style.borderColor = 'var(--primary-600)'
-                  e.currentTarget.style.background = 'var(--primary-100)'
-                }}
-                onDragLeave={e => {
-                  e.currentTarget.style.borderColor = 'var(--primary-300)'
-                  e.currentTarget.style.background = 'var(--primary-50)'
-                }}
-                onDrop={e => {
-                  e.preventDefault()
-                  e.currentTarget.style.borderColor = 'var(--primary-300)'
-                  e.currentTarget.style.background = 'var(--primary-50)'
-                  handleFileChange({ target: { files: e.dataTransfer.files } })
-                }}>
-                  <input type="file" multiple accept=".jpg,.jpeg,.png,.pdf" onChange={handleFileChange} style={{ display: 'none' }} id="file-input"/>
-                  <label htmlFor="file-input" style={{ cursor: 'pointer', display: 'block' }}>
-                    <div style={{ fontSize: 32, marginBottom: 8 }}>📄</div>
-                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Drag files here or click to browse</div>
-                    <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>JPG, PNG, PDF • Max 5MB each • Up to 3 files</div>
-                  </label>
+                <label className="form-label">Last Name *</label>
+                <div style={{ position: 'relative' }}>
+                  <FiUser style={{ position: 'absolute', left: 14, top: 13, color: 'var(--gray-400)' }} />
+                  <input className="form-control" name="last_name" value={form.last_name} onChange={handleChange} placeholder="Dela Cruz" style={{ paddingLeft: 40, background: 'var(--gray-50)', border: '1px solid var(--gray-200)', borderRadius: 12 }}/>
                 </div>
-                {documents.length > 0 && (
-                  <div style={{ marginTop: 12 }}>
-                    {documents.map((doc, idx) => (
-                      <div key={idx} style={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                        padding: 12, background: 'var(--gray-50)', borderRadius: 6, marginBottom: 8
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontSize: 18 }}>📎</span>
-                          <div>
-                            <div style={{ fontWeight: 500, fontSize: 14 }}>{doc.name}</div>
-                            <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>
-                              {(doc.size / 1024 / 1024).toFixed(2)} MB
-                            </div>
-                          </div>
-                        </div>
-                        <button type="button" onClick={() => removeDocument(idx)} style={{
-                          background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 18
-                        }}>✕</button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {errors.last_name && <div className="form-error">{errors.last_name}</div>}
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Email Address *</label>
+              <div style={{ position: 'relative' }}>
+                <FiMail style={{ position: 'absolute', left: 14, top: 13, color: 'var(--gray-400)' }} />
+                <input className="form-control" name="email" type="email" value={form.email} onChange={handleChange} placeholder="juan@email.com" style={{ paddingLeft: 40, background: 'var(--gray-50)', border: '1px solid var(--gray-200)', borderRadius: 12 }}/>
+              </div>
+              {errors.email && <div className="form-error">{errors.email}</div>}
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Phone Number *</label>
+              <div style={{ position: 'relative' }}>
+                <FiPhone style={{ position: 'absolute', left: 14, top: 13, color: 'var(--gray-400)' }} />
+                <input className="form-control" name="phone" value={form.phone} onChange={handleChange} placeholder="09XXXXXXXXX" style={{ paddingLeft: 40, background: 'var(--gray-50)', border: '1px solid var(--gray-200)', borderRadius: 12 }}/>
+              </div>
+              {errors.phone && <div className="form-error">{errors.phone}</div>}
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Home Address *</label>
+              <div style={{ position: 'relative' }}>
+                <FiMapPin style={{ position: 'absolute', left: 14, top: 13, color: 'var(--gray-400)' }} />
+                <textarea className="form-control" name="address" value={form.address} onChange={handleChange} rows={2} placeholder="House No., Street, Barangay..." style={{ paddingLeft: 40, background: 'var(--gray-50)', border: '1px solid var(--gray-200)', borderRadius: 12 }}/>
+              </div>
+              {errors.address && <div className="form-error">{errors.address}</div>}
+            </div>
+
+            <div className="grid-2">
+              <div className="form-group">
+                <label className="form-label">Password *</label>
+                <div style={{ position: 'relative' }}>
+                  <FiLock style={{ position: 'absolute', left: 14, top: 13, color: 'var(--gray-400)' }} />
+                  <input className="form-control" name="password" type="password" value={form.password} onChange={handleChange} placeholder="••••••••" style={{ paddingLeft: 40, background: 'var(--gray-50)', border: '1px solid var(--gray-200)', borderRadius: 12 }}/>
+                </div>
+                {errors.password && <div className="form-error">{errors.password}</div>}
+              </div>
+              <div className="form-group">
+                <label className="form-label">Confirm Password *</label>
+                <div style={{ position: 'relative' }}>
+                  <FiLock style={{ position: 'absolute', left: 14, top: 13, color: 'var(--gray-400)' }} />
+                  <input className="form-control" name="password_confirmation" type="password" value={form.password_confirmation} onChange={handleChange} placeholder="••••••••" style={{ paddingLeft: 40, background: 'var(--gray-50)', border: '1px solid var(--gray-200)', borderRadius: 12 }}/>
+                </div>
+                {errors.password_confirmation && <div className="form-error">{errors.password_confirmation}</div>}
+              </div>
+            </div>
+
+            <div style={{ borderLeft: '4px solid var(--primary-600)', paddingLeft: 16, marginTop: 40, marginBottom: 24 }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--gray-900)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>Proof of Residency</h3>
+            </div>
+
+            <div className="form-group">
+              <div style={{
+                border: '2px dashed var(--gray-200)', borderRadius: 16, padding: '32px',
+                textAlign: 'center', cursor: 'pointer', background: 'var(--gray-50)',
+                transition: 'all 0.2s', position: 'relative'
+              }} 
+              onDragOver={e => { e.preventDefault(); e.currentTarget.style.borderColor = 'var(--primary-500)'; }}
+              onDragLeave={e => { e.currentTarget.style.borderColor = 'var(--gray-200)'; }}
+              onDrop={e => { e.preventDefault(); handleFileChange({ target: { files: e.dataTransfer.files } }); }}>
+                <input type="file" multiple accept=".jpg,.jpeg,.png,.pdf" onChange={handleFileChange} style={{ display: 'none' }} id="file-input"/>
+                <label htmlFor="file-input" style={{ cursor: 'pointer', display: 'block' }}>
+                  <FiUploadCloud size={32} style={{ color: 'var(--primary-600)', marginBottom: 12 }} />
+                  <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--gray-900)' }}>Drop documents or click to upload</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--gray-500)', marginTop: 4 }}>JPG, PNG, PDF up to 5MB</div>
+                </label>
               </div>
 
-              <button className="btn btn-primary w-full mt-2" disabled={loading}>
-                {loading ? 'Creating Account...' : 'Create Account'}
-              </button>
-            </form>
+              {documents.length > 0 && (
+                <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {documents.map((doc, idx) => (
+                    <div key={idx} style={{
+                      display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
+                      background: 'white', border: '1px solid var(--gray-200)', borderRadius: 12
+                    }}>
+                      <FiFileText style={{ color: 'var(--primary-600)' }} />
+                      <div style={{ flex: 1, fontSize: '0.875rem', fontWeight: 600 }}>{doc.name}</div>
+                      <button type="button" onClick={() => removeDocument(idx)} style={{ background: 'none', border: 'none', color: 'var(--danger)' }}>
+                        <FiX size={18} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-            <p className="text-center mt-3 text-sm text-muted">
-              Already have an account? <Link to="/login">Sign in</Link>
+            <button className="btn btn-primary w-full" disabled={loading} style={{
+              padding: '16px', borderRadius: 12, fontSize: '1rem', fontWeight: 700,
+              background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)', border: 'none',
+              boxShadow: '0 10px 20px rgba(37, 99, 235, 0.2)', marginTop: 24
+            }}>
+              {loading ? 'Processing...' : (
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                  Create Account <FiArrowRight />
+                </span>
+              )}
+            </button>
+          </form>
+
+          <div style={{ textAlign: 'center', marginTop: 40, paddingTop: 30, borderTop: '1px solid var(--gray-100)' }}>
+            <p style={{ fontSize: '1rem', color: 'var(--gray-500)' }}>
+              Already have an account? {' '}
+              <Link to="/login" style={{ color: 'var(--primary-600)', fontWeight: 800, textDecoration: 'none' }}>
+                Sign in here
+              </Link>
             </p>
           </div>
         </div>

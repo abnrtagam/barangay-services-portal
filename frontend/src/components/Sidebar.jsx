@@ -45,40 +45,28 @@ export default function Sidebar() {
       zIndex: 100
     }}>
       <div style={{
-        display: 'flex', alignItems: 'center', gap: '14px',
-        padding: '32px 24px 24px',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
+        padding: '32px 16px 24px',
         borderBottom: '1px solid rgba(255,255,255,.05)'
       }}>
-        <div style={{ overflow: 'hidden', borderRadius: '50%', width: 44, height: 44, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ 
+          width: 70, height: 70, background: '#fff', 
+          borderRadius: '16px', display: 'flex', 
+          alignItems: 'center', justifyContent: 'center',
+          marginBottom: '16px', padding: '8px',
+          boxShadow: '0 8px 16px rgba(0,0,0,0.2)'
+        }}>
           <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
         <div>
-          <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.15rem', color: 'white', letterSpacing: '-0.01em' }}>Barangay Bulua</div>
-          <div style={{ fontSize: '.72rem', color: '#94a3b8', letterSpacing: '.06em', textTransform: 'uppercase', marginTop: '2px' }}>Admin Portal</div>
+          <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.1rem', color: 'white', letterSpacing: '-0.01em' }}>Barangay Bulua</div>
+          <div style={{ fontSize: '.68rem', color: '#94a3b8', letterSpacing: '.04em', textTransform: 'uppercase', marginTop: '6px', lineHeight: 1.4 }}>
+            Online Appointment &<br/>Complaint System
+          </div>
         </div>
       </div>
 
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: '12px',
-        padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,.05)'
-      }}>
-        <div style={{
-          width: 40, height: 40, border_radius: '12px',
-          background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)', color: 'white',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '1.1rem',
-          boxShadow: '0 4px 10px rgba(37, 99, 235, 0.2)',
-          borderRadius: '12px'
-        }}>
-          {admin.name?.[0] || 'A'}
-        </div>
-        <div>
-          <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: '.9rem', color: 'white' }}>{admin.name || 'Administrator'}</div>
-          <div style={{ fontSize: '.72rem', color: '#64748b' }}>System Admin</div>
-        </div>
-      </div>
-
-      <nav style={{ flex: 1, padding: '24px 16px' }}>
+      <nav style={{ flex: 1, padding: '24px 16px', overflowY: 'auto' }}>
         <div style={{
           fontSize: '.68rem', letterSpacing: '.12em', textTransform: 'uppercase',
           color: '#475569', fontFamily: 'var(--font-heading)', fontWeight: 800,
@@ -105,22 +93,29 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,.05)' }}>
+      {/* Bottom Actions Section */}
+      <div style={{ padding: '24px 16px', borderTop: '1px solid rgba(255,255,255,.05)' }}>
         <button 
           onClick={handleLogout}
           style={{
             display: 'flex', alignItems: 'center', gap: '12px',
-            padding: '12px 16px', borderRadius: '12px',
-            fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: '0.92rem',
-            color: '#f87171', cursor: 'pointer', border: 'none',
-            background: 'none', width: '100%', textAlign: 'left',
-            transition: 'all 0.2s ease'
+            padding: '14px 16px', borderRadius: '12px',
+            fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '0.9rem',
+            color: '#f87171', cursor: 'pointer', border: '1px solid rgba(248, 113, 113, 0.2)',
+            background: 'rgba(248, 113, 113, 0.05)', width: '100%', textAlign: 'left',
+            transition: 'all 0.2s ease',
+            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.05)'
           }}
         >
           <span style={{ display: 'flex', alignItems: 'center', fontSize: '1.1rem' }}><FiLogOut /></span>
-          <span>Logout</span>
+          <span>Sign Out</span>
         </button>
       </div>
+
+      <style>{`
+        aside::-webkit-scrollbar { display: none; }
+        aside { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </aside>
   )
 }

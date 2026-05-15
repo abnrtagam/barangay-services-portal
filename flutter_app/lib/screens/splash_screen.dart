@@ -63,11 +63,11 @@ class SplashScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'ONLINE APPOINTMENT &\nCOMPLAINT SYSTEM',
+                  'AN ONLINE APPOINTMENT AND\nCOMPLAINT SYSTEM',
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColors.primary100,
-                    letterSpacing: 3,
+                    letterSpacing: 2.5,
                     fontWeight: FontWeight.w600,
                     height: 1.5,
                   ),

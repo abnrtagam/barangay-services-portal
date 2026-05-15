@@ -26,12 +26,12 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-        <div className="brand-logo" style={{ overflow: 'hidden', borderRadius: '50%', width: 36, height: 36, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="brand-logo" style={{ overflow: 'hidden', borderRadius: '6px', width: 36, height: 36, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px' }}>
           <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
         <div>
           <span className="brand-name">Barangay Bulua</span>
-          <span className="brand-sub">Online Appointment & Complaint System</span>
+          <span className="brand-sub">An Online Appointment and Complaint System</span>
         </div>
       </div>
 
@@ -49,7 +49,7 @@ export default function Navbar() {
           <FiChevronDown size={14} />
           {dropOpen && (
             <div className="dropdown">
-              <Link to="/resident/dashboard" className="drop-item">
+              <Link to="/resident/profile" className="drop-item">
                 <FiUser size={14}/> My Profile
               </Link>
               <div className="drop-divider"></div>

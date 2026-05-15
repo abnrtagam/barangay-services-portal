@@ -100,11 +100,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     ),
                                     const SizedBox(height: 4),
                                     const Text(
-                                      'Welcome back to your portal',
+                                      'An Online Appointment and Complaint System',
                                       style: TextStyle(
-                                        color: Colors.white60,
+                                        color: Colors.white70,
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500,
+                                        fontFamily: 'DM Sans',
                                       ),
                                     ),
                                   ],
