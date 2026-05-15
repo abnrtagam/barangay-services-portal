@@ -20,6 +20,7 @@ import ComplaintHistory from '../pages/ComplaintHistory'
 import BookAppointment from '../pages/BookAppointment'
 import AppointmentHistory from '../pages/AppointmentHistory'
 import Announcements from '../pages/Announcements'
+import ResidentProfile from '../pages/ResidentProfile'
 
 // Admin pages
 import AdminDashboard from '../pages/AdminDashboard'
@@ -60,6 +61,7 @@ export default function AppRoutes() {
         <Route path="appointments/book" element={<BookAppointment />} />
         <Route path="appointments/history" element={<AppointmentHistory />} />
         <Route path="announcements" element={<Announcements />} />
+        <Route path="profile" element={<ResidentProfile />} />
       </Route>
 
       {/* Admin Protected */}
