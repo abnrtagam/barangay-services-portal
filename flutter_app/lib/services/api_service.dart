@@ -49,18 +49,28 @@ class ApiService {
         request.headers.addAll(headers);
 
         // Add form fields
-        body.forEach((key, value) {
-          if (value is List<int>) {
-            // This is a file
-            request.files.add(http.MultipartFile.fromBytes(
+        for (var entry in body.entries) {
+          if (entry.value is List<String> && entry.key == 'documents') {
+            // Handle multiple file paths for registration
+            List<String> filePaths = entry.value as List<String>;
+            for (String path in filePaths) {
+              request.files.add(await http.MultipartFile.fromPath(
+                'documents',
+                path,
+              ));
+            }
+          } else if (entry.key == 'attachment' && entry.value is String) {
+            // Handle single attachment for complaints
+            request.files.add(await http.MultipartFile.fromPath(
               'attachment',
-              value,
-              filename: 'upload',
+              entry.value as String,
             ));
+          } else if (entry.value is String) {
+            request.fields[entry.key] = entry.value;
           } else {
-            request.fields[key] = value.toString();
+             request.fields[entry.key] = entry.value.toString();
           }
-        });
+        }
 
         response = await request.send().then(http.Response.fromStream).timeout(
               const Duration(milliseconds: ApiConstants.receiveTimeout),

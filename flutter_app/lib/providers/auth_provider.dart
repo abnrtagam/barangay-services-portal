@@ -89,6 +89,7 @@ class AuthProvider with ChangeNotifier {
     required String phone,
     required String address,
     required String password,
+    required List<String> documentPaths,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -102,6 +103,7 @@ class AuthProvider with ChangeNotifier {
         phone: phone,
         address: address,
         password: password,
+        documentPaths: documentPaths,
       );
 
       _isLoading = false;

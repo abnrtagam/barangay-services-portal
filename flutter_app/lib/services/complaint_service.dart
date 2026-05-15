@@ -34,22 +34,9 @@ class ComplaintService {
     required int categoryId,
     required String subject,
     required String details,
-    List<int>? attachmentBytes,
-    String? attachmentName,
+    String? attachmentPath,
   }) async {
     try {
-      final body = <String, dynamic>{
-        'category_id': categoryId,
-        'subject': subject,
-        'details': details,
-      };
-
-      final bool hasAttachment = attachmentBytes != null && attachmentBytes.isNotEmpty;
-
-      if (hasAttachment) {
-        body['attachment'] = attachmentBytes;
-      }
-
       final response = await ApiService.post(
         ApiConstants.complaintSubmit,
         body,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../constants/app_colors.dart';
+import 'package:image_picker/image_picker.dart';
 import 'otp_verification_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -18,6 +19,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
   final _passwordController = TextEditingController();
+  final List<XFile> _selectedDocuments = [];
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickDocuments() async {
+    try {
+      final List<XFile> pickedFiles = await _picker.pickMultiImage();
+      if (pickedFiles.isNotEmpty) {
+        setState(() {
+          _selectedDocuments.addAll(pickedFiles);
+          // Backend expects max 3 documents
+          if (_selectedDocuments.length > 3) {
+            _selectedDocuments.removeRange(3, _selectedDocuments.length);
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Maximum of 3 documents allowed')));
+          }
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error picking images: $e')));
+    }
+  }
 
   @override
   void dispose() {
@@ -43,6 +64,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       phone: _phoneController.text,
       address: _addressController.text,
       password: _passwordController.text,
+      documentPaths: _selectedDocuments.map((f) => f.path).toList(),
     );
 
     if (mounted) {
@@ -96,6 +118,48 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             _inputLabel('ACCOUNT PASSWORD'),
             TextField(controller: _passwordController, obscureText: true, decoration: const InputDecoration(hintText: 'At least 5 characters')),
+            const SizedBox(height: 24),
+
+            const Text('Proof of Residency', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.primary900, fontFamily: 'Plus Jakarta Sans')),
+            const SizedBox(height: 4),
+            const Text('Upload Valid ID or Brgy. Certificate (Max 3)', style: TextStyle(fontSize: 13, color: AppColors.gray500, fontFamily: 'DM Sans')),
+            const SizedBox(height: 12),
+            
+            OutlinedButton.icon(
+              onPressed: _pickDocuments,
+              icon: const Icon(Icons.upload_file_rounded),
+              label: const Text('Select Images'),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                side: const BorderSide(color: AppColors.primary500),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+            if (_selectedDocuments.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Column(
+                children: _selectedDocuments.map((doc) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.image_outlined, size: 20, color: AppColors.gray500),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(doc.name, style: const TextStyle(fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded, size: 20, color: AppColors.danger),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () {
+                          setState(() {
+                            _selectedDocuments.remove(doc);
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                )).toList(),
+              ),
+            ],
             const SizedBox(height: 32),
 
             Consumer<AuthProvider>(

@@ -16,6 +16,7 @@ class AuthService {
     required String phone,
     required String address,
     required String password,
+    required List<String> documentPaths,
   }) async {
     try {
       final response = await ApiService.post(
@@ -27,7 +28,9 @@ class AuthService {
           'phone': phone,
           'address': address,
           'password': password,
+          if (documentPaths.isNotEmpty) 'documents': documentPaths,
         },
+        isFormData: true,
       );
 
       if (response['success']) {
