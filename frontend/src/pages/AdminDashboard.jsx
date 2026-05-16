@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { DashboardCard, StatusBadge } from '../components/DashboardCard'
 import {
   FiUsers, FiAlertCircle, FiClock,
-  FiCalendar, FiCheckCircle, FiClipboard,
+  FiCalendar, FiCheckCircle, FiClipboard, FiTrendingUp, FiActivity, FiMap, FiRefreshCw
 } from 'react-icons/fi'
+import { 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
+} from 'recharts'
+import { format, subDays, startOfDay, isSameDay } from 'date-fns'
 
 const EmptyState = ({ message }) => (
   <tr>
@@ -13,230 +18,299 @@ const EmptyState = ({ message }) => (
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '36px 20px',
+        padding: '48px 20px',
         color: '#94a3b8',
-        gap: '10px',
+        gap: '12px',
       }}>
-        <FiClipboard size={32} strokeWidth={1.5} />
-        <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>{message}</span>
+        <div style={{ padding: '20px', background: '#f8fafc', borderRadius: '50%' }}>
+          <FiClipboard size={40} strokeWidth={1} />
+        </div>
+        <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{message}</span>
       </div>
     </td>
   </tr>
 )
 
 export default function AdminDashboard() {
+  const navigate = useNavigate()
   const [stats, setStats]           = useState({})
+  const [zoneStats, setZoneStats]   = useState([])
+  const [dailyData, setDailyData]   = useState([])
   const [recentComplaints, setRC]   = useState([])
   const [recentAppointments, setRA] = useState([])
   const [loading, setLoading]       = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const token = localStorage.getItem('admin_token')
 
-  useEffect(() => {
+  const fetchData = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true)
     const headers = { Authorization: `Bearer ${token}` }
-    Promise.all([
-      axios.get('/api/admin/stats', { headers }),
-      axios.get('/api/admin/complaints?limit=6', { headers }),
-      axios.get('/api/admin/appointments?limit=6', { headers }),
-    ]).then(([s, c, a]) => {
-      setStats(s.data)
-      setRC(c.data.data || [])
-      setRA(a.data.data || [])
-    }).catch(() => {}).finally(() => setLoading(false))
-  }, [])
+    
+    try {
+      // Fetch core stats first
+      const [sRes, zRes, cRes, aRes] = await Promise.all([
+        axios.get('/api/admin/stats', { headers }).catch(e => ({ data: {} })),
+        axios.get('/api/admin/residents/zone-stats', { headers }).catch(e => ({ data: { data: [] } })),
+        axios.get('/api/admin/complaints?limit=6', { headers }).catch(e => ({ data: { data: [] } })),
+        axios.get('/api/admin/appointments?limit=6', { headers }).catch(e => ({ data: { data: [] } })),
+      ])
+      
+      setStats(sRes.data || {})
+      setZoneStats(zRes.data.data || [])
+      setRC(cRes.data.data || [])
+      setRA(aRes.data.data || [])
 
-  if (loading) return <div className="spinner-wrap"><div className="spinner" /></div>
+      // Fetch daily stats separately so it doesn't block the rest
+      try {
+        const dRes = await axios.get('/api/admin/daily-stats', { headers })
+        const backendDaily = dRes.data.complaints || []
+        
+        const last7Days = [...Array(7)].map((_, i) => {
+          const d = subDays(new Date(), 6 - i)
+          return {
+            name: format(d, 'EEE'),
+            fullDate: format(d, 'yyyy-MM-dd'),
+            count: 0
+          }
+        })
 
-  const today = new Date().toLocaleDateString('en-PH', {
+        const processed = last7Days.map(day => {
+          const match = backendDaily.find(b => {
+            const bDate = format(new Date(b.date), 'yyyy-MM-dd')
+            return bDate === day.fullDate
+          })
+          return { name: day.name, count: match ? match.count : 0 }
+        })
+        setDailyData(processed)
+      } catch (err) {
+        console.warn("Daily stats failed, using empty chart", err)
+        setDailyData([])
+      }
+
+    } catch (err) {
+      console.error("Dashboard fetch error:", err)
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
+  }, [token])
+
+  useEffect(() => {
+    fetchData()
+    const interval = setInterval(() => fetchData(true), 60000)
+    return () => clearInterval(interval)
+  }, [fetchData])
+
+  if (loading) return (
+    <div style={{ height: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="spinner" style={{ width: '50px', height: '50px' }} />
+    </div>
+  )
+
+  const todayStr = new Date().toLocaleDateString('en-PH', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   })
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1400px' }}>
+    <div style={{ padding: '32px', maxWidth: '1600px', margin: '0 auto', background: '#f8fafc', minHeight: '100vh' }}>
 
-      {/* Welcome Banner */}
+      {/* Header & Welcome */}
       <div style={{
-        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%)',
-        borderRadius: '16px',
-        padding: '28px 32px',
-        marginBottom: '28px',
+        background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #60a5fa 100%)',
+        borderRadius: '32px',
+        padding: '48px 48px',
+        marginBottom: '40px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '16px',
-        boxShadow: '0 4px 20px rgba(37, 99, 235, 0.25)',
+        boxShadow: '0 20px 40px rgba(37, 99, 235, 0.2)',
         position: 'relative',
         overflow: 'hidden',
+        color: 'white'
       }}>
-        <div style={{
-          position: 'absolute', right: '-40px', top: '-40px',
-          width: '200px', height: '200px', borderRadius: '50%',
-          background: 'rgba(255,255,255,0.06)', pointerEvents: 'none',
-        }} />
-        <div style={{
-          position: 'absolute', right: '60px', bottom: '-60px',
-          width: '160px', height: '160px', borderRadius: '50%',
-          background: 'rgba(255,255,255,0.04)', pointerEvents: 'none',
-        }} />
-        <div>
-          <p style={{
-            color: 'rgba(255,255,255,0.75)', fontSize: '0.8rem',
-            fontWeight: 600, letterSpacing: '0.1em',
-            textTransform: 'uppercase', margin: '0 0 6px 0',
+        <div style={{ position: 'absolute', right: '-50px', top: '-50px', width: '300px', height: '300px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', pointerEvents: 'none' }} />
+        
+        <div style={{ zIndex: 1 }}>
+          <div style={{ 
+            background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)', 
+            padding: '6px 14px', borderRadius: '10px', fontSize: '0.75rem', 
+            fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em',
+            marginBottom: '16px', display: 'inline-block', border: '1px solid rgba(255,255,255,0.2)'
           }}>
-            Admin Portal
-          </p>
-          <h1 style={{
-            color: '#ffffff', fontSize: '1.75rem', fontWeight: 800,
-            margin: '0 0 6px 0', letterSpacing: '-0.02em',
-          }}>
-            Admin Dashboard
+            <FiActivity style={{ marginRight: '6px' }} /> {refreshing ? 'Refreshing...' : 'Live System Monitor'}
+          </div>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 900, margin: '0 0 12px 0', letterSpacing: '-0.03em' }}>
+            Good Day, Admin!
           </h1>
-          <p style={{
-            color: 'rgba(255,255,255,0.7)', fontSize: '0.875rem', margin: 0,
-          }}>
-            Overview of all barangay service requests.
+          <p style={{ fontSize: '1.1rem', opacity: 0.9, fontWeight: 500, maxWidth: '500px' }}>
+            Welcome back to the command center. You have <span style={{ fontWeight: 800 }}>{stats.pendingComplaints || 0}</span> pending complaints that need your attention today.
           </p>
         </div>
-        <div style={{
-          background: 'rgba(255,255,255,0.15)',
-          backdropFilter: 'blur(8px)',
-          borderRadius: '10px',
-          padding: '10px 18px',
-          color: '#ffffff',
-          fontSize: '0.82rem',
-          fontWeight: 600,
-          border: '1px solid rgba(255,255,255,0.2)',
-          whiteSpace: 'nowrap',
+
+        <div style={{ 
+          background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)', 
+          padding: '24px 32px', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.2)',
+          textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '4px'
         }}>
-          {today}
+          <button 
+            onClick={() => fetchData(true)}
+            style={{ 
+              background: 'none', border: 'none', color: 'white', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem',
+              fontWeight: 700, marginBottom: '8px', justifyContent: 'flex-end', opacity: 0.8
+            }}
+          >
+            <FiRefreshCw className={refreshing ? 'spin' : ''} /> Force Refresh
+          </button>
+          <div style={{ fontSize: '0.85rem', fontWeight: 700, opacity: 0.8, textTransform: 'uppercase' }}>Current Date</div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 800 }}>{todayStr}</div>
         </div>
       </div>
 
-      {/* Resident Statistics */}
-      <p style={{
-        fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em',
-        textTransform: 'uppercase', color: '#2563eb', margin: '0 0 14px 2px',
-        display: 'flex', alignItems: 'center', gap: '8px'
-      }}>
-        <FiUsers size={14} /> Registered Residents
-      </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px', marginBottom: '28px' }}>
-        <DashboardCard 
-          title="Total Residents"    
-          value={stats.totalResidents || 0} 
-          icon={<FiUsers />}       
-          color="blue"    
-          sub="Verified accounts in the system" 
-        />
+      {/* Analytics Overview Section */}
+      <div style={{ marginBottom: '48px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', padding: '0 8px' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <FiActivity color="#2563eb" /> System Insights
+          </h2>
+          <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#64748b' }}>Last updated: Just now</div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+          <DashboardCard 
+            title="Total Population"    
+            value={stats.totalResidents || 0} 
+            icon={<FiUsers />}       
+            color="blue"    
+            sub="Registered residents" 
+          />
+          <DashboardCard 
+            title="Pending Reports" 
+            value={stats.pendingComplaints || 0} 
+            icon={<FiAlertCircle />}       
+            color="danger" 
+            sub="Critical priority" 
+          />
+          <DashboardCard 
+            title="Active Appointments"     
+            value={stats.pendingAppointments || 0} 
+            icon={<FiClock />} 
+            color="warning"   
+            sub="Scheduled for today" 
+          />
+          <DashboardCard 
+            title="Resolution Rate"     
+            value={stats.totalComplaints > 0 ? Math.round(((stats.resolvedComplaints || 0) / stats.totalComplaints) * 100) + '%' : '100%'} 
+            icon={<FiTrendingUp />} 
+            color="success" 
+            sub="Monthly average" 
+          />
+        </div>
       </div>
 
-      {/* Complaints Section */}
-      <p style={{
-        fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em',
-        textTransform: 'uppercase', color: '#dc2626', margin: '0 0 14px 2px',
-        display: 'flex', alignItems: 'center', gap: '8px'
-      }}>
-        <FiAlertCircle size={14} /> Complaints Management
-      </p>
-      <div className="grid-4 mb-3">
-        <DashboardCard 
-          title="Total"   
-          value={stats.totalComplaints || 0} 
-          icon={<FiAlertCircle />} 
-          color="red"     
-          sub="Lifetime reports" 
-        />
-        <DashboardCard 
-          title="Pending" 
-          value={stats.pendingComplaints || 0} 
-          icon={<FiClock />}       
-          color="warning" 
-          sub="Action required" 
-        />
-        <DashboardCard 
-          title="Approved"     
-          value={stats.approvedComplaints || 0} 
-          icon={<FiCheckCircle />} 
-          color="blue"   
-          sub="Validated" 
-        />
-        <DashboardCard 
-          title="Resolved"     
-          value={stats.resolvedComplaints || 0} 
-          icon={<FiCheckCircle />} 
-          color="green" 
-          sub="Closed" 
-        />
-      </div>
-
-      {/* Appointments Section */}
-      <p style={{
-        fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em',
-        textTransform: 'uppercase', color: '#0891b2', margin: '8px 0 14px 2px',
-        display: 'flex', alignItems: 'center', gap: '8px'
-      }}>
-        <FiCalendar size={14} /> Appointment Scheduling
-      </p>
-      <div className="grid-3 mb-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
-        <DashboardCard 
-          title="Total" 
-          value={stats.totalAppointments || 0} 
-          icon={<FiCalendar />}    
-          color="info"    
-          sub="Visit requests" 
-        />
-        <DashboardCard 
-          title="Pending" 
-          value={stats.pendingAppointments || 0} 
-          icon={<FiClock />}       
-          color="warning" 
-          sub="Awaiting approval" 
-        />
-        <DashboardCard 
-          title="Completed"    
-          value={stats.completedAppointments || 0} 
-          icon={<FiCalendar />}    
-          color="green"   
-          sub="Finished" 
-        />
-      </div>
-
-      {/* Section Label */}
-      <p style={{
-        fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em',
-        textTransform: 'uppercase', color: '#94a3b8', margin: '24px 0 14px 2px',
-      }}>
-        Recent Activity
-      </p>
-
-      {/* Recent Tables */}
-      <div className="grid-2">
-
-        <div style={{
-          background: '#ffffff', borderRadius: '16px',
-          border: 'none',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden',
-        }}>
-          <div style={{
-            padding: '18px 24px', borderBottom: '1px solid #f1f5f9',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          }}>
+      {/* Main Grid: Pulse Chart & Activity */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '32px', marginBottom: '48px' }}>
+        
+        {/* Community Pulse Card */}
+        <div style={{ background: 'white', borderRadius: '32px', padding: '32px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', position: 'relative', height: '100%' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
             <div>
-              <h2 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>
-                Recent Complaints
-              </h2>
-              <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: '2px 0 0 0' }}>
-                Latest complaint activity
-              </p>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: '0 0 4px 0' }}>Community Pulse</h3>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>Actual complaint activity for the last 7 days</p>
             </div>
-            <span style={{
-              background: '#dbeafe', color: '#1d4ed8', fontSize: '0.68rem',
-              fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
-              padding: '4px 10px', borderRadius: '999px', border: '1px solid #bfdbfe',
-            }}>
-              Live
-            </span>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#2563eb' }}>{stats.totalComplaints || 0}</div>
+              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b' }}>Total Complaints</div>
+            </div>
+          </div>
+          
+          <div style={{ height: '220px', width: '100%' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={dailyData}>
+                <defs>
+                  <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 12, fontWeight: 600, fill: '#94a3b8' }} 
+                  dy={10}
+                />
+                <YAxis hide={true} />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                  labelStyle={{ fontWeight: 800, marginBottom: '4px' }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="count" 
+                  stroke="#2563eb" 
+                  strokeWidth={4}
+                  fillOpacity={1} 
+                  fill="url(#colorCount)" 
+                  animationDuration={1500}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Zone Distribution Card */}
+        <div style={{ background: '#0f172a', borderRadius: '32px', padding: '32px', color: 'white', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ position: 'absolute', right: '-20px', bottom: '-20px', opacity: 0.1 }}>
+            <FiMap size={120} />
+          </div>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: '0 0 24px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <FiMap /> Zone Insights
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
+            {zoneStats.length === 0 ? (
+              <p style={{ opacity: 0.6, fontSize: '0.9rem' }}>No resident data by zone yet.</p>
+            ) : (
+              zoneStats.slice(0, 5).map((z, idx) => {
+                const colors = ['#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#dbeafe']
+                const percentage = stats.totalResidents > 0 ? (z.count / stats.totalResidents) * 100 : 0
+                return (
+                  <div key={z.zone}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 700, marginBottom: '6px' }}>
+                      <span>{z.zone}</span>
+                      <span>{z.count} Residents</span>
+                    </div>
+                    <div style={{ height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${percentage}%`, background: colors[idx % colors.length], borderRadius: '4px', transition: 'width 1s ease-in-out' }} />
+                    </div>
+                  </div>
+                )
+              })
+            )}
+          </div>
+          <button 
+            onClick={() => navigate('/admin/reports')}
+            style={{ 
+              marginTop: '32px', width: '100%', padding: '14px', borderRadius: '16px', 
+              background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
+              color: 'white', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+          >
+            View Full Reports
+          </button>
+        </div>
+      </div>
+
+      {/* Detailed Activity Tables */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+        
+        {/* Complaints Card */}
+        <div style={{ background: 'white', borderRadius: '32px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', overflow: 'hidden' }}>
+          <div style={{ padding: '24px 32px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>Recent Complaints</h3>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#2563eb', background: '#eff6ff', padding: '4px 10px', borderRadius: '8px' }}>LIVE FEED</span>
           </div>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -251,15 +325,16 @@ export default function AdminDashboard() {
                 {recentComplaints.length === 0
                   ? <EmptyState message="No recent complaints." />
                   : recentComplaints.map(c => (
-                    <tr key={c.id}>
-                      <td style={{ ...tdStyle, fontWeight: 600, fontSize: '0.82rem', color: '#1e293b' }}>
-                        {c.resident_name}
+                    <tr key={c.id} style={{ transition: 'background 0.2s' }}>
+                      <td style={tdStyle}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 800, color: '#475569' }}>
+                            {c.resident_name?.[0]}
+                          </div>
+                          <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{c.resident_name}</span>
+                        </div>
                       </td>
-                      <td style={{
-                        ...tdStyle, fontSize: '0.85rem', color: '#334155',
-                        maxWidth: '200px', overflow: 'hidden',
-                        textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      }}>
+                      <td style={{ ...tdStyle, fontSize: '0.85rem', color: '#64748b', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {c.subject}
                       </td>
                       <td style={tdStyle}><StatusBadge status={c.status} /></td>
@@ -271,37 +346,18 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div style={{
-          background: '#ffffff', borderRadius: '16px',
-          border: 'none',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.03)', overflow: 'hidden',
-        }}>
-          <div style={{
-            padding: '18px 24px', borderBottom: '1px solid #f1f5f9',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          }}>
-            <div>
-              <h2 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>
-                Recent Appointments
-              </h2>
-              <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: '2px 0 0 0' }}>
-                Upcoming appointment requests
-              </p>
-            </div>
-            <span style={{
-              background: '#dcfce7', color: '#15803d', fontSize: '0.68rem',
-              fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
-              padding: '4px 10px', borderRadius: '999px', border: '1px solid #bbf7d0',
-            }}>
-              Fresh
-            </span>
+        {/* Appointments Card */}
+        <div style={{ background: 'white', borderRadius: '32px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', overflow: 'hidden' }}>
+          <div style={{ padding: '24px 32px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>Upcoming Appointments</h3>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#10b981', background: '#f0fdf4', padding: '4px 10px', borderRadius: '8px' }}>FRESH</span>
           </div>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#f8fafc' }}>
                   <th style={thStyle}>Resident</th>
-                  <th style={thStyle}>Date</th>
+                  <th style={thStyle}>Schedule</th>
                   <th style={thStyle}>Status</th>
                 </tr>
               </thead>
@@ -309,12 +365,18 @@ export default function AdminDashboard() {
                 {recentAppointments.length === 0
                   ? <EmptyState message="No recent appointments." />
                   : recentAppointments.map(a => (
-                    <tr key={a.id}>
-                      <td style={{ ...tdStyle, fontWeight: 600, fontSize: '0.82rem', color: '#1e293b' }}>
-                        {a.resident_name}
+                    <tr key={a.id} style={{ transition: 'background 0.2s' }}>
+                      <td style={tdStyle}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 800, color: '#475569' }}>
+                            {a.resident_name?.[0]}
+                          </div>
+                          <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{a.resident_name}</span>
+                        </div>
                       </td>
-                      <td style={{ ...tdStyle, fontSize: '0.82rem', color: '#334155' }}>
-                        {a.appointment_date} {a.time_slot}
+                      <td style={{ ...tdStyle, fontSize: '0.85rem', color: '#64748b' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{a.appointment_date}</div>
+                        <div style={{ fontSize: '0.75rem' }}>{a.time_slot}</div>
                       </td>
                       <td style={tdStyle}><StatusBadge status={a.status} /></td>
                     </tr>
@@ -331,17 +393,17 @@ export default function AdminDashboard() {
 }
 
 const thStyle = {
-  padding: '10px 16px',
-  fontSize: '0.7rem',
-  fontWeight: 700,
-  letterSpacing: '0.07em',
+  padding: '16px 32px',
+  fontSize: '0.75rem',
+  fontWeight: 800,
+  letterSpacing: '0.1em',
   textTransform: 'uppercase',
-  color: '#64748b',
+  color: '#94a3b8',
   textAlign: 'left',
   borderBottom: '1px solid #f1f5f9',
 }
 
 const tdStyle = {
-  padding: '13px 16px',
+  padding: '18px 32px',
   borderBottom: '1px solid #f8fafc',
 }

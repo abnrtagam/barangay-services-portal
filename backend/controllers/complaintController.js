@@ -5,7 +5,7 @@ const getComplaintStatusHistory = async (complaint_id) => {
     `SELECT id, old_status, new_status, notes, changed_at
      FROM complaint_status_history
      WHERE complaint_id = ?
-     ORDER BY changed_at ASC`,
+     ORDER BY changed_at DESC`,
     [complaint_id]
   )
   return rows

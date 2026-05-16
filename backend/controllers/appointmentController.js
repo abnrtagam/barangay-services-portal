@@ -5,7 +5,7 @@ const getAppointmentStatusHistory = async (appointment_id) => {
     `SELECT id, old_status, new_status, notes, changed_at
      FROM appointment_status_history
      WHERE appointment_id = ?
-     ORDER BY changed_at ASC`,
+     ORDER BY changed_at DESC`,
     [appointment_id]
   )
   return rows
