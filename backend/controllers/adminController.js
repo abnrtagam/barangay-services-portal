@@ -91,12 +91,20 @@ exports.updateComplaintStatus = async (req, res) => {
     )
     if (!complaintRow) return res.status(404).json({ message: 'Complaint not found.' })
 
-    const finalComplaintStatuses = ['Resolved', 'Rejected']
-  if (finalComplaintStatuses.includes(complaintRow.status)) {
-      return res.status(400).json({
-        success: false,
-        message: 'This complaint has already been finalized and is locked from further updates.'
-      })
+    // Enforce proper status transitions
+    const complaintTransitions = {
+      'Pending':   ['Approved', 'Rejected'],
+      'Approved':  ['Scheduled', 'Resolved'],
+      'Scheduled': ['Resolved'],
+      'Resolved':  [],
+      'Rejected':  [],
+    }
+    const allowed = complaintTransitions[complaintRow.status] || []
+    if (allowed.length === 0) {
+      return res.status(400).json({ message: 'This complaint has been finalized and is locked from further updates.' })
+    }
+    if (!allowed.includes(status)) {
+      return res.status(400).json({ message: `Cannot change status from "${complaintRow.status}" to "${status}". Allowed: ${allowed.join(', ')}` })
     }
 
     const [result] = await db.query(
@@ -197,12 +205,20 @@ exports.updateAppointmentStatus = async (req, res) => {
     )
     if (!appointmentRow) return res.status(404).json({ message: 'Appointment not found.' })
 
-    const finalAppointmentStatuses = ['Completed', 'Cancelled', 'Rejected']
-    if (finalAppointmentStatuses.includes(appointmentRow.status)) {
-      return res.status(400).json({
-        success: false,
-        message: 'This appointment has already been finalized and is locked from further updates.'
-      })
+    // Enforce proper status transitions
+    const appointmentTransitions = {
+      'Pending':   ['Approved', 'Rejected'],
+      'Approved':  ['Completed', 'Cancelled'],
+      'Completed': [],
+      'Cancelled': [],
+      'Rejected':  [],
+    }
+    const allowedAppt = appointmentTransitions[appointmentRow.status] || []
+    if (allowedAppt.length === 0) {
+      return res.status(400).json({ message: 'This appointment has been finalized and is locked from further updates.' })
+    }
+    if (!allowedAppt.includes(status)) {
+      return res.status(400).json({ message: `Cannot change status from "${appointmentRow.status}" to "${status}". Allowed: ${allowedAppt.join(', ')}` })
     }
 
     const [result] = await db.query(

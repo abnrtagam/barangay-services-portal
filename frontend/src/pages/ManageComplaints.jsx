@@ -6,6 +6,13 @@ import { formatDate } from '../utils/date'
 
 const STATUS_OPTS = ['', 'Pending', 'Approved', 'Scheduled', 'Resolved', 'Rejected']
 const FINAL_COMPLAINT_STATUSES = ['Resolved', 'Rejected']
+const COMPLAINT_TRANSITIONS = {
+  'Pending':   ['Approved', 'Rejected'],
+  'Approved':  ['Scheduled', 'Resolved'],
+  'Scheduled': ['Resolved'],
+  'Resolved':  [],
+  'Rejected':  [],
+}
 
 export default function ManageComplaints() {
   const [complaints, setComplaints] = useState([])
@@ -35,7 +42,8 @@ export default function ManageComplaints() {
   const openDetail = (c) => {
     setSelected(c)
     setRemarks(c.admin_remarks || '')
-    setNewStatus(c.status)
+    const transitions = COMPLAINT_TRANSITIONS[c.status] || []
+    setNewStatus(transitions[0] || c.status)
   }
 
   const isFinalized = selected && FINAL_COMPLAINT_STATUSES.includes(selected.status)
@@ -228,7 +236,7 @@ export default function ManageComplaints() {
                 disabled={isFinalized}
                 style={isFinalized ? { background: 'var(--gray-100)', cursor: 'not-allowed' } : {}}
               >
-                {STATUS_OPTS.filter(Boolean).map(s => <option key={s} value={s}>{s}</option>)}
+                {(COMPLAINT_TRANSITIONS[selected.status] || []).map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
             <div className="form-group">

@@ -7,6 +7,13 @@ import { formatDate } from '../utils/date'
 
 const APPT_STATUSES = ['Pending', 'Approved', 'Completed', 'Cancelled', 'Rejected']
 const FINAL_APPT_STATUSES = ['Completed', 'Cancelled', 'Rejected']
+const APPT_TRANSITIONS = {
+  'Pending':   ['Approved', 'Rejected'],
+  'Approved':  ['Completed', 'Cancelled'],
+  'Completed': [],
+  'Cancelled': [],
+  'Rejected':  [],
+}
 
 export default function ManageAppointments() {
   const [appointments, setAppointments] = useState([])
@@ -31,7 +38,12 @@ export default function ManageAppointments() {
 
   useEffect(() => { load() }, [])
 
-  const openModal = (a) => { setSelected(a); setNewStatus(a.status); setRemarks(a.admin_remarks || '') }
+  const openModal = (a) => {
+    setSelected(a)
+    const transitions = APPT_TRANSITIONS[a.status] || []
+    setNewStatus(transitions[0] || a.status)
+    setRemarks(a.admin_remarks || '')
+  }
 
   const isFinalized = selected && FINAL_APPT_STATUSES.includes(selected.status)
 
@@ -190,7 +202,7 @@ export default function ManageAppointments() {
                 disabled={isFinalized}
                 style={isFinalized ? { background: 'var(--gray-100)', cursor: 'not-allowed' } : {}}
               >
-                {APPT_STATUSES.map(s => <option key={s}>{s}</option>)}
+                {(APPT_TRANSITIONS[selected?.status] || []).map(s => <option key={s}>{s}</option>)}
               </select>
             </div>
             <div className="form-group">
