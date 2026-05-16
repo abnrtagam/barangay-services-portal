@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { StatusBadge, Modal, AlertMessage } from '../components/DashboardCard'
 import { FiEye, FiCheck, FiX, FiCalendar } from 'react-icons/fi'
+import { formatDate } from '../utils/date'
 
 const APPT_STATUSES = ['Pending', 'Approved', 'Completed', 'Cancelled', 'Rejected']
 const FINAL_APPT_STATUSES = ['Completed', 'Cancelled', 'Rejected']
@@ -173,6 +174,7 @@ export default function ManageAppointments() {
               <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Resident</span><span>{selected.resident_name}</span>
               <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Date & Time</span><span>{selected.appointment_date} — {selected.time_slot}</span>
               <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Purpose</span><span>{selected.purpose}</span>
+              <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Filed</span><span>{formatDate(selected.created_at)}</span>
             </div>
             <div style={{ marginBottom: 16, padding: 12, borderRadius: 'var(--radius-md)', background: 'var(--gray-50)', border: '1px solid var(--gray-150)', color: 'var(--gray-700)' }}>
               {isFinalized
