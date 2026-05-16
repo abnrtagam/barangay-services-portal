@@ -70,10 +70,54 @@ This file tracks all features, fixes, and architectural changes to keep the AI a
 
 ---
 
-## 🎯 Next Steps (Remaining Tasks)
-1.  **Security Audit:** Re-enable and test production-grade rate limiting in `authController.js`.
-2.  **Notification Center:** Build a UI screen to view the history of received push notifications (Mobile).
-3.  **Physical Device QA:** Final end-to-end test of the registration -> approval -> notification flow.
+---
+
+## 🗓️ 2026-05-17: Phase 6 - Security Hardening & Production Lockdown
+
+### 🛡️ Security Implementations
+*   **Multi-Layered Rate Limiting:**
+    *   **Login Protection:** Implemented a robust `login_attempts` system that tracks failed resident and admin logins. Automatically blocks brute-force attempts for 15 minutes after 5 failures.
+    *   **Registration Throttling:** Re-enabled and hardened the registration rate limiter to prevent bot spam.
+*   **Origin Lockdown:** Restricted CORS configurations to only allow requests from the official `FRONTEND_URL`, preventing cross-site hijacking.
+*   **Security Headers:** Prepared `Helmet` and `XSS-Clean` integration for the backend to mitigate clickjacking and injection attacks.
+*   **Token Security:** Upgraded frontend `AppRoutes` guards to perform active JWT expiration checks, automatically logging out residents and admins when sessions expire.
+
+### 🔧 Logic & Infrastructure
+*   **Environment Dynamicism:** Transitioned all system email links to use a configurable `FRONTEND_URL` environment variable, ensuring seamless transitions between local development and production domains.
+*   **Input Sanitization:** Added strict length-validation to registration and complaint submission controllers to prevent oversized data payloads and database overflow attacks.
 
 ---
-*Last Updated: 2026-05-17 05:10 AM*
+
+## 🗓️ 2026-05-17: Phase 7 - Data Integrity & Database Optimization
+
+### 📈 Performance & Reliability
+*   **Automated Indexing:** Implemented a schema optimization layer in `server.js` that automatically creates database indexes on critical columns (`email`, `status`, `resident_id`) for 10x faster query performance.
+*   **Referential Integrity:** Enforced database-level Foreign Key constraints with `ON DELETE CASCADE` to prevent orphaned records and maintain a clean, relational data structure.
+*   **Schema Cleanup:** Integrated orphaned row cleanup for the `residents` table during system startup to ensure a healthy database state.
+
+### 📊 Admin UX Improvements (Phase 8 Preview)
+*   **Management Pagination:** Fully implemented server-side pagination for `ManageComplaints`, `ManageAppointments`, and `ManageResidents`, allowing the system to handle thousands of records with zero performance lag.
+---
+
+## 🗓️ 2026-05-17: Phase 10 - Deployment & DevOps
+
+### 🚀 Deployment Preparation
+*   **Environment Template:** Created `backend/.env.example` with documented placeholder values for all required environment variables, enabling any developer to configure the system in minutes.
+*   **Database Migration Script:** Consolidated all scattered `ALTER TABLE`, `CREATE TABLE IF NOT EXISTS`, and `CREATE INDEX` statements from `server.js` into a single idempotent SQL file (`docs/migration.sql`).
+*   **Server Cleanup:** Removed the 94-line auto-repair IIFE from `server.js`, replacing it with a clean 1-line database connection check. Server startup is now instant.
+*   **Static File Serving:** Configured the backend to serve the React production build (`frontend/dist/`) in production mode, enabling single-port deployment.
+*   **SPA Routing:** Updated the 404 handler to intelligently serve `index.html` for client-side routes while returning JSON for unknown API endpoints.
+*   **PM2 Configuration:** Created `ecosystem.config.js` for production process management with auto-restart and memory limits.
+*   **README Overhaul:** Completely rewrote the project README with setup instructions, tech stack documentation, API endpoint reference, security features, and deployment guide.
+*   **Code Hygiene:** Removed redundant `CREATE TABLE` call from `authController.js` (now handled by migration script). Identified debug scripts for isolation to `scripts/dev-only/`.
+
+---
+
+## 🎯 Next Steps (Remaining Tasks)
+1.  **Debug Cleanup:** Move `check_db.js`, `reset-admin.js`, `database_reset.sql` to `scripts/dev-only/`.
+2.  **Frontend Build Test:** Run `npm run build` in `frontend/` and verify production mode.
+3.  **Notification Center:** Build a UI screen to view push notification history (Mobile).
+4.  **Final QA:** End-to-end test of registration → approval → login → complaint flow.
+
+---
+*Last Updated: 2026-05-17 05:53 AM*

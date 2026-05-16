@@ -32,13 +32,32 @@ import ManageAnnouncements from '../pages/ManageAnnouncements'
 import Reports from '../pages/Reports'
 
 // Guards
+const isTokenExpired = (token) => {
+  if (!token) return true
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    return payload.exp * 1000 < Date.now()
+  } catch {
+    return true
+  }
+}
+
 const ResidentGuard = ({ children }) => {
   const token = localStorage.getItem('resident_token')
-  return token ? children : <Navigate to="/login" replace />
+  if (isTokenExpired(token)) {
+    localStorage.removeItem('resident_token')
+    return <Navigate to="/login" replace />
+  }
+  return children
 }
+
 const AdminGuard = ({ children }) => {
   const token = localStorage.getItem('admin_token')
-  return token ? children : <Navigate to="/admin/login" replace />
+  if (isTokenExpired(token)) {
+    localStorage.removeItem('admin_token')
+    return <Navigate to="/admin/login" replace />
+  }
+  return children
 }
 
 export default function AppRoutes() {

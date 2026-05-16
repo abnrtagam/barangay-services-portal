@@ -24,19 +24,52 @@ export default function ManageAppointments() {
   const [alert, setAlert]               = useState(null)
   const [submitting, setSubmitting]     = useState(false)
   const [filter, setFilter]             = useState({ status: '', date: '' })
+  const [pagination, setPagination]     = useState({ page: 1, limit: 10, total: 0 })
   const token = localStorage.getItem('admin_token')
 
-  const load = () => {
+  const load = (page = 1) => {
     setLoading(true)
-    const params = {}
+    const params = { page, limit: pagination.limit }
     if (filter.status) params.status = filter.status
     if (filter.date)   params.date   = filter.date
     axios.get('/api/admin/appointments', { headers: { Authorization: `Bearer ${token}` }, params })
-      .then(r => setAppointments(r.data.data || []))
+      .then(r => {
+        setAppointments(r.data.data || [])
+        setPagination(p => ({ ...p, page, total: r.data.total || 0 }))
+      })
       .catch(() => {}).finally(() => setLoading(false))
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load(1) }, [filter.status, filter.date])
+
+  const totalPages = Math.ceil(pagination.total / pagination.limit)
+
+  const Pagination = () => {
+    if (totalPages <= 1) return null
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', padding: '24px', background: '#f8fafc', borderTop: '1px solid #f1f5f9' }}>
+        <button 
+          className="btn btn-secondary btn-sm" 
+          disabled={pagination.page <= 1} 
+          onClick={() => load(pagination.page - 1)}
+          style={{ padding: '8px 16px', fontWeight: 700 }}
+        >
+          Previous
+        </button>
+        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#64748b' }}>
+          Page <span style={{ color: '#0f172a' }}>{pagination.page}</span> of {totalPages}
+        </div>
+        <button 
+          className="btn btn-secondary btn-sm" 
+          disabled={pagination.page >= totalPages} 
+          onClick={() => load(pagination.page + 1)}
+          style={{ padding: '8px 16px', fontWeight: 700 }}
+        >
+          Next
+        </button>
+      </div>
+    )
+  }
 
   const openModal = (a) => {
     setSelected(a)
@@ -152,6 +185,7 @@ export default function ManageAppointments() {
             </table>
           </div>
         )}
+        <Pagination />
       </div>
       <Modal open={!!selected} onClose={() => setSelected(null)} title="Manage Appointment"
         footer={<>

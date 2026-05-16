@@ -28,6 +28,12 @@ exports.create = async (req, res) => {
   if (!category_id || !subject || !details) {
     return res.status(422).json({ message: 'Category, subject and details are required.' })
   }
+  if (subject.length > 255) {
+    return res.status(422).json({ message: 'Subject is too long (max 255 chars).' })
+  }
+  if (details.length > 5000) {
+    return res.status(422).json({ message: 'Details are too long (max 5000 chars).' })
+  }
   try {
     const attachment = req.file ? req.file.filename : null
     const [result] = await db.query(

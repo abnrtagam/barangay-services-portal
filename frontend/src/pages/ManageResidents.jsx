@@ -14,29 +14,66 @@ export default function ManageResidents() {
   const [zone, setZone]           = useState('All Zones')
   const [zoneStats, setZoneStats] = useState([])
   
+  const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 })
   const token = localStorage.getItem('admin_token')
 
-  const load = (q = search, z = zone) => {
+  const load = (page = 1, q = search, z = zone) => {
     setLoading(true)
     axios.get('/api/admin/residents', {
       headers: { Authorization: `Bearer ${token}` },
       params: { 
         search: q,
-        zone: z === 'All Zones' ? '' : z
+        zone: z === 'All Zones' ? '' : z,
+        page,
+        limit: pagination.limit
       }
-    }).then(r => setResidents(r.data.data || [])).catch(() => {}).finally(() => setLoading(false))
+    }).then(r => {
+      setResidents(r.data.data || [])
+      setPagination(p => ({ ...p, page, total: r.data.total || 0 }))
+    }).catch(() => {}).finally(() => setLoading(false))
   }
 
   const loadStats = () => {
     axios.get('/api/admin/residents/zone-stats', {
       headers: { Authorization: `Bearer ${token}` }
-    }).then(r => setZoneStats(r.data.data || [])).catch(() => {})
+    }).then(r => {
+      setZoneStats(r.data.data || [])
+    }).catch(() => {})
   }
 
   useEffect(() => { 
-    load()
+    load(1)
     loadStats()
   }, [])
+
+  const totalPages = Math.ceil(pagination.total / pagination.limit)
+
+  const Pagination = () => {
+    if (totalPages <= 1) return null
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', padding: '24px', background: '#f8fafc', borderTop: '1px solid #f1f5f9' }}>
+        <button 
+          className="btn btn-secondary btn-sm" 
+          disabled={pagination.page <= 1} 
+          onClick={() => load(pagination.page - 1)}
+          style={{ padding: '8px 16px', fontWeight: 700 }}
+        >
+          Previous
+        </button>
+        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#64748b' }}>
+          Page <span style={{ color: '#0f172a' }}>{pagination.page}</span> of {totalPages}
+        </div>
+        <button 
+          className="btn btn-secondary btn-sm" 
+          disabled={pagination.page >= totalPages} 
+          onClick={() => load(pagination.page + 1)}
+          style={{ padding: '8px 16px', fontWeight: 700 }}
+        >
+          Next
+        </button>
+      </div>
+    )
+  }
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -186,6 +223,7 @@ export default function ManageResidents() {
             </table>
           </div>
         )}
+        <Pagination />
       </div>
       <Modal open={!!selected} onClose={() => setSelected(null)} title="Resident Details"
         footer={<button className="btn btn-secondary" onClick={() => setSelected(null)}>Close</button>}

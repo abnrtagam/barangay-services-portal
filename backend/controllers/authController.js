@@ -65,6 +65,77 @@ const checkRateLimit = async (ipAddress, email) => {
   }
 }
 
+/**
+ * Check rate limiting for login attempts
+ */
+const checkLoginRateLimit = async (email, ipAddress) => {
+
+  const [attempts] = await db.query(
+    'SELECT * FROM login_attempts WHERE email = ? AND ip_address = ?',
+    [email, ipAddress]
+  )
+
+  if (attempts.length) {
+    const attempt = attempts[0]
+    
+    // Check if currently blocked
+    if (attempt.blocked_until && new Date(attempt.blocked_until) > new Date()) {
+      const minutesLeft = Math.ceil((new Date(attempt.blocked_until) - new Date()) / 60000)
+      throw new Error(`Too many failed login attempts. Please try again in ${minutesLeft} minutes.`)
+    }
+
+    // Reset count if last attempt was over 15 minutes ago
+    const cooldown = new Date(Date.now() - 15 * 60 * 1000)
+    if (new Date(attempt.last_attempt) < cooldown) {
+      await db.query(
+        'UPDATE login_attempts SET attempt_count = 0, blocked_until = NULL WHERE id = ?',
+        [attempt.id]
+      )
+    }
+  }
+}
+
+/**
+ * Record a failed login attempt
+ */
+const recordFailedLogin = async (email, ipAddress) => {
+  const [attempts] = await db.query(
+    'SELECT * FROM login_attempts WHERE email = ? AND ip_address = ?',
+    [email, ipAddress]
+  )
+
+  if (attempts.length) {
+    const attempt = attempts[0]
+    const newCount = attempt.attempt_count + 1
+    let blockedUntil = null
+
+    // Block for 15 minutes after 5 failed attempts
+    if (newCount >= 5) {
+      blockedUntil = new Date(Date.now() + 15 * 60 * 1000)
+    }
+
+    await db.query(
+      'UPDATE login_attempts SET attempt_count = ?, blocked_until = ?, last_attempt = NOW() WHERE id = ?',
+      [newCount, blockedUntil, attempt.id]
+    )
+  } else {
+    await db.query(
+      'INSERT INTO login_attempts (email, ip_address, attempt_count) VALUES (?, ?, 1)',
+      [email, ipAddress]
+    )
+  }
+}
+
+/**
+ * Reset failed login attempts on success
+ */
+const resetLoginAttempts = async (email, ipAddress) => {
+  await db.query(
+    'DELETE FROM login_attempts WHERE email = ? AND ip_address = ?',
+    [email, ipAddress]
+  )
+}
+
 // POST /api/auth/register
 exports.register = async (req, res) => {
   const { first_name, last_name, dob, email, phone, address, zone, gov_id_type, gov_id_number, password } = req.body
@@ -94,8 +165,22 @@ exports.register = async (req, res) => {
     return res.status(422).json({ message: 'Invalid phone number format. Use 09XXXXXXXXX.' })
   }
 
+  // Length validations
+  if (first_name.length > 50 || last_name.length > 50) {
+    return res.status(422).json({ message: 'Name is too long (max 50 chars).' })
+  }
+  if (address.length > 255) {
+    return res.status(422).json({ message: 'Address is too long (max 255 chars).' })
+  }
+  if (email.length > 100) {
+    return res.status(422).json({ message: 'Email is too long (max 100 chars).' })
+  }
+  if (gov_id_number.length > 50) {
+    return res.status(422).json({ message: 'ID number is too long (max 50 chars).' })
+  }
+
   try {
-    // Rate limiting removed for development
+    await checkRateLimit(req.ip, email)
 
     // Check for existing email
     const [existing] = await db.query('SELECT id FROM users WHERE email = ?', [email])
@@ -274,6 +359,7 @@ exports.login = async (req, res) => {
   }
 
   try {
+    await checkLoginRateLimit(email, req.ip)
     const [rows] = await db.query(
       `SELECT u.*, r.id AS resident_id 
        FROM users u 
@@ -283,6 +369,7 @@ exports.login = async (req, res) => {
     )
 
     if (!rows.length) {
+      await recordFailedLogin(email, req.ip)
       return res.status(401).json({ message: 'Invalid credentials.' })
     }
 
@@ -291,6 +378,7 @@ exports.login = async (req, res) => {
     // Check password
     const match = await bcrypt.compare(password, user.password)
     if (!match) {
+      await recordFailedLogin(email, req.ip)
       return res.status(401).json({ message: 'Invalid credentials.' })
     }
 
@@ -330,6 +418,9 @@ exports.login = async (req, res) => {
       return res.status(403).json({ message: 'Access denied.' })
     }
 
+    // Success - reset attempts
+    await resetLoginAttempts(email, req.ip)
+
     // Generate token
     const token = sign({ id: user.id, resident_id: user.resident_id, role: 'resident' })
     const { password: _, ...safeUser } = user
@@ -337,6 +428,9 @@ exports.login = async (req, res) => {
     res.json({ token, user: safeUser })
   } catch (err) {
     console.error(err)
+    if (err.message.includes('Too many')) {
+      return res.status(429).json({ message: err.message })
+    }
     res.status(500).json({ message: 'Login failed.' })
   }
 }
@@ -350,6 +444,7 @@ exports.adminLogin = async (req, res) => {
   }
 
   try {
+    await checkLoginRateLimit(email, req.ip)
     const [rows] = await db.query(
       `SELECT u.*, a.id AS admin_id 
        FROM users u 
@@ -359,6 +454,7 @@ exports.adminLogin = async (req, res) => {
     )
 
     if (!rows.length) {
+      await recordFailedLogin(email, req.ip)
       return res.status(401).json({ message: 'Invalid admin credentials.' })
     }
 
@@ -366,8 +462,12 @@ exports.adminLogin = async (req, res) => {
     const match = await bcrypt.compare(password, user.password)
     
     if (!match) {
+      await recordFailedLogin(email, req.ip)
       return res.status(401).json({ message: 'Invalid admin credentials.' })
     }
+
+    // Success - reset attempts
+    await resetLoginAttempts(email, req.ip)
 
     const token = sign({ 
       id: user.id, 
@@ -384,6 +484,9 @@ exports.adminLogin = async (req, res) => {
     })
   } catch (err) {
     console.error(err)
+    if (err.message.includes('Too many')) {
+      return res.status(429).json({ message: err.message })
+    }
     res.status(500).json({ message: 'Login failed.' })
   }
 }

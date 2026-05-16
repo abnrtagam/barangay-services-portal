@@ -160,7 +160,7 @@ const sendApprovalEmail = async (to, firstName, isApproved) => {
               </div>
 
               <div style="text-align: center;">
-                <a href="http://localhost:3000/login" class="button">Login to Your Account</a>
+                <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/login" class="button">Login to Your Account</a>
               </div>
             ` : `
               <p>Thank you for your interest in joining the Barangay Bulua portal. Unfortunately, your registration could not be approved at this time.</p>
@@ -251,7 +251,7 @@ const sendComplaintStatusEmail = async (to, firstName = 'Resident', subject = 'y
             </div>
 
             <div style="text-align: center; margin-top: 32px;">
-              <a href="http://localhost:3000/complaints" style="display: inline-block; padding: 12px 24px; background: #1e40af; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">Track in Dashboard</a>
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/complaints" style="display: inline-block; padding: 12px 24px; background: #1e40af; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">Track in Dashboard</a>
             </div>
           </div>
           <div class="footer">
