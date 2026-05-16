@@ -4,7 +4,7 @@ import { Modal } from '../components/DashboardCard'
 import { FiEye, FiSearch, FiUser, FiUsers, FiFilter, FiMapPin } from 'react-icons/fi'
 import { formatDate } from '../utils/date'
 
-const ZONES = ['All Zones', 'Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5', 'Zone 6', 'Zone 7', 'Zone 8', 'Zone 9', 'Zone 10', 'Zone 11', 'Zone 12']
+const ZONES = ['All Zones', 'Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5', 'Zone 6', 'Zone 7', 'Zone 8', 'Zone 9', 'Zone 10']
 
 export default function ManageResidents() {
   const [residents, setResidents] = useState([])

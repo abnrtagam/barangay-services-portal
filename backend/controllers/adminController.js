@@ -313,7 +313,7 @@ exports.getZoneStats = async (req, res) => {
       GROUP BY zone 
       ORDER BY zone ASC
     `)
-    res.json(rows)
+    res.json({ data: rows })
   } catch (err) {
     console.error(err)
     res.status(500).json({ message: 'Failed to fetch zone stats.' })

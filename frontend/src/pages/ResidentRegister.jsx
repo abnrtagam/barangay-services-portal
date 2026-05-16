@@ -221,7 +221,7 @@ export default function ResidentRegister() {
 
                 >
                   <option value="">Select your Zone</option>
-                  {[...Array(12)].map((_, i) => (
+                  {[...Array(10)].map((_, i) => (
                     <option key={i+1} value={`Zone ${i+1}`}>Zone {i+1}</option>
                   ))}
                 </select>
