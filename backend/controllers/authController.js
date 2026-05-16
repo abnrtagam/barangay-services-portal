@@ -69,9 +69,11 @@ const checkRateLimit = async (ipAddress, email) => {
 exports.register = async (req, res) => {
   const { first_name, last_name, dob, email, phone, address, zone, gov_id_type, gov_id_number, password } = req.body
   
-  // Validation
-  if (!first_name || !last_name || !dob || !email || !phone || !address || !zone || !gov_id_type || !gov_id_number || !password) {
-    return res.status(422).json({ message: 'All fields are required.' })
+  // Validation — tell the user exactly which field is missing
+  const requiredFields = { first_name: 'First Name', last_name: 'Last Name', dob: 'Date of Birth', email: 'Email Address', phone: 'Phone Number', address: 'Home Address', zone: 'Zone', gov_id_type: 'Government ID Type', gov_id_number: 'Government ID Number', password: 'Password' }
+  const missing = Object.entries(requiredFields).filter(([key]) => !req.body[key]).map(([, label]) => label)
+  if (missing.length) {
+    return res.status(422).json({ message: `Missing required fields: ${missing.join(', ')}` })
   }
 
 
@@ -93,9 +95,7 @@ exports.register = async (req, res) => {
   }
 
   try {
-    // Rate limiting
-    const ipAddress = req.ip || req.connection.remoteAddress
-    await checkRateLimit(ipAddress, email)
+    // Rate limiting removed for development
 
     // Check for existing email
     const [existing] = await db.query('SELECT id FROM users WHERE email = ?', [email])
@@ -124,8 +124,8 @@ exports.register = async (req, res) => {
 
     // Create user account (status: pending, email_verified: false)
     const [result] = await db.query(
-      `INSERT INTO users (first_name, last_name, dob, email, phone, address, zone, gov_id_type, gov_id_number, password, role, status, email_verified, verification_documents) 
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      `INSERT INTO users (first_name, last_name, dob, email, phone, address, zone, gov_id_type, gov_id_number, password, role, status, email_verified, verification_documents, created_at) 
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW())`,
       [first_name, last_name, dob, email, phone, address, zone, gov_id_type, gov_id_number, hash, 'resident', 'pending', false, documentPaths]
     )
 
