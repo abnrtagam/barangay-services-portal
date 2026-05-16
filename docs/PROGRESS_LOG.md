@@ -111,13 +111,38 @@ This file tracks all features, fixes, and architectural changes to keep the AI a
 *   **README Overhaul:** Completely rewrote the project README with setup instructions, tech stack documentation, API endpoint reference, security features, and deployment guide.
 *   **Code Hygiene:** Removed redundant `CREATE TABLE` call from `authController.js` (now handled by migration script). Identified debug scripts for isolation to `scripts/dev-only/`.
 
+*   **Debug Isolation:** Successfully moved potentially destructive debug scripts (`check_db.js`, `reset_test_database.js`, etc.) into `backend/scripts/dev-only/` to prevent accidental execution or exposure in production.
+*   **Production Build Verification:** Successfully ran `npm run build` using Vite. The frontend compiled cleanly into the `dist/` directory with a highly optimized footprint, confirming the system is fully deployment-ready.
+
+---
+
+## 🗓️ 2026-05-17: Phase 8B & 9A - Admin UX & Resident Experience
+
+### 📋 Admin Activity Audit Log (Phase 8.2)
+*   **Database Table:** Created `admin_activity_log` table with indexed columns for `admin_id`, `action_type`, and `created_at` for fast query performance.
+*   **Activity Logging Service:** Built `activityLogController.js` with a reusable `logActivity()` helper that records admin actions with timestamps and descriptions.
+*   **Integrated Logging:** Wired audit logging into complaint status updates, appointment status updates, and admin password changes in `adminController.js`.
+*   **Activity Log Page:** Created `ActivityLog.jsx` with a timeline-style feed, action type filtering (Status Updates, Password Changes, Verifications), and paginated navigation.
+*   **Sidebar Navigation:** Added "Activity Log" link with `FiActivity` icon to the admin sidebar.
+
+### 🚫 Resident Appointment Cancellation (Phase 9.3)
+*   **Cancel Endpoint:** Created `PATCH /api/residents/appointments/:id/cancel` with ownership validation, status restriction (only Pending/Approved), and a 24-hour policy window.
+*   **Status History Tracking:** Cancellations are recorded in `appointment_status_history` with the note "Cancelled by resident."
+*   **Frontend Integration:** Added a "Cancel" button to `AppointmentHistory.jsx` — visible only for eligible appointments (Pending/Approved, >24hrs before date). Cancel is also available inside the appointment detail modal.
+*   **Confirmation Dialog:** Users must confirm before cancelling, with success/error alerts displayed after the action.
+
+### 🔐 Admin Profile & Password Change (Phase 8.6)
+*   **Password Change Endpoint:** Created `PATCH /api/admin/profile/password` with current password verification via `bcrypt.compare()`, minimum 8-character validation, and same-password rejection.
+*   **Admin Profile Page:** Built `AdminProfile.jsx` with a two-column layout — account information card (initials avatar, email, role) and a password change form with real-time validation.
+*   **Audit Integration:** Password changes are logged to the activity audit trail.
+*   **Sidebar Navigation:** Added "Profile" link with `FiUser` icon to the admin sidebar bottom section.
+
 ---
 
 ## 🎯 Next Steps (Remaining Tasks)
-1.  **Debug Cleanup:** Move `check_db.js`, `reset-admin.js`, `database_reset.sql` to `scripts/dev-only/`.
-2.  **Frontend Build Test:** Run `npm run build` in `frontend/` and verify production mode.
-3.  **Notification Center:** Build a UI screen to view push notification history (Mobile).
-4.  **Final QA:** End-to-end test of registration → approval → login → complaint flow.
+1.  **Web Notification Bell:** Add a notification dropdown to the resident web layout for feature parity with mobile.
+2.  **Complaint Attachment Gallery:** Display uploaded photos in a lightbox modal instead of raw file links.
+3.  **Final QA:** End-to-end test of the full system flow including new features.
 
 ---
-*Last Updated: 2026-05-17 05:53 AM*
+*Last Updated: 2026-05-17 06:41 AM*

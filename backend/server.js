@@ -1,11 +1,22 @@
 require('dotenv').config()
 const express = require('express')
 const db = require('./config/db')
-// Verify database connection on startup
+// Verify database connection and ensure new tables exist
 ;(async () => {
   try {
     await db.query('SELECT 1')
     console.log('✅ Database connected')
+    // Ensure new feature tables exist
+    await db.query(`CREATE TABLE IF NOT EXISTS admin_activity_log (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      admin_id BIGINT UNSIGNED NOT NULL,
+      action_type VARCHAR(50) NOT NULL,
+      target_type VARCHAR(50) NOT NULL,
+      target_id BIGINT UNSIGNED DEFAULT NULL,
+      description TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      INDEX(admin_id), INDEX(action_type), INDEX(created_at)
+    ) ENGINE=InnoDB`)
   } catch (err) {
     console.error('❌ Database connection failed:', err.message)
     process.exit(1)

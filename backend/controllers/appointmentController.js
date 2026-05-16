@@ -123,3 +123,48 @@ exports.getMyAppointmentById = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch appointment.' })
   }
 }
+
+// PATCH /api/residents/appointments/:id/cancel  (resident cancels own)
+exports.cancelMyAppointment = async (req, res) => {
+  const { id } = req.params
+  const resident_id = req.user.resident_id
+  try {
+    const [[appointment]] = await db.query(
+      `SELECT a.* FROM appointments a WHERE a.id = ? AND a.resident_id = ?`,
+      [id, resident_id]
+    )
+    if (!appointment) {
+      return res.status(404).json({ message: 'Appointment not found.' })
+    }
+
+    // Only Pending or Approved can be cancelled
+    if (!['Pending', 'Approved'].includes(appointment.status)) {
+      return res.status(400).json({ message: `Cannot cancel an appointment with status "${appointment.status}".` })
+    }
+
+    // Must be at least 24 hours before appointment date
+    const appointmentDate = new Date(appointment.appointment_date)
+    const now = new Date()
+    const hoursUntil = (appointmentDate - now) / (1000 * 60 * 60)
+    if (hoursUntil < 24) {
+      return res.status(400).json({ message: 'Appointments can only be cancelled at least 24 hours before the scheduled date.' })
+    }
+
+    await db.query(
+      'UPDATE appointments SET status = ?, updated_at = NOW() WHERE id = ?',
+      ['Cancelled', id]
+    )
+
+    // Record in status history
+    await db.query(
+      `INSERT INTO appointment_status_history (appointment_id, old_status, new_status, changed_by, notes, changed_at)
+       VALUES (?, ?, 'Cancelled', NULL, 'Cancelled by resident', NOW())`,
+      [id, appointment.status]
+    )
+
+    res.json({ message: 'Appointment cancelled successfully.' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Failed to cancel appointment.' })
+  }
+}

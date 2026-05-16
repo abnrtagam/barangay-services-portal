@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const ctrl   = require('../controllers/adminController')
 const ann    = require('../controllers/announcementController')
+const actLog = require('../controllers/activityLogController')
 const auth   = require('../middleware/authMiddleware')
 const role   = require('../middleware/roleMiddleware')
 
@@ -9,7 +10,6 @@ router.use(auth, role('admin'))
 // Dashboard
 router.get('/stats', ctrl.getStats)
 router.get('/daily-stats', ctrl.getDailyStats)
-
 
 // Complaints
 router.get('/complaints',              ctrl.getComplaints)
@@ -23,7 +23,6 @@ router.patch('/appointments/:id/status',  ctrl.updateAppointmentStatus)
 router.get('/residents', ctrl.getResidents)
 router.get('/residents/zone-stats', ctrl.getZoneStats)
 
-
 // Announcements
 router.post('/announcements',       ann.create)
 router.put('/announcements/:id',    ann.update)
@@ -33,4 +32,11 @@ router.delete('/announcements/:id', ann.remove)
 router.get('/reports',         ctrl.getReports)
 router.get('/reports/export',  ctrl.exportReport)
 
+// Activity Log
+router.get('/activity-log', actLog.getActivityLog)
+
+// Profile
+router.patch('/profile/password', ctrl.changePassword)
+
 module.exports = router
+

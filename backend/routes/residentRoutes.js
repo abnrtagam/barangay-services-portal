@@ -13,6 +13,7 @@ router.get('/complaints',      cCtrl.getMyComplaints)
 router.get('/complaints/:id',  cCtrl.getMyComplaintById)
 router.get('/appointments',    aCtrl.getMyAppointments)
 router.get('/appointments/:id', aCtrl.getMyAppointmentById)
+router.patch('/appointments/:id/cancel', aCtrl.cancelMyAppointment)
 router.get('/notifications',    rCtrl.getNotifications)
 router.patch('/profile',        rCtrl.updateProfile)
 

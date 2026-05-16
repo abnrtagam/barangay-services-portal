@@ -1,5 +1,6 @@
 const db = require('../config/db')
 const NotificationService = require('../services/notificationService')
+const { logActivity } = require('./activityLogController')
 
 // ── Dashboard Stats ─────────────────────────────────────────
 exports.getStats = async (req, res) => {
@@ -148,6 +149,9 @@ exports.updateComplaintStatus = async (req, res) => {
       console.error('FCM Notification failed:', fcmError);
     }
 
+    // Audit log
+    await logActivity(adminId, 'status_update', 'complaint', id, `Changed complaint #${id} "${complaintRow.subject}" from ${complaintRow.status} to ${status}`)
+
     res.json({ message: 'Complaint updated successfully.' })
   } catch (err) {
     console.error(err)
@@ -262,6 +266,9 @@ exports.updateAppointmentStatus = async (req, res) => {
     } catch (fcmError) {
       console.error('FCM Notification failed:', fcmError);
     }
+
+    // Audit log
+    await logActivity(adminId, 'status_update', 'appointment', id, `Changed appointment #${id} from ${appointmentRow.status} to ${status}`)
 
     res.json({ message: 'Appointment updated.' })
   } catch (err) {
@@ -435,5 +442,43 @@ exports.getDailyStats = async (req, res) => {
   } catch (err) {
     console.error(err)
     res.status(500).json({ message: 'Failed to fetch daily stats.' })
+  }
+}
+
+// ── Admin Password Change ───────────────────────────────────
+exports.changePassword = async (req, res) => {
+  const { current_password, new_password } = req.body
+  const userId = req.user.id
+
+  if (!current_password || !new_password) {
+    return res.status(422).json({ message: 'Current and new password are required.' })
+  }
+  if (new_password.length < 8) {
+    return res.status(422).json({ message: 'New password must be at least 8 characters.' })
+  }
+  if (current_password === new_password) {
+    return res.status(422).json({ message: 'New password must be different from current password.' })
+  }
+
+  try {
+    const bcrypt = require('bcryptjs')
+    const [[user]] = await db.query('SELECT password FROM users WHERE id = ?', [userId])
+    if (!user) return res.status(404).json({ message: 'User not found.' })
+
+    const isMatch = await bcrypt.compare(current_password, user.password)
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Current password is incorrect.' })
+    }
+
+    const hashed = await bcrypt.hash(new_password, 12)
+    await db.query('UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?', [hashed, userId])
+
+    const adminId = req.user.admin_id || req.user.id
+    await logActivity(adminId, 'password_change', 'admin', adminId, 'Admin changed their password')
+
+    res.json({ message: 'Password changed successfully.' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Failed to change password.' })
   }
 }

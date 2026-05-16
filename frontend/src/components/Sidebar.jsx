@@ -2,7 +2,7 @@ import React from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   FiGrid, FiAlertCircle, FiCalendar, FiUsers,
-  FiBell, FiFileText, FiLogOut, FiSettings
+  FiBell, FiFileText, FiLogOut, FiSettings, FiActivity, FiUser
 } from 'react-icons/fi'
 
 const NAV = [
@@ -13,6 +13,7 @@ const NAV = [
   { label: 'Residents',     icon: <FiUsers />,       to: '/admin/residents' },
   { label: 'Announcements', icon: <FiBell />,        to: '/admin/announcements' },
   { label: 'Reports',       icon: <FiFileText />,    to: '/admin/reports' },
+  { label: 'Activity Log',  icon: <FiActivity />,    to: '/admin/activity-log' },
 ]
 
 export default function Sidebar() {
@@ -95,6 +96,20 @@ export default function Sidebar() {
 
       {/* Bottom Actions Section */}
       <div style={{ padding: '24px 16px', borderTop: '1px solid rgba(255,255,255,.05)' }}>
+        <NavLink
+          to="/admin/profile"
+          style={({ isActive }) => ({
+            display: 'flex', alignItems: 'center', gap: '12px',
+            padding: '12px 16px', borderRadius: '12px', marginBottom: '10px',
+            fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: '0.9rem',
+            color: isActive ? 'white' : '#94a3b8', cursor: 'pointer', border: 'none',
+            background: isActive ? '#2563eb' : 'transparent', width: '100%', textDecoration: 'none',
+            transition: 'all 0.2s ease'
+          })}
+        >
+          <FiUser />
+          <span>Profile</span>
+        </NavLink>
         <button 
           onClick={handleLogout}
           style={{

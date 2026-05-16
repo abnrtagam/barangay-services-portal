@@ -129,7 +129,21 @@ CREATE INDEX `idx_complaints_status`       ON `complaints`(`status`);
 CREATE INDEX `idx_appointments_resident`   ON `appointments`(`resident_id`);
 CREATE INDEX `idx_appointments_date`       ON `appointments`(`appointment_date`);
 
--- ── 8. Approve the seeded admin account ─────────────────────
+-- ── 8. Admin activity audit log ─────────────────────────────
+CREATE TABLE IF NOT EXISTS `admin_activity_log` (
+  `id`          INT AUTO_INCREMENT PRIMARY KEY,
+  `admin_id`    BIGINT UNSIGNED NOT NULL,
+  `action_type` VARCHAR(50)  NOT NULL,
+  `target_type` VARCHAR(50)  NOT NULL,
+  `target_id`   BIGINT UNSIGNED DEFAULT NULL,
+  `description` TEXT NOT NULL,
+  `created_at`  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX(`admin_id`),
+  INDEX(`action_type`),
+  INDEX(`created_at`)
+) ENGINE=InnoDB;
+
+-- ── 9. Approve the seeded admin account ─────────────────────
 UPDATE `users` SET `status` = 'approved', `email_verified` = TRUE
 WHERE `email` = 'admin@barangay.gov.ph' AND `role` = 'admin';
 

@@ -30,6 +30,8 @@ import ManageAppointments from '../pages/ManageAppointments'
 import ManageResidents from '../pages/ManageResidents'
 import ManageAnnouncements from '../pages/ManageAnnouncements'
 import Reports from '../pages/Reports'
+import ActivityLog from '../pages/ActivityLog'
+import AdminProfile from '../pages/AdminProfile'
 
 // Guards
 const isTokenExpired = (token) => {
@@ -93,6 +95,8 @@ export default function AppRoutes() {
         <Route path="residents" element={<ManageResidents />} />
         <Route path="announcements" element={<ManageAnnouncements />} />
         <Route path="reports" element={<Reports />} />
+        <Route path="activity-log" element={<ActivityLog />} />
+        <Route path="profile" element={<AdminProfile />} />
       </Route>
 
       {/* Fallback */}

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
-import { StatusBadge, Modal } from '../components/DashboardCard'
+import { StatusBadge, Modal, AlertMessage } from '../components/DashboardCard'
 import StatusTimeline from '../components/StatusTimeline'
-import { FiEye, FiPlus } from 'react-icons/fi'
+import { FiEye, FiPlus, FiXCircle } from 'react-icons/fi'
 import { formatDate } from '../utils/date'
 
 export default function AppointmentHistory() {
@@ -11,15 +11,20 @@ export default function AppointmentHistory() {
   const [loading, setLoading]           = useState(true)
   const [selected, setSelected]         = useState(null)
   const [statusFilter, setStatusFilter] = useState('')
+  const [alert, setAlert] = useState(null)
+  const [cancelling, setCancelling] = useState(false)
   const token = localStorage.getItem('resident_token')
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true)
     const params = statusFilter ? { status: statusFilter } : {}
     axios.get('/api/residents/appointments', { headers: { Authorization: `Bearer ${token}` }, params })
       .then(r => setAppointments(r.data.data || []))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [statusFilter])
+  }
+
+  useEffect(() => { load() }, [statusFilter])
 
   const loadAppointmentDetail = async (id) => {
     try {
@@ -33,6 +38,27 @@ export default function AppointmentHistory() {
   }
 
   const STATUS_OPTS = ['', 'Pending', 'Approved', 'Completed', 'Cancelled', 'Rejected']
+
+  const canCancel = (a) => {
+    if (!['Pending', 'Approved'].includes(a.status)) return false
+    const apptDate = new Date(a.appointment_date)
+    return (apptDate - new Date()) / (1000 * 60 * 60) >= 24
+  }
+
+  const handleCancel = async (id) => {
+    if (!window.confirm('Are you sure you want to cancel this appointment?')) return
+    setCancelling(true)
+    try {
+      await axios.patch(`/api/residents/appointments/${id}/cancel`, {}, { headers: { Authorization: `Bearer ${token}` } })
+      setAlert({ type: 'success', message: 'Appointment cancelled successfully.' })
+      setSelected(null)
+      load()
+    } catch (err) {
+      setAlert({ type: 'error', message: err.response?.data?.message || 'Failed to cancel.' })
+    } finally {
+      setCancelling(false)
+    }
+  }
 
   return (
     <div>
@@ -100,9 +126,16 @@ export default function AppointmentHistory() {
                     <td><StatusBadge status={a.status}/></td>
                     <td style={{ fontSize: '.82rem', color: 'var(--gray-500)' }}>{formatDate(a.created_at)}</td>
                     <td>
-                      <button className="btn btn-secondary btn-sm" onClick={() => loadAppointmentDetail(a.id)}>
-                        <FiEye/> View
-                      </button>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button className="btn btn-secondary btn-sm" onClick={() => loadAppointmentDetail(a.id)}>
+                          <FiEye/> View
+                        </button>
+                        {canCancel(a) && (
+                          <button className="btn btn-danger btn-sm" onClick={() => handleCancel(a.id)} disabled={cancelling}>
+                            <FiXCircle/> Cancel
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -112,9 +145,18 @@ export default function AppointmentHistory() {
         )}
       </div>
 
+      {alert && <div style={{ marginTop: 16 }}><AlertMessage type={alert.type} message={alert.message} onClose={() => setAlert(null)} /></div>}
+
       <Modal
         open={!!selected} onClose={() => setSelected(null)} title="Appointment Details"
-        footer={<button className="btn btn-secondary" onClick={() => setSelected(null)}>Close</button>}
+        footer={<>
+          {selected && canCancel(selected) && (
+            <button className="btn btn-danger" onClick={() => handleCancel(selected.id)} disabled={cancelling}>
+              <FiXCircle /> {cancelling ? 'Cancelling...' : 'Cancel Appointment'}
+            </button>
+          )}
+          <button className="btn btn-secondary" onClick={() => setSelected(null)}>Close</button>
+        </>}
       >
         {selected && (
           <div style={{ fontSize: '.9rem', lineHeight: 1.8 }}>
