@@ -76,11 +76,11 @@ export default function ResidentRegister() {
       }} className="auth-sidebar">
         <div style={{ maxWidth: '400px', textAlign: 'center' }}>
           <div style={{ 
-            width: 90, height: 90, background: 'white', borderRadius: '24px',
+            width: 90, height: 90,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 32px', padding: 12, boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+            margin: '0 auto 32px'
           }}>
-            <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', background: 'transparent' }} />
           </div>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '3rem', marginBottom: 20, color: 'white', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
             Join the Community

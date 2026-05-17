@@ -51,13 +51,12 @@ export default function Sidebar() {
         borderBottom: '1px solid rgba(255,255,255,.05)'
       }}>
         <div style={{ 
-          width: 70, height: 70, background: '#fff', 
-          borderRadius: '16px', display: 'flex', 
+          width: 70, height: 70,
+          display: 'flex', 
           alignItems: 'center', justifyContent: 'center',
-          marginBottom: '16px', padding: '8px',
-          boxShadow: '0 8px 16px rgba(0,0,0,0.2)'
+          marginBottom: '16px'
         }}>
-          <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', background: 'transparent' }} />
         </div>
         <div>
           <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.1rem', color: 'white', letterSpacing: '-0.01em' }}>Barangay Bulua</div>
