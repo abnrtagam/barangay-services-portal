@@ -251,10 +251,6 @@ In production mode, the backend serves the React build from `frontend/dist/` —
 
 ---
 
-## 🤝 Contributors
-
-- **Barangay Bulua Digital Team** — Capstone Development
-
 ---
 
-*© 2026 Barangay Bulua Digital Team. All Rights Reserved.*
+*© 2026 Barangay Bulua. All Rights Reserved.*
