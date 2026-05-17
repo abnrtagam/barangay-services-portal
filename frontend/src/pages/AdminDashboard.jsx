@@ -139,7 +139,7 @@ export default function AdminDashboard() {
           }}>
             <FiActivity style={{ marginRight: '6px' }} /> {refreshing ? 'Refreshing...' : 'Live System Monitor'}
           </div>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: 900, margin: '0 0 12px 0', letterSpacing: '-0.03em' }}>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 900, margin: '0 0 12px 0', letterSpacing: '-0.03em', color: 'white' }}>
             Good Day, Admin!
           </h1>
           <p style={{ fontSize: '1.1rem', opacity: 0.9, fontWeight: 500, maxWidth: '500px' }}>

@@ -23,8 +23,8 @@ export default function LandingPage() {
           padding: '16px 0', borderBottom: '1px solid rgba(255,255,255,.12)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ overflow: 'hidden', borderRadius: '8px', width: 44, height: 44, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}>
-              <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            <div style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', background: 'transparent' }} />
             </div>
             <span style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.2rem', color: 'white' }}>Barangay Bulua</span>
           </div>
@@ -36,11 +36,10 @@ export default function LandingPage() {
 
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '70px 0 100px', textAlign: 'center' }}>
           <div style={{ 
-            width: 100, height: 100, borderRadius: '50%', background: 'white', 
+            width: 100, height: 100,
             margin: '0 auto 24px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.15)', padding: 12
           }}>
-            <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', background: 'transparent' }} />
           </div>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,

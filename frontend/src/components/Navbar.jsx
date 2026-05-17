@@ -26,8 +26,8 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-        <div className="brand-logo" style={{ overflow: 'hidden', borderRadius: '6px', width: 36, height: 36, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px' }}>
-          <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        <div className="brand-logo" style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', background: 'transparent' }} />
         </div>
         <div>
           <span className="brand-name">Barangay Bulua</span>
