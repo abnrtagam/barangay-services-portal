@@ -97,12 +97,10 @@ export default function AdminForgotPassword() {
         <div style={{ width: '100%', maxWidth: 420 }}>
           <div style={{ textAlign: 'center', marginBottom: 28 }}>
             <div style={{
-              width: 56, height: 56, borderRadius: 14, background: '#1e293b', border: '1px solid #334155',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px',
+              width: 80, height: 80,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px',
             }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2">
-                <path d="M12 2a10 10 0 0 1 10 10M12 2a10 10 0 0 0-10 10M12 2v10m0 0l-3-3m3 3l3-3M12 12v8"/>
-              </svg>
+              <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
             </div>
             <h1 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.6rem', marginBottom: 6, color: 'white' }}>Admin Reset Password</h1>
             <p style={{ color: '#94a3b8', fontSize: '.9rem' }}>Enter your admin email to receive a reset code</p>
@@ -162,12 +160,10 @@ export default function AdminForgotPassword() {
       <div style={{ width: '100%', maxWidth: 420 }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div style={{
-            width: 56, height: 56, borderRadius: 14, background: '#1e293b', border: '1px solid #334155',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px',
+            width: 80, height: 80,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px',
           }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2">
-              <path d="M12 2a10 10 0 0 1 10 10M12 2a10 10 0 0 0-10 10M12 2v10m0 0l-3-3m3 3l3-3M12 12v8"/>
-            </svg>
+            <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
           </div>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.6rem', marginBottom: 6, color: 'white' }}>Create New Password</h1>
           <p style={{ color: '#94a3b8', fontSize: '.9rem' }}>Enter the code and your new admin password</p>

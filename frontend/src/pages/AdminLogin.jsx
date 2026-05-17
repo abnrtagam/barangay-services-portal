@@ -27,56 +27,51 @@ export default function AdminLogin() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+      background: '#0f172a',
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
       position: 'relative', overflow: 'hidden'
     }}>
       {/* Decorative background blobs */}
-      <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '40%', height: '40%', background: 'radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%)', borderRadius: '50%' }} />
-      <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: '40%', height: '40%', background: 'radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%)', borderRadius: '50%' }} />
+      <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '40%', height: '40%', background: 'radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)', borderRadius: '50%' }} />
+      <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: '40%', height: '40%', background: 'radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)', borderRadius: '50%' }} />
 
       <div style={{ width: '100%', maxWidth: 440, position: 'relative', zIndex: 1 }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{
-            width: 80, height: 80, borderRadius: '50%', 
-            background: 'white',
+            width: 80, height: 80,
             display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px',
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
-            padding: 12
           }}>
-            <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            <img src="/logo.png" alt="Barangay Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
           </div>
-          <h1 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '2.2rem', marginBottom: 8, color: '#0f172a', letterSpacing: '-0.02em' }}>Admin Portal</h1>
-          <p style={{ color: '#64748b', fontSize: '1rem', fontWeight: 500 }}>Authorized personnel login for Barangay Bulua</p>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '2.2rem', marginBottom: 8, color: 'white', letterSpacing: '-0.02em' }}>Admin Portal</h1>
+          <p style={{ color: '#94a3b8', fontSize: '1rem', fontWeight: 500 }}>Authorized personnel login for Barangay Bulua</p>
         </div>
 
-        <div className="card" style={{ border: 'none', borderRadius: '24px', boxShadow: '0 20px 50px rgba(0,0,0,0.05)', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', padding: '12px' }}>
-          <div className="card-body" style={{ padding: '32px' }}>
-            {alert && <AlertMessage type={alert.type} message={alert.message} onClose={() => setAlert(null)}/>}
-            <form onSubmit={handleSubmit}>
-              <div className="form-group" style={{ marginBottom: 24 }}>
-                <label className="form-label" style={{ fontWeight: 700, fontSize: '0.8rem', textTransform: 'uppercase', color: '#64748b', letterSpacing: '0.05em', marginBottom: 10 }}>Admin Email</label>
-                <input className="form-control" name="email" type="email" value={form.email} onChange={e => setForm(p => ({...p, email: e.target.value}))} placeholder="admin@bulua.gov.ph" autoFocus 
-                       style={{ borderRadius: '12px', padding: '14px 18px', border: '1.5px solid #e2e8f0', background: '#f8fafc', fontSize: '1rem' }} />
-              </div>
-              <div className="form-group" style={{ marginBottom: 32 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                  <label className="form-label" style={{ fontWeight: 700, fontSize: '0.8rem', textTransform: 'uppercase', color: '#64748b', letterSpacing: '0.05em', margin: 0 }}>Password</label>
-                  <Link to="/admin/forgot-password" style={{ fontSize: '0.8rem', fontWeight: 600, color: '#2563eb', textDecoration: 'none' }}>Forgot Password?</Link>
-                </div>
-                <input className="form-control" name="password" type="password" value={form.password} onChange={e => setForm(p => ({...p, password: e.target.value}))} placeholder="••••••••"
-                       style={{ borderRadius: '12px', padding: '14px 18px', border: '1.5px solid #e2e8f0', background: '#f8fafc', fontSize: '1rem' }} />
-              </div>
-              <button className="btn btn-primary w-full" disabled={loading} style={{ borderRadius: '12px', padding: '16px', fontSize: '1.05rem', fontWeight: 700, background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)', border: 'none', boxShadow: '0 8px 20px rgba(37, 99, 235, 0.2)' }}>
-                {loading ? 'Authenticating...' : 'Sign In to Dashboard'}
-              </button>
-            </form>
-            <div style={{ textAlign: 'center', marginTop: 28 }}>
-              <Link to="/login" style={{ color: '#64748b', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                Back to Resident Login
-              </Link>
+        <div style={{ background: '#1e293b', borderRadius: '24px', padding: '32px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', border: '1px solid #334155' }}>
+          {alert && <AlertMessage type={alert.type} message={alert.message} onClose={() => setAlert(null)}/>}
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ display: 'block', fontWeight: 700, fontSize: '0.8rem', textTransform: 'uppercase', color: '#e2e8f0', letterSpacing: '0.05em', marginBottom: 10 }}>Admin Email</label>
+              <input name="email" type="email" value={form.email} onChange={e => setForm(p => ({...p, email: e.target.value}))} placeholder="admin@bulua.gov.ph" autoFocus 
+                     style={{ width: '100%', borderRadius: '12px', padding: '14px 18px', border: '1px solid #334155', background: '#0f172a', color: 'white', fontSize: '1rem' }} />
             </div>
+            <div style={{ marginBottom: 32 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <label style={{ fontWeight: 700, fontSize: '0.8rem', textTransform: 'uppercase', color: '#e2e8f0', letterSpacing: '0.05em', margin: 0 }}>Password</label>
+                <Link to="/admin/forgot-password" style={{ fontSize: '0.8rem', fontWeight: 600, color: '#60a5fa', textDecoration: 'none' }}>Forgot Password?</Link>
+              </div>
+              <input name="password" type="password" value={form.password} onChange={e => setForm(p => ({...p, password: e.target.value}))} placeholder="••••••••"
+                     style={{ width: '100%', borderRadius: '12px', padding: '14px 18px', border: '1px solid #334155', background: '#0f172a', color: 'white', fontSize: '1rem' }} />
+            </div>
+            <button disabled={loading} style={{ width: '100%', borderRadius: '12px', padding: '16px', fontSize: '1.05rem', fontWeight: 800, background: '#3b82f6', color: 'white', border: 'none', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 8px 20px rgba(59, 130, 246, 0.3)' }}>
+              {loading ? 'Authenticating...' : 'Sign In to Dashboard'}
+            </button>
+          </form>
+          <div style={{ textAlign: 'center', marginTop: 28 }}>
+            <Link to="/login" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              Back to Resident Login
+            </Link>
           </div>
         </div>
       </div>
