@@ -150,7 +150,7 @@ exports.updateComplaintStatus = async (req, res) => {
     }
 
     // Audit log
-    await logActivity(adminId, 'status_update', 'complaint', id, `Changed complaint #${id} "${complaintRow.subject}" from ${complaintRow.status} to ${status}`)
+    await logActivity(adminId, 'status_update', 'complaint', id, `Updated ${complaintRow.first_name}'s complaint "${complaintRow.subject}" from ${complaintRow.status} to ${status}`)
 
     res.json({ message: 'Complaint updated successfully.' })
   } catch (err) {
@@ -268,7 +268,7 @@ exports.updateAppointmentStatus = async (req, res) => {
     }
 
     // Audit log
-    await logActivity(adminId, 'status_update', 'appointment', id, `Changed appointment #${id} from ${appointmentRow.status} to ${status}`)
+    await logActivity(adminId, 'status_update', 'appointment', id, `Updated ${appointmentRow.first_name}'s appointment on ${appointmentRow.appointment_date} (${appointmentRow.purpose}) from ${appointmentRow.status} to ${status}`)
 
     res.json({ message: 'Appointment updated.' })
   } catch (err) {
