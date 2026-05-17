@@ -15,6 +15,7 @@ router.get('/appointments',    aCtrl.getMyAppointments)
 router.get('/appointments/:id', aCtrl.getMyAppointmentById)
 router.patch('/appointments/:id/cancel', aCtrl.cancelMyAppointment)
 router.get('/notifications',    rCtrl.getNotifications)
+router.delete('/notifications', rCtrl.clearNotifications)
 router.patch('/profile',        rCtrl.updateProfile)
 
 

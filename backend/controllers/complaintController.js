@@ -17,7 +17,8 @@ exports.getCategories = async (req, res) => {
     const [rows] = await db.query('SELECT * FROM complaint_categories ORDER BY name')
     res.json(rows)
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch categories.' })
+    console.error('getCategories error:', err)
+    res.status(500).json({ message: 'Failed to fetch categories. ' + err.message })
   }
 }
 

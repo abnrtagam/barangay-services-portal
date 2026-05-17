@@ -8,6 +8,10 @@ import '../../services/api_service.dart';
 import '../../services/notification_service.dart';
 import '../../constants/api_constants.dart';
 import 'package:intl/intl.dart';
+import '../../providers/complaint_provider.dart';
+import '../../providers/appointment_provider.dart';
+import 'complaint_detail_screen.dart';
+import 'appointment_detail_screen.dart';
 
 class NotificationCenterScreen extends StatefulWidget {
   const NotificationCenterScreen({super.key});
@@ -65,7 +69,12 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
         actions: [
           if (_notifications.isNotEmpty)
             TextButton(
-              onPressed: () => setState(() => _notifications.clear()),
+              onPressed: () async {
+                final success = await NotificationService.clearNotifications();
+                if (success) {
+                  setState(() => _notifications.clear());
+                }
+              },
               child: const Text('Clear All', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
             ),
         ],
@@ -95,21 +104,45 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
   }
 
   Widget _buildNotificationCard(dynamic notification) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: () {
+        final type = notification['type']?.toString().toLowerCase();
+        final refIdStr = notification['reference_id']?.toString();
+        if (type == null || refIdStr == null || refIdStr == 'null') return;
+        
+        final refId = int.tryParse(refIdStr);
+        if (refId == null) return;
+
+        if (type == 'complaint') {
+          final comps = context.read<ComplaintProvider>().complaints;
+          final idx = comps.indexWhere((c) => c.id == refId);
+          if (idx != -1) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => ComplaintDetailScreen(complaint: comps[idx])));
+          }
+        } else if (type == 'appointment') {
+          final apps = context.read<AppointmentProvider>().appointments;
+          final idx = apps.indexWhere((a) => a.id == refId);
+          if (idx != -1) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => AppointmentDetailScreen(appointment: apps[idx])));
+          }
+        }
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(10),
@@ -151,6 +184,7 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

@@ -28,14 +28,15 @@ class NotificationService {
       await db.execute(`
         CREATE TABLE IF NOT EXISTS notifications (
           id INT AUTO_INCREMENT PRIMARY KEY,
-          user_id INT NOT NULL,
+          user_id BIGINT UNSIGNED NOT NULL,
           type VARCHAR(50),
+          reference_id BIGINT UNSIGNED DEFAULT NULL,
           title VARCHAR(255),
           message TEXT,
           is_read BOOLEAN DEFAULT 0,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        )
+        ) ENGINE=InnoDB
       `);
       
       try {
@@ -43,11 +44,16 @@ class NotificationService {
       } catch (e) {
         // Ignore if column already exists (Error 1060: Duplicate column name)
       }
+      try {
+        await db.execute('ALTER TABLE notifications ADD COLUMN reference_id BIGINT UNSIGNED DEFAULT NULL AFTER type');
+      } catch (e) {
+        // Ignore if column already exists
+      }
 
       // 1. Save to historical notifications table FIRST so the web/mobile app can always see it
       await db.execute(
-        'INSERT INTO notifications (user_id, type, title, message, is_read, created_at) VALUES (?, ?, ?, ?, 0, NOW())',
-        [userId, data.type || 'system', title, body]
+        'INSERT INTO notifications (user_id, type, reference_id, title, message, is_read, created_at) VALUES (?, ?, ?, ?, ?, 0, NOW())',
+        [userId, data.type || 'system', data.id || null, title, body]
       );
 
       // 2. Get the user's FCM token from the database for Push Notification

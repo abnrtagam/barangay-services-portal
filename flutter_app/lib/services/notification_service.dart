@@ -78,4 +78,13 @@ class NotificationService {
       };
     }
   }
+  // Clear all notifications
+  static Future<bool> clearNotifications() async {
+    try {
+      final response = await ApiService.delete(ApiConstants.notifications);
+      return response['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

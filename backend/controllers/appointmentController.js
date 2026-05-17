@@ -69,7 +69,7 @@ exports.create = async (req, res) => {
     res.status(201).json({ message: 'Appointment booked successfully.' })
   } catch (err) {
     console.error(err)
-    res.status(500).json({ message: 'Failed to book appointment.' })
+    res.status(500).json({ message: 'Failed to book appointment. ' + err.message })
   }
 }
 

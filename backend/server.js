@@ -17,6 +17,33 @@ const db = require('./config/db')
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       INDEX(admin_id), INDEX(action_type), INDEX(created_at)
     ) ENGINE=InnoDB`)
+    await db.query(`CREATE TABLE IF NOT EXISTS login_attempts (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      email VARCHAR(255) NOT NULL,
+      ip_address VARCHAR(45) NOT NULL,
+      attempt_count INT DEFAULT 1,
+      last_attempt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      blocked_until TIMESTAMP NULL DEFAULT NULL,
+      INDEX(email, ip_address)
+    ) ENGINE=InnoDB`)
+    await db.query(`CREATE TABLE IF NOT EXISTS registration_attempts (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      ip_address VARCHAR(45) NOT NULL,
+      email VARCHAR(255) DEFAULT NULL,
+      attempt_count INT DEFAULT 1,
+      last_attempt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      blocked_until TIMESTAMP NULL DEFAULT NULL,
+      INDEX(ip_address)
+    ) ENGINE=InnoDB`)
+    await db.query(`CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      email VARCHAR(255) NOT NULL,
+      token VARCHAR(255) NOT NULL,
+      otp_code VARCHAR(10) NOT NULL,
+      used BOOLEAN DEFAULT FALSE,
+      expires_at TIMESTAMP NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB`)
     // Ensure two_factor_enabled column exists on users table
     try {
       await db.query(`ALTER TABLE users ADD COLUMN two_factor_enabled BOOLEAN DEFAULT FALSE AFTER status`)

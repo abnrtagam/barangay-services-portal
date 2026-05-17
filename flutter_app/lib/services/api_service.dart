@@ -120,6 +120,27 @@ class ApiService {
     }
   }
 
+  // Make a DELETE request to the backend
+  static Future<Map<String, dynamic>> delete(String endpoint) async {
+    try {
+      final token = await StorageService.getToken();
+      final headers = _buildHeaders(token);
+
+      final response = await http
+          .delete(
+            Uri.parse(endpoint),
+            headers: headers,
+          )
+          .timeout(
+            const Duration(milliseconds: ApiConstants.receiveTimeout),
+          );
+
+      return _handleResponse(response);
+    } catch (e) {
+      throw Exception('Network error: $e');
+    }
+  }
+
   // Build headers with JWT token
   // This is like showing your VIP pass to the backend
   static Map<String, String> _buildHeaders(String? token) {

@@ -40,6 +40,18 @@ exports.getNotifications = async (req, res) => {
   }
 }
 
+// DELETE /api/residents/notifications
+exports.clearNotifications = async (req, res) => {
+  const user_id = req.user.id
+  try {
+    await db.query('DELETE FROM notifications WHERE user_id = ?', [user_id])
+    res.json({ message: 'Notifications cleared.' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Failed to clear notifications.' })
+  }
+}
+
 // PATCH /api/residents/profile
 exports.updateProfile = async (req, res) => {
   const user_id = req.user.id
