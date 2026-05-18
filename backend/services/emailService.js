@@ -198,6 +198,47 @@ const sendApprovalEmail = async (to, firstName, isApproved) => {
  * Send complaint status update email
  */
 const sendComplaintStatusEmail = async (to, firstName = 'Resident', subject = 'your complaint', status = '', adminRemarks = '') => {
+  const normalizedStatus = (status || '').toLowerCase()
+  let guidelinesHtml = ''
+
+  if (normalizedStatus === 'pending') {
+    guidelinesHtml = `
+      <li>Your complaint has been received and is under review</li>
+      <li>You will be notified once the admin makes a decision</li>
+      <li>You can track the status in your dashboard</li>
+    `
+  } else if (normalizedStatus === 'approved') {
+    guidelinesHtml = `
+      <li>Your complaint has been approved and is being acted on</li>
+      <li>The barangay team will investigate the issue</li>
+      <li>You can track progress in your dashboard</li>
+    `
+  } else if (normalizedStatus === 'scheduled') {
+    guidelinesHtml = `
+      <li>An investigation has been scheduled for your complaint</li>
+      <li>Our team will look into this matter on the scheduled date</li>
+      <li>You will receive updates as the situation progresses</li>
+    `
+  } else if (normalizedStatus === 'rejected') {
+    guidelinesHtml = `
+      <li>Your complaint has been reviewed but could not be processed at this time</li>
+      <li>You may contact the barangay office directly for clarification on why it was rejected</li>
+      <li>You may file a new complaint if the issue persists</li>
+    `
+  } else if (normalizedStatus === 'resolved') {
+    guidelinesHtml = `
+      <li>Your complaint has been fully resolved</li>
+      <li>No further action is needed on your end</li>
+      <li>If the same issue occurs again you may file a new complaint through the portal</li>
+      <li>Thank you for bringing this to our attention</li>
+    `
+  } else {
+    guidelinesHtml = `
+      <li>You can track the full history of this complaint in your dashboard.</li>
+      <li>Your safety and confidentiality are always protected.</li>
+    `
+  }
+
   const mailOptions = {
     from: {
       name: 'Barangay Bulua Portal',
@@ -249,9 +290,7 @@ const sendComplaintStatusEmail = async (to, firstName = 'Resident', subject = 'y
             <div class="guideline-box">
               <p style="margin: 0 0 8px; font-weight: 700;">Guidelines:</p>
               <ul style="margin: 0; padding-left: 20px;">
-                <li>You can track the full history of this complaint in your dashboard.</li>
-                <li>If the status is "Resolved" but you feel the issue persists, you may file a new report or visit the office.</li>
-                <li>Your safety and confidentiality are always protected.</li>
+                ${guidelinesHtml}
               </ul>
             </div>
 
