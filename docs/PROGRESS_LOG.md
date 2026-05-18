@@ -137,6 +137,23 @@ This file tracks all features, fixes, and architectural changes to keep the AI a
 *   **Audit Integration:** Password changes are logged to the activity audit trail.
 *   **Sidebar Navigation:** Added "Profile" link with `FiUser` icon to the admin sidebar bottom section.
 
+## 🗓️ 2026-05-18: Phase 11 - Real-Time Safety & Dashboard Automation
+
+### 🛡️ Real-Time Account Suspension (Web & Mobile)
+*   **Real-Time Status Check Endpoint:** Created a lightweight `GET /api/auth/check-status` route on the backend to dynamically check the logged-in user's active database status.
+*   **Security Middleware Interception:** Integrated deep status checking inside `authMiddleware.js`. Any incoming authenticated requests from a suspended resident are immediately blocked with a `403 Forbidden` response.
+*   **React Web Polling & Dialog:** Added a silent 30-second interval check to `ResidentLayout`. On suspension, a high-end overlay modal with a 5-second countdown triggers, automatically clearing credentials and redirecting to the login screen with a custom notification.
+*   **Flutter Polling & Alert Modal:** Configured a periodic 30-second checking timer in `NavigationShell`. On suspension detection (including 403 blocks), a beautifully styled `AlertDialog` with a 5-second countdown triggers. Logs the resident out and pops them back to the login screen.
+*   **Flutter Silent Re-mount Fix:** Solved a critical architectural bug where `AppRoot` listened to global loading states to swap to a splash screen, causing the login screen to unmount and discard validation error modals. Handled cleanly using an `isInitializing` flag.
+
+### 🔔 Admin Live Dashboard Notifications
+*   **Dashboard Feed:** Added a scrollable "Live Notifications" card feed on the React web admin panel in `AdminDashboard.jsx` inside a premium 3-column layout.
+*   **Recipient Names Resolution:** Fixed a SQL query bug inside `appointmentController.js` and `complaintController.js` to ensure the live notifications feed correctly displays full resident names instead of throwing undefined values.
+
+### 🚫 Mobile Appointment Cancellation & Notes
+*   **Additional Notes Pop-up:** Added visual support for viewing a resident's additional notes directly in the Flutter appointment detail screen.
+*   **Mobile Cancellation Button:** Integrated the red-outlined cancellation confirmation button inside `AppointmentDetailScreen` in Flutter.
+
 ---
 
 ## 🎯 Next Steps (Remaining Tasks)
@@ -145,4 +162,4 @@ This file tracks all features, fixes, and architectural changes to keep the AI a
 3.  **Final QA:** End-to-end test of the full system flow including new features.
 
 ---
-*Last Updated: 2026-05-17 06:41 AM*
+*Last Updated: 2026-05-18 09:15 AM*

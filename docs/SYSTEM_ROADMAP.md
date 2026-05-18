@@ -21,11 +21,15 @@
 | **Backend** | Push Notifications (Firebase FCM) | ✅ Complete |
 | **Backend** | Admin Dashboard Stats + Zone Stats | ✅ Complete |
 | **Backend** | Reports + CSV Export | ✅ Complete |
+| **Backend** | Real-Time Account Suspension API & Middleware | ✅ Complete |
 | **Backend** | Status History Tracking | ✅ Complete |
 | **Web (React)** | Landing Page, Login, Register, OTP, Forgot Password | ✅ Complete |
 | **Web (React)** | Resident Dashboard, Profile, Complaints, Appointments | ✅ Complete |
-| **Web (React)** | Admin Dashboard, Manage All Entities, Reports | ✅ Complete |
+| **Web (React)** | Real-Time Suspension Dialog & Countdown | ✅ Complete |
+| **Web (React)** | Admin Dashboard + Live Audit Activity Log | ✅ Complete |
 | **Mobile (Flutter)** | Auth, Dashboard, Complaints, Appointments, Announcements | ✅ Complete |
+| **Mobile (Flutter)** | Real-Time Suspension Check & Alert Dialog | ✅ Complete |
+| **Mobile (Flutter)** | Appointment Cancellation & Additional Notes | ✅ Complete |
 | **Mobile (Flutter)** | Status Timeline, Profile, Notification Center | ✅ Complete |
 | **Branding** | Email templates with Barangay Bulua institutional identity | ✅ Complete |
 
@@ -186,4 +190,4 @@
 ---
 
 *This roadmap is a living document. Update it as phases are completed or priorities shift.*  
-*Last Updated: 2026-05-17 05:14 AM*
+*Last Updated: 2026-05-18 09:15 AM*
