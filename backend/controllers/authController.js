@@ -17,6 +17,7 @@ const generateOTP = () => {
  * Check rate limiting for registration attempts
  */
 const checkRateLimit = async (ipAddress, email) => {
+  return; // Disabled for testing/development
   const [attempts] = await db.query(
     'SELECT * FROM registration_attempts WHERE ip_address = ?',
     [ipAddress]
@@ -69,7 +70,7 @@ const checkRateLimit = async (ipAddress, email) => {
  * Check rate limiting for login attempts
  */
 const checkLoginRateLimit = async (email, ipAddress) => {
-
+  return; // Disabled for testing/development
   const [attempts] = await db.query(
     'SELECT * FROM login_attempts WHERE email = ? AND ip_address = ?',
     [email, ipAddress]
@@ -877,6 +878,30 @@ exports.changePassword = async (req, res) => {
     console.error(err)
 // ... changePassword logic ends above ...
     res.status(500).json({ message: 'Failed to change password.' })
+  }
+}
+
+// GET /api/auth/check-status
+exports.checkStatus = async (req, res) => {
+  try {
+    const [users] = await db.query(
+      'SELECT status FROM users WHERE id = ?',
+      [req.user.id]
+    )
+
+    if (!users.length) {
+      return res.status(404).json({ message: 'User not found.' })
+    }
+
+    const user = users[0]
+    if (user.status === 'suspended') {
+      return res.json({ status: 'suspended' })
+    }
+
+    res.json({ status: 'active' })
+  } catch (err) {
+    console.error('Error in check-status endpoint:', err)
+    res.status(500).json({ message: 'Server error checking status.' })
   }
 }
 

@@ -19,5 +19,6 @@ router.post('/admin-forgot-password', ctrl.adminForgotPassword)
 router.post('/admin-reset-password',  ctrl.adminResetPassword)
 router.post('/reactivate',      ctrl.requestReactivation)
 router.post('/change-password', authMiddleware, ctrl.changePassword)
+router.get('/check-status', authMiddleware, ctrl.checkStatus)
 
 module.exports = router
