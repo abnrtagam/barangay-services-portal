@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../models/appointment_model.dart';
+import '../../providers/appointment_provider.dart';
 import '../../widgets/status_badge.dart';
 import '../../constants/app_colors.dart';
 import 'package:intl/intl.dart';
@@ -8,6 +10,66 @@ class AppointmentDetailScreen extends StatelessWidget {
   final Appointment appointment;
 
   const AppointmentDetailScreen({super.key, required this.appointment});
+
+  void _confirmCancel(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Cancel Appointment', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.danger)),
+        content: const Text('Are you sure you want to cancel this appointment? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('NO, KEEP IT', style: TextStyle(color: AppColors.gray500, fontWeight: FontWeight.bold)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.danger,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () async {
+              Navigator.pop(dialogCtx); // Close dialog
+              
+              // Show a loading dialog
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (loadingCtx) => const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary600),
+                ),
+              );
+
+              final result = await context.read<AppointmentProvider>().cancelAppointment(appointment.id);
+              
+              if (context.mounted) {
+                Navigator.pop(context); // Close loading dialog
+                
+                if (result['success']) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Appointment cancelled successfully!'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                  Navigator.pop(context); // Go back to history screen
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(result['message'] ?? 'Failed to cancel appointment'),
+                      backgroundColor: AppColors.danger,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('YES, CANCEL', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +160,32 @@ class AppointmentDetailScreen extends StatelessWidget {
                 _buildTimeline(appointment.history ?? []),
               ]),
             ),
+
+            if (['pending', 'approved'].contains(appointment.status.toLowerCase())) ...[
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => _confirmCancel(context),
+                  icon: const Icon(Icons.cancel_outlined, color: AppColors.danger),
+                  label: const Text(
+                    'CANCEL APPOINTMENT',
+                    style: TextStyle(
+                      color: AppColors.danger,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    side: const BorderSide(color: AppColors.danger, width: 1.5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+            ],
 
             const SizedBox(height: 32),
           ],

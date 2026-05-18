@@ -4,7 +4,7 @@ import axios from 'axios'
 import { DashboardCard, StatusBadge } from '../components/DashboardCard'
 import {
   FiUsers, FiAlertCircle, FiClock,
-  FiCalendar, FiCheckCircle, FiClipboard, FiTrendingUp, FiActivity, FiMap, FiRefreshCw
+  FiCalendar, FiCheckCircle, FiClipboard, FiTrendingUp, FiActivity, FiMap, FiRefreshCw, FiBell, FiXCircle
 } from 'react-icons/fi'
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
@@ -38,6 +38,7 @@ export default function AdminDashboard() {
   const [dailyData, setDailyData]   = useState([])
   const [recentComplaints, setRC]   = useState([])
   const [recentAppointments, setRA] = useState([])
+  const [notifications, setNotifications] = useState([])
   const [loading, setLoading]       = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const token = localStorage.getItem('admin_token')
@@ -48,17 +49,19 @@ export default function AdminDashboard() {
     
     try {
       // Fetch core stats first
-      const [sRes, zRes, cRes, aRes] = await Promise.all([
+      const [sRes, zRes, cRes, aRes, nRes] = await Promise.all([
         axios.get('/api/admin/stats', { headers }).catch(e => ({ data: {} })),
         axios.get('/api/admin/residents/zone-stats', { headers }).catch(e => ({ data: { data: [] } })),
         axios.get('/api/admin/complaints?limit=6', { headers }).catch(e => ({ data: { data: [] } })),
         axios.get('/api/admin/appointments?limit=6', { headers }).catch(e => ({ data: { data: [] } })),
+        axios.get('/api/admin/notifications', { headers }).catch(e => ({ data: { data: [] } })),
       ])
       
       setStats(sRes.data || {})
       setZoneStats(zRes.data.data || [])
       setRC(cRes.data.data || [])
       setRA(aRes.data.data || [])
+      setNotifications(nRes.data.data || [])
 
       // Fetch daily stats separately so it doesn't block the rest
       try {
@@ -94,6 +97,55 @@ export default function AdminDashboard() {
       setRefreshing(false)
     }
   }, [token])
+
+  const handleMarkAsRead = async (id) => {
+    const headers = { Authorization: `Bearer ${token}` }
+    try {
+      await axios.patch(`/api/admin/notifications/${id}/read`, {}, { headers })
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: 1 } : n))
+    } catch (err) {
+      console.error('Failed to mark notification as read:', err)
+    }
+  }
+
+  const handleClearNotifications = async () => {
+    const headers = { Authorization: `Bearer ${token}` }
+    try {
+      await axios.delete('/api/admin/notifications', { headers })
+      setNotifications([])
+    } catch (err) {
+      console.error('Failed to clear notifications:', err)
+    }
+  }
+
+  const getNotificationStyles = (type) => {
+    switch (type) {
+      case 'appointment_booked':
+        return {
+          icon: <FiCalendar color="#2563eb" />,
+          bg: '#eff6ff',
+          label: 'Appointment Booked'
+        }
+      case 'appointment_cancelled':
+        return {
+          icon: <FiXCircle color="#ef4444" />,
+          bg: '#fef2f2',
+          label: 'Appointment Cancelled'
+        }
+      case 'complaint_filed':
+        return {
+          icon: <FiAlertCircle color="#8b5cf6" />,
+          bg: '#f5f3ff',
+          label: 'Complaint Filed'
+        }
+      default:
+        return {
+          icon: <FiActivity color="#475569" />,
+          bg: '#f1f5f9',
+          label: 'System Notification'
+        }
+    }
+  }
 
   useEffect(() => {
     fetchData()
@@ -201,8 +253,8 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Main Grid: Pulse Chart & Activity */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '32px', marginBottom: '48px' }}>
+      {/* Main Grid: Pulse Chart, Notifications & Zone Distribution */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 0.8fr', gap: '32px', marginBottom: '48px' }}>
         
         {/* Community Pulse Card */}
         <div style={{ background: 'white', borderRadius: '32px', padding: '32px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', position: 'relative', height: '100%' }}>
@@ -250,6 +302,73 @@ export default function AdminDashboard() {
                 />
               </AreaChart>
             </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Live Notifications Card */}
+        <div style={{ background: 'white', borderRadius: '32px', padding: '32px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: '0 0 4px 0' }}>Live Notifications</h3>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>Real-time resident updates</p>
+            </div>
+            {notifications.length > 0 && (
+              <button 
+                onClick={handleClearNotifications}
+                style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Clear All
+              </button>
+            )}
+          </div>
+
+          <div style={{ flex: 1, overflowY: 'auto', maxHeight: '220px', paddingRight: '4px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {notifications.length === 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#94a3b8', gap: '8px', padding: '32px 0' }}>
+                <FiBell size={32} style={{ opacity: 0.4 }} />
+                <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>No new notifications</span>
+              </div>
+            ) : (
+              notifications.map(n => {
+                const styles = getNotificationStyles(n.type)
+                return (
+                  <div 
+                    key={n.id} 
+                    onClick={() => !n.is_read && handleMarkAsRead(n.id)}
+                    style={{
+                      display: 'flex', gap: '12px', padding: '12px', borderRadius: '16px',
+                      background: n.is_read ? '#f8fafc' : '#ffffff',
+                      border: n.is_read ? '1px solid #f1f5f9' : '1px solid #e2e8f0',
+                      boxShadow: n.is_read ? 'none' : '0 2px 8px rgba(0,0,0,0.02)',
+                      cursor: n.is_read ? 'default' : 'pointer',
+                      transition: 'all 0.2s',
+                      position: 'relative'
+                    }}
+                  >
+                    {!n.is_read && (
+                      <div style={{ position: 'absolute', top: '12px', right: '12px', width: '8px', height: '8px', borderRadius: '50%', background: '#2563eb' }} />
+                    )}
+                    <div style={{
+                      width: '36px', height: '36px', borderRadius: '10px', flexShrink: 0,
+                      background: styles.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem'
+                    }}>
+                      {styles.icon}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0, paddingRight: '8px' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: n.is_read ? '#64748b' : '#1e293b', marginBottom: '2px' }}>
+                        {styles.label}
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: n.is_read ? '#94a3b8' : '#475569', lineHeight: 1.3, marginBottom: '4px', wordBreak: 'break-word' }}>
+                        {n.message}
+                      </div>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                        {format(new Date(n.created_at), 'MMM d, y • h:mm a')}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })
+            )}
           </div>
         </div>
 

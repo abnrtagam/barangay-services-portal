@@ -32,12 +32,12 @@ class DatabaseSeeder extends Seeder
         }
 
         // ── Admin User ──────────────────────────────────────────
-        $adminExists = DB::table('users')->where('email', 'admin@barangay.gov.ph')->exists();
+        $adminExists = DB::table('users')->where('email', 'admin@bulua.gov.ph')->exists();
         if (!$adminExists) {
             $adminId = DB::table('users')->insertGetId([
                 'first_name' => 'Barangay',
                 'last_name'  => 'Admin',
-                'email'      => 'admin@barangay.gov.ph',
+                'email'      => 'admin@bulua.gov.ph',
                 'phone'      => '09000000000',
                 'address'    => 'Barangay Hall',
                 'password'   => Hash::make('admin1234'),
@@ -53,7 +53,7 @@ class DatabaseSeeder extends Seeder
         }
 
         // ── Sample Announcement ─────────────────────────────────
-        $adminUser = DB::table('users')->where('email', 'admin@barangay.gov.ph')->first();
+        $adminUser = DB::table('users')->where('email', 'admin@bulua.gov.ph')->first();
         if ($adminUser) {
             $hasAnn = DB::table('announcements')->exists();
             if (!$hasAnn) {
@@ -79,6 +79,6 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->command->info('✅ Seeding complete!');
-        $this->command->info('   Admin login: admin@barangay.gov.ph / admin1234');
+        $this->command->info('   Admin login: admin@bulua.gov.ph / admin1234');
     }
 }

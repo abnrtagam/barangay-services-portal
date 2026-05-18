@@ -97,6 +97,30 @@ class AppointmentProvider with ChangeNotifier {
     }
   }
 
+  // Cancel an existing appointment
+  Future<Map<String, dynamic>> cancelAppointment(int appointmentId) async {
+    _isSubmitting = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final result = await AppointmentService.cancelAppointment(appointmentId);
+
+      if (result['success']) {
+        await fetchAppointments();
+      }
+
+      _isSubmitting = false;
+      notifyListeners();
+      return result;
+    } catch (e) {
+      _isSubmitting = false;
+      _errorMessage = 'Error: $e';
+      notifyListeners();
+      return {'success': false, 'message': 'Error: $e'};
+    }
+  }
+
   void clearError() {
     _errorMessage = null;
     notifyListeners();

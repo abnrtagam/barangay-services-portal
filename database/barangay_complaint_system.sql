@@ -181,13 +181,13 @@ INSERT INTO `complaint_categories` (`name`, `description`, `created_at`, `update
 
 -- Admin user  (password: admin1234)
 INSERT INTO `users` (`first_name`, `last_name`, `email`, `phone`, `address`, `password`, `role`, `created_at`, `updated_at`) VALUES
-('Barangay', 'Admin', 'admin@barangay.gov.ph', '09000000000', 'Barangay Hall',
+('Barangay', 'Admin', 'admin@bulua.gov.ph', '09000000000', 'Barangay Hall',
  '$2y$12$8RNKbVlJYnBUZ1hzZpMpOeCkqJcODpzEcSPOhG5UcJJvF/yDcZx8y',
  'admin', NOW(), NOW());
 
 -- Link admin record
 INSERT INTO `admins` (`user_id`, `created_at`, `updated_at`)
-SELECT `id`, NOW(), NOW() FROM `users` WHERE `email` = 'admin@barangay.gov.ph';
+SELECT `id`, NOW(), NOW() FROM `users` WHERE `email` = 'admin@bulua.gov.ph';
 
 -- Sample announcements
 INSERT INTO `announcements` (`title`, `content`, `priority`, `created_by`, `created_at`, `updated_at`)
@@ -196,7 +196,7 @@ SELECT
   'We are pleased to launch our new online complaint and appointment booking system. Residents can now file complaints and schedule visits to the barangay hall from the comfort of their homes.',
   'High',
   id, NOW(), NOW()
-FROM `users` WHERE `email` = 'admin@barangay.gov.ph';
+FROM `users` WHERE `email` = 'admin@bulua.gov.ph';
 
 INSERT INTO `announcements` (`title`, `content`, `priority`, `created_by`, `created_at`, `updated_at`)
 SELECT
@@ -204,10 +204,10 @@ SELECT
   'The barangay hall is open Monday to Friday, 8:00 AM to 5:00 PM. Walk-in appointments are available, but we encourage residents to book online for faster service. The office is closed on weekends and public holidays.',
   'Normal',
   id, NOW(), NOW()
-FROM `users` WHERE `email` = 'admin@barangay.gov.ph';
+FROM `users` WHERE `email` = 'admin@bulua.gov.ph';
 
 -- ============================================================
 -- DONE — Admin credentials:
---   Email:    admin@barangay.gov.ph
+--   Email:    admin@bulua.gov.ph
 --   Password: admin1234
 -- ============================================================

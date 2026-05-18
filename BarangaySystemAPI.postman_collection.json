@@ -71,7 +71,7 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@barangay.gov.ph\",\n  \"password\": \"admin1234\"\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@bulua.gov.ph\",\n  \"password\": \"admin1234\"\n}" },
             "url": { "raw": "{{base_url}}/auth/admin-login", "host": ["{{base_url}}"], "path": ["auth","admin-login"] },
             "description": "Login as admin. Token auto-saved."
           }
@@ -319,7 +319,7 @@
           "request": {
             "method": "PATCH",
             "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" },{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"first_name\": \"Admin\",\n  \"last_name\": \"Bulua\",\n  \"email\": \"admin@barangay.gov.ph\",\n  \"phone\": \"09171234567\",\n  \"two_factor_enabled\": false\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"first_name\": \"Admin\",\n  \"last_name\": \"Bulua\",\n  \"email\": \"admin@bulua.gov.ph\",\n  \"phone\": \"09171234567\",\n  \"two_factor_enabled\": false\n}" },
             "url": { "raw": "{{base_url}}/admin/profile", "host": ["{{base_url}}"], "path": ["admin","profile"] }
           }
         },

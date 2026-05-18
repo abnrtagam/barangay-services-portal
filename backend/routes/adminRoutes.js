@@ -39,5 +39,10 @@ router.get('/activity-log', actLog.getActivityLog)
 router.patch('/profile', ctrl.updateProfile)
 router.patch('/profile/password', ctrl.changePassword)
 
+// Notifications
+router.get('/notifications', ctrl.getNotifications)
+router.patch('/notifications/:id/read', ctrl.markNotificationRead)
+router.delete('/notifications', ctrl.clearNotifications)
+
 module.exports = router
 

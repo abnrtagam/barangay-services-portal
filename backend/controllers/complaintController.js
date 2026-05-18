@@ -47,7 +47,26 @@ exports.create = async (req, res) => {
        VALUES (?, NULL, ?, NULL, NOW())`,
       [complaintId, 'Pending']
     )
-    res.status(201).json({ message: 'Complaint submitted successfully.' })
+
+    // Notify all admins
+    try {
+      const [[user]] = await db.query('SELECT first_name, last_name FROM users WHERE id = ?', [req.user.id])
+      const residentName = user ? `${user.first_name} ${user.last_name}` : 'A resident'
+      const NotificationService = require('../services/notificationService')
+      const [admins] = await db.query("SELECT id FROM users WHERE role = 'admin'")
+      for (const adminUser of admins) {
+        await NotificationService.sendNotification(
+          adminUser.id,
+          'New Complaint Filed',
+          `Resident ${residentName} has filed a new complaint: "${subject}".`,
+          { type: 'complaint_filed', id: complaintId }
+        )
+      }
+    } catch (notifyErr) {
+      console.error('Failed to notify admins of new complaint:', notifyErr)
+    }
+
+    res.status(201).json({ message: 'Complaint submitted successfully.', id: complaintId })
   } catch (err) {
     console.error(err)
     res.status(500).json({ message: 'Failed to submit complaint.' })

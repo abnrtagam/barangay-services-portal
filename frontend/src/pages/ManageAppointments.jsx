@@ -220,6 +220,14 @@ export default function ManageAppointments() {
               <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Resident</span><span>{selected.resident_name}</span>
               <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Date & Time</span><span>{selected.appointment_date} — {selected.time_slot}</span>
               <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Purpose</span><span>{selected.purpose}</span>
+              {selected.notes && (
+                <>
+                  <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Resident Notes</span>
+                  <span style={{ background: '#f8fafc', padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0', display: 'inline-block', whiteSpace: 'pre-wrap', fontStyle: 'italic', color: '#475569' }}>
+                    "{selected.notes}"
+                  </span>
+                </>
+              )}
               <span style={{ color: 'var(--gray-500)', fontWeight: 600 }}>Filed</span><span>{formatDate(selected.created_at)}</span>
             </div>
             <div style={{ marginBottom: 16, padding: 12, borderRadius: 'var(--radius-md)', background: 'var(--gray-50)', border: '1px solid var(--gray-150)', color: 'var(--gray-700)' }}>

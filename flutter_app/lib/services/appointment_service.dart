@@ -71,4 +71,27 @@ class AppointmentService {
       return {'success': false, 'message': 'Error: $e'};
     }
   }
+
+  // Cancel an appointment
+  static Future<Map<String, dynamic>> cancelAppointment(int appointmentId) async {
+    try {
+      final response = await ApiService.patch(
+        '${ApiConstants.appointments}/$appointmentId/cancel',
+        {},
+      );
+      if (response['success']) {
+        return {
+          'success': true,
+          'message': response['data']['message'] ?? 'Appointment cancelled successfully',
+        };
+      } else {
+        return {
+          'success': false,
+          'message': response['message'] ?? 'Failed to cancel appointment',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Error: $e'};
+    }
+  }
 }

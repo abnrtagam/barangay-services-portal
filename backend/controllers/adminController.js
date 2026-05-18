@@ -514,3 +514,63 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: 'Failed to update profile.' });
   }
 };
+
+// GET /api/admin/notifications
+exports.getNotifications = async (req, res) => {
+  const adminId = req.user.id;
+  try {
+    const [rows] = await db.query(
+      'SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50',
+      [adminId]
+    );
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch notifications.' });
+  }
+};
+
+// PATCH /api/admin/notifications/:id/read
+exports.markNotificationRead = async (req, res) => {
+  const adminId = req.user.id;
+  const notificationId = req.params.id;
+  try {
+    await db.query(
+      'UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?',
+      [notificationId, adminId]
+    );
+    res.json({ success: true, message: 'Notification marked as read.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to update notification.' });
+  }
+};
+
+// DELETE /api/admin/notifications
+exports.clearNotifications = async (req, res) => {
+  const adminId = req.user.id;
+  try {
+    await db.query('DELETE FROM notifications WHERE user_id = ?', [adminId]);
+    res.json({ success: true, message: 'Notifications cleared.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to clear notifications.' });
+  }
+};
+
+// Global helper to notify all admins
+exports.notifyAdmins = async (title, message, type = 'system', referenceId = null) => {
+  try {
+    const [admins] = await db.query("SELECT id FROM users WHERE role = 'admin'");
+    for (const adminUser of admins) {
+      await NotificationService.sendNotification(
+        adminUser.id,
+        title,
+        message,
+        { type, id: referenceId }
+      );
+    }
+  } catch (err) {
+    console.error('Failed to notify admins:', err);
+  }
+};

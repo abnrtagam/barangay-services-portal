@@ -111,7 +111,7 @@ npm run dev
 
 | Role | Email | Password |
 |------|-------|----------|
-| **Admin** | `admin@barangay.gov.ph` | `admin1234` |
+| **Admin** | `admin@bulua.gov.ph` | `admin1234` |
 | **Resident** | *(Register via the portal)* | — |
 
 ---

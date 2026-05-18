@@ -25,7 +25,7 @@ async function resetAdmin() {
 
   // Check if admin user exists
   const [rows] = await db.execute(
-    "SELECT id, email, role FROM users WHERE email = 'admin@barangay.gov.ph'"
+    "SELECT id, email, role FROM users WHERE email = 'admin@bulua.gov.ph'"
   )
 
   if (rows.length === 0) {
@@ -35,7 +35,7 @@ async function resetAdmin() {
     const [result] = await db.execute(
       `INSERT INTO users (first_name, last_name, email, phone, address, password, role, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      ['Barangay', 'Admin', 'admin@barangay.gov.ph', '09000000000', 'Barangay Hall', hash, 'admin']
+      ['Barangay', 'Admin', 'admin@bulua.gov.ph', '09000000000', 'Barangay Hall', hash, 'admin']
     )
 
     const userId = result.insertId
@@ -53,7 +53,7 @@ async function resetAdmin() {
 
     // Update existing admin password
     await db.execute(
-      "UPDATE users SET password = ? WHERE email = 'admin@barangay.gov.ph'",
+      "UPDATE users SET password = ? WHERE email = 'admin@bulua.gov.ph'",
       [hash]
     )
 
@@ -62,7 +62,7 @@ async function resetAdmin() {
 
   // Verify the update
   const [verify] = await db.execute(
-    "SELECT id, email, role, password FROM users WHERE email = 'admin@barangay.gov.ph'"
+    "SELECT id, email, role, password FROM users WHERE email = 'admin@bulua.gov.ph'"
   )
 
   if (verify.length > 0) {
@@ -75,7 +75,7 @@ async function resetAdmin() {
 
   await db.end()
   console.log('\nDone! Now login with:')
-  console.log('  Email:    admin@barangay.gov.ph')
+  console.log('  Email:    admin@bulua.gov.ph')
   console.log('  Password: admin1234')
 }
 

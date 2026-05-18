@@ -146,7 +146,7 @@ CREATE TABLE IF NOT EXISTS `admin_activity_log` (
 
 -- ── 9. Approve the seeded admin account ─────────────────────
 UPDATE `users` SET `status` = 'approved', `email_verified` = TRUE
-WHERE `email` = 'admin@barangay.gov.ph' AND `role` = 'admin';
+WHERE `email` = 'admin@bulua.gov.ph' AND `role` = 'admin';
 
 -- ============================================================
 -- MIGRATION COMPLETE

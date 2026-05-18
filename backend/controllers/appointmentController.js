@@ -66,7 +66,26 @@ exports.create = async (req, res) => {
        VALUES (?, NULL, ?, NULL, NOW())`,
       [appointmentId, 'Pending']
     )
-    res.status(201).json({ message: 'Appointment booked successfully.' })
+
+    // Notify all admins
+    try {
+      const [[user]] = await db.query('SELECT first_name, last_name FROM users WHERE id = ?', [req.user.id])
+      const residentName = user ? `${user.first_name} ${user.last_name}` : 'A resident'
+      const NotificationService = require('../services/notificationService')
+      const [admins] = await db.query("SELECT id FROM users WHERE role = 'admin'")
+      for (const adminUser of admins) {
+        await NotificationService.sendNotification(
+          adminUser.id,
+          'New Appointment Booked',
+          `Resident ${residentName} has booked a new appointment for ${appointment_date} at ${time_slot} (${purpose}).`,
+          { type: 'appointment_booked', id: appointmentId }
+        )
+      }
+    } catch (notifyErr) {
+      console.error('Failed to notify admins of new appointment booking:', notifyErr)
+    }
+
+    res.status(201).json({ message: 'Appointment booked successfully.', id: appointmentId })
   } catch (err) {
     console.error(err)
     res.status(500).json({ message: 'Failed to book appointment. ' + err.message })
@@ -161,6 +180,24 @@ exports.cancelMyAppointment = async (req, res) => {
        VALUES (?, ?, 'Cancelled', NULL, 'Cancelled by resident', NOW())`,
       [id, appointment.status]
     )
+
+    // Notify all admins
+    try {
+      const [[user]] = await db.query('SELECT first_name, last_name FROM users WHERE id = ?', [req.user.id])
+      const residentName = user ? `${user.first_name} ${user.last_name}` : 'A resident'
+      const NotificationService = require('../services/notificationService')
+      const [admins] = await db.query("SELECT id FROM users WHERE role = 'admin'")
+      for (const adminUser of admins) {
+        await NotificationService.sendNotification(
+          adminUser.id,
+          'Appointment Cancelled',
+          `Resident ${residentName} has cancelled their appointment #${id} (${appointment.purpose}).`,
+          { type: 'appointment_cancelled', id }
+        )
+      }
+    } catch (notifyErr) {
+      console.error('Failed to notify admins of appointment cancellation:', notifyErr)
+    }
 
     res.json({ message: 'Appointment cancelled successfully.' })
   } catch (err) {
